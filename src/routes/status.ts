@@ -1,9 +1,8 @@
-import { getCommonSettings } from "bungie-net-core/endpoints/Core"
 import { z } from "zod"
 import { RaidHubRoute } from "../RaidHubRoute"
 import { cacheControl } from "../middlewares/cache-control"
 import { zISODateString } from "../schema/util"
-import { bungiePlatformHttp } from "../services/bungie/client"
+import { getDestiny2Status } from "../services/bungie/getDestiny2Status"
 import { postgres } from "../services/postgres"
 import { getAtlasStatus } from "../services/prometheus/getAtlasStatus"
 
@@ -82,7 +81,7 @@ export const statusRoute = new RaidHubRoute({
         const [latestActivity, atlasStatus, isDestinyApiEnabled] = await Promise.all([
             getLatestActivityByDate(),
             getAtlasStatus(),
-            getCommonSettings(bungiePlatformHttp).then(res => res.Response.systems.Destiny2.enabled)
+            getDestiny2Status().catch(() => false)
         ])
 
         if (isDestinyApiEnabled) {
