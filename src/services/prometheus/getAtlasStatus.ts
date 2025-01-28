@@ -39,7 +39,7 @@ export const getAtlasStatus = async (): Promise<
             timestamp: timestamp * 1000,
             lag: parseFloat(lag)
         }))
-        .filter(({ lag }) => lag > 0)
+        .filter(({ lag }) => lag > 2.5)
 
     if (!values?.length) {
         return { isCrawling: false, lag: null }
