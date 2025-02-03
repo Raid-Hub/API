@@ -57,12 +57,14 @@ export const getActivities = async (
                     INNER JOIN activity_version USING (hash)
                     INNER JOIN activity_definition ON activity_definition.id = activity_version.activity_id
                     WHERE membership_id = $1::bigint
-                    AND date_completed < ${cursor ? "$3" : "(SELECT last_seen + interval '1 second' FROM player WHERE membership_id = $1::bigint)"}
+                    ${cursor ? "AND date_completed < $3" : ""}
                     ${cutoff ? `AND date_completed > ${cursor ? "$4" : "$3"}` : ""}
                     ORDER BY date_completed DESC
                     ${!cutoff ? "LIMIT $2" : ""}
                 ) as __inner__   
                 LIMIT $2;`,
+                // Note: the use of strictly less than is important because the cursor is the date of the last activity
+                // that was fetched. If we used less than or equal to, we would fetch the same activity twice.
                 {
                     params: params,
                     fetchCount: count
