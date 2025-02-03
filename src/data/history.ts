@@ -63,6 +63,8 @@ export const getActivities = async (
                     ${!cutoff ? "LIMIT $2" : ""}
                 ) as __inner__   
                 LIMIT $2;`,
+                // Note: the use of strictly less than is important because the cursor is the date of the last activity
+                // that was fetched. If we used less than or equal to, we would fetch the same activity twice.
                 {
                     params: params,
                     fetchCount: count
