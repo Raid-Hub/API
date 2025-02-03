@@ -57,7 +57,7 @@ export const getActivities = async (
                     INNER JOIN activity_version USING (hash)
                     INNER JOIN activity_definition ON activity_definition.id = activity_version.activity_id
                     WHERE membership_id = $1::bigint
-                    AND date_completed < ${cursor ? "$3" : "(SELECT last_seen + interval '1 second' FROM player WHERE membership_id = $1::bigint)"}
+                    ${cursor ? "AND date_completed < $3" : ""}
                     ${cutoff ? `AND date_completed > ${cursor ? "$4" : "$3"}` : ""}
                     ORDER BY date_completed DESC
                     ${!cutoff ? "LIMIT $2" : ""}
