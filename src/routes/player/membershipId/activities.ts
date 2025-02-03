@@ -70,6 +70,14 @@ in order to optimize performance. Subsequent requests will return the full numbe
         const { membershipId } = req.params
         const { cursor, count } = req.query
 
+        // Prefetch, but don't await until permissions are checked
+        const activitiesPromise = cursor
+            ? getActivities(membershipId, {
+                  count,
+                  cursor
+              })
+            : getFirstPageOfActivities(membershipId, count)
+
         const player = await getPlayer(membershipId)
 
         if (!player) {
@@ -81,13 +89,7 @@ in order to optimize performance. Subsequent requests will return the full numbe
             return RaidHubRoute.fail(ErrorCode.PlayerPrivateProfileError, { membershipId })
         }
 
-        const activities = cursor
-            ? await getActivities(membershipId, {
-                  count,
-                  cursor
-              })
-            : await getFirstPageOfActivities(membershipId, count)
-
+        const activities = await activitiesPromise
         const countFound = activities.length
 
         // If we found the max number of activities, we need to check if there are more
@@ -108,11 +110,13 @@ in order to optimize performance. Subsequent requests will return the full numbe
 /* This allows us to fetch the same set of activities for the first request each day, making caching just a bit better. We
     can cache subsequent pages, while leaving the first one open */
 async function getFirstPageOfActivities(membershipId: bigint, count: number) {
-    const today = new Date()
-    today.setUTCHours(10, 0, 0, 0)
+    const baselineCutoff = new Date()
+    baselineCutoff.setDate(baselineCutoff.getDate() - 1)
+    baselineCutoff.setUTCHours(10, 0, 0, 0)
 
-    const lastMonth = new Date(today)
-    lastMonth.setUTCMonth(today.getUTCMonth() - 1, 0)
+    // First pass
+    const lastMonth = new Date(baselineCutoff)
+    lastMonth.setUTCMonth(baselineCutoff.getUTCMonth() - 1, 0)
 
     const activities = await getActivities(membershipId, {
         cutoff: lastMonth,
@@ -122,9 +126,9 @@ async function getFirstPageOfActivities(membershipId: bigint, count: number) {
         return activities
     }
 
-    // If we don't have any activities from last month, try last year
-    const lastYear = new Date(today)
-    lastYear.setFullYear(today.getUTCFullYear() - 1, 0, 0)
+    // Second pass: If we don't have any activities from last month, try last year
+    const lastYear = new Date(baselineCutoff)
+    lastYear.setFullYear(baselineCutoff.getUTCFullYear() - 1, 0, 0)
 
     const lastYearActivities = await getActivities(membershipId, {
         cutoff: lastYear,
@@ -134,7 +138,7 @@ async function getFirstPageOfActivities(membershipId: bigint, count: number) {
         return lastYearActivities
     }
 
-    // If we don't have any activities from last year, just get the first page
+    // Third pass: If we don't have any activities from last year, just get the first page
     return await getActivities(membershipId, {
         count
     })

@@ -47,6 +47,13 @@ This is used to hydrate the RaidHub profile page`,
     async handler(req) {
         const membershipId = req.params.membershipId
 
+        // Prefetch, but don't await until permissions are checked
+        const statsPromises = Promise.all([
+            getPlayerActivityStats(membershipId),
+            getPlayerGlobalStats(membershipId),
+            getWorldFirstEntries(membershipId)
+        ])
+
         const player = await getPlayer(membershipId)
 
         if (!player) {
@@ -58,11 +65,7 @@ This is used to hydrate the RaidHub profile page`,
             return RaidHubRoute.fail(ErrorCode.PlayerPrivateProfileError, { membershipId })
         }
 
-        const [activityStats, globalStats, worldFirstEntries] = await Promise.all([
-            getPlayerActivityStats(membershipId),
-            getPlayerGlobalStats(membershipId),
-            getWorldFirstEntries(membershipId)
-        ])
+        const [activityStats, globalStats, worldFirstEntries] = await statsPromises
 
         return RaidHubRoute.ok({
             playerInfo: player,
