@@ -20,7 +20,7 @@ describe("player search 200", () => {
         })
 
         if (data.type === "ok") {
-            expect(data.parsed.results).toBeGreaterThan(5)
+            expect(data.parsed.results.length).toBeGreaterThan(5)
         }
     })
 
