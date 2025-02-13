@@ -112,7 +112,7 @@ export async function getInstances({
             flawless AS "flawless",
             date_started AS "dateStarted",
             date_completed AS "dateCompleted",
-            season_id AS "seasonId",
+            season_id AS "season",
             duration AS "duration",
             platform_type AS "platformType",
             date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
