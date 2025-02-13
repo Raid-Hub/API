@@ -35,15 +35,15 @@ export async function getInstances({
     const params: (string | number | boolean | Date)[] = []
     const conditions: string[] = []
 
+    if (membershipIds.length === 0) {
+        throw new TypeError("No membership IDs provided")
+    }
+
     const playerStmnts = new Array<string>(membershipIds.length)
     for (let i = 0; i < membershipIds.length; i++) {
         params.push(String(membershipIds[i]))
         playerStmnts[i] =
             `SELECT instance_id FROM instance_player WHERE membership_id = $${params.length}::bigint`
-    }
-
-    if (playerStmnts.length === 0) {
-        throw new TypeError("No membership IDs provided")
     }
 
     if (activityId !== undefined) {
@@ -112,7 +112,7 @@ export async function getInstances({
             flawless AS "flawless",
             date_started AS "dateStarted",
             date_completed AS "dateCompleted",
-            season_id AS "season",
+            season_id AS "seasonId",
             duration AS "duration",
             platform_type AS "platformType",
             date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
