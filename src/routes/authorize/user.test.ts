@@ -15,14 +15,16 @@ describe("authorize 200", () => {
 
         expectOk(result)
 
-        jwt.verify(result.parsed.value as string, process.env.JWT_SECRET!, (err, result) => {
-            expect(err).toBeNull()
-            expect(result).toMatchObject({
-                isAdmin: false,
-                bungieMembershipId: "1234567890",
-                destinyMembershipIds: ["4611686018467346804", "4611686018488107374"]
+        if (result.type === "ok") {
+            jwt.verify(result.parsed.value, process.env.JWT_SECRET!, (err, result) => {
+                expect(err).toBeNull()
+                expect(result).toMatchObject({
+                    isAdmin: false,
+                    bungieMembershipId: "1234567890",
+                    destinyMembershipIds: ["4611686018467346804", "4611686018488107374"]
+                })
             })
-        })
+        }
     })
 })
 

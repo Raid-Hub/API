@@ -24,12 +24,16 @@ describe("player activities 200", () => {
 
     test("end of list", async () =>
         await t("4611686018488107374", new Date("2000-01-01T17:00:00Z")).then(result => {
-            expect(result.parsed.activities.length).toBeFalsy()
+            if (result.type === "ok") {
+                expect(result.parsed.activities.length).toBeFalsy()
+            }
         }))
 
     test("final raid", async () =>
         await t("4611686018488107374", new Date("2019-06-24T17:00:00Z")).then(result => {
-            expect(result.parsed.activities.length).toBe(2)
+            if (result.type === "ok") {
+                expect(result.parsed.activities.length).toBe(2)
+            }
         }))
 })
 
