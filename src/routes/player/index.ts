@@ -1,6 +1,7 @@
 import { RaidHubRouter } from "../../RaidHubRouter"
 import { playerActivitiesRoute } from "./membershipId/activities"
 import { playerBasicRoute } from "./membershipId/basic"
+import { playerInstancesRoute } from "./membershipId/instances"
 import { playerProfileRoute } from "./membershipId/profile"
 import { playerTeammatesRoute } from "./membershipId/teammates"
 import { playerSearchRoute } from "./search"
@@ -27,6 +28,10 @@ export const playerRouter = new RaidHubRouter({
                     {
                         path: "/teammates",
                         route: playerTeammatesRoute
+                    },
+                    {
+                        path: "/instances",
+                        route: playerInstancesRoute
                     }
                 ]
             })

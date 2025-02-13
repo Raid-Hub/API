@@ -5,7 +5,7 @@ import { getPlayer } from "../../../data/player"
 import { zInstanceForPlayer } from "../../../schema/components/InstanceForPlayer"
 import { ErrorCode } from "../../../schema/errors/ErrorCode"
 import { zBigIntString, zISODateString } from "../../../schema/util"
-import { canAccessPrivateProfile } from "../../../util/auth"
+import { canAccessProtectedResource } from "../../../util/auth"
 
 export const playerActivitiesRoute = new RaidHubRoute({
     method: "get",
@@ -84,7 +84,7 @@ in order to optimize performance. Subsequent requests will return the full numbe
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, { membershipId })
         } else if (
             player.isPrivate &&
-            !(await canAccessPrivateProfile(membershipId, req.headers.authorization ?? ""))
+            !(await canAccessProtectedResource(membershipId, req.headers.authorization ?? ""))
         ) {
             return RaidHubRoute.fail(ErrorCode.PlayerPrivateProfileError, { membershipId })
         }

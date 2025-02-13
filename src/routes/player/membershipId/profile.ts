@@ -11,7 +11,7 @@ import { processPlayerAsync } from "../../../middlewares/processPlayerAsync"
 import { WorldFirstEntry, zPlayerProfile } from "../../../schema/components/PlayerProfile"
 import { ErrorCode } from "../../../schema/errors/ErrorCode"
 import { zBigIntString } from "../../../schema/util"
-import { canAccessPrivateProfile } from "../../../util/auth"
+import { canAccessProtectedResource } from "../../../util/auth"
 
 export const playerProfileRoute = new RaidHubRoute({
     method: "get",
@@ -60,7 +60,7 @@ This is used to hydrate the RaidHub profile page`,
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, { membershipId })
         } else if (
             player.isPrivate &&
-            !(await canAccessPrivateProfile(membershipId, req.headers.authorization ?? ""))
+            !(await canAccessProtectedResource(membershipId, req.headers.authorization ?? ""))
         ) {
             return RaidHubRoute.fail(ErrorCode.PlayerPrivateProfileError, { membershipId })
         }

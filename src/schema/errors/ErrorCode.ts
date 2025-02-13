@@ -11,6 +11,7 @@ export enum ErrorCode {
     /** Specific */
     PlayerNotFoundError = "PlayerNotFoundError",
     PlayerPrivateProfileError = "PlayerPrivateProfileError",
+    PlayerProtectedResourceError = "PlayerProtectedResourceError",
     InstanceNotFoundError = "InstanceNotFoundError",
     PGCRNotFoundError = "PGCRNotFoundError",
     PlayerNotOnLeaderboardError = "PlayerNotOnLeaderboardError",
