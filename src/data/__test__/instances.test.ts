@@ -68,6 +68,52 @@ describe("getInstances", () => {
         }
     })
 
+    it("filters by player count", async () => {
+        const playerCount = 6
+        const data = await getInstances({
+            membershipIds: ["4611686018488107374"],
+            count: 10,
+            playerCount
+        }).catch(console.error)
+
+        const parsed = z.array(zInstanceWithPlayers).safeParse(data)
+        if (!parsed.success) {
+            console.error(parsed.error.errors)
+            expect(parsed.error.errors).toHaveLength(0)
+        } else {
+            expect(parsed.success).toBe(true)
+            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.every(instance => instance.playerCount === playerCount)).toBe(true)
+        }
+    })
+
+    it("filters by player count range", async () => {
+        const minPlayerCount = 2
+        const maxPlayerCount = 4
+        const data = await getInstances({
+            membershipIds: ["4611686018488107374"],
+            count: 10,
+            minPlayerCount,
+            maxPlayerCount
+        }).catch(console.error)
+
+        const parsed = z.array(zInstanceWithPlayers).safeParse(data)
+        if (!parsed.success) {
+            console.error(parsed.error.errors)
+            expect(parsed.error.errors).toHaveLength(0)
+        } else {
+            expect(parsed.success).toBe(true)
+            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(
+                parsed.data.every(
+                    instance =>
+                        instance.playerCount >= minPlayerCount &&
+                        instance.playerCount <= maxPlayerCount
+                )
+            ).toBe(true)
+        }
+    })
+
     it("filters by date range", async () => {
         const minDate = new Date("2023-01-01")
         const maxDate = new Date("2023-12-31")

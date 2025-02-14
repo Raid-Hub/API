@@ -9,6 +9,9 @@ export async function getInstances({
     completed,
     fresh,
     flawless,
+    playerCount,
+    minPlayerCount,
+    maxPlayerCount,
     minDurationSeconds,
     maxDurationSeconds,
     season,
@@ -24,6 +27,9 @@ export async function getInstances({
     completed?: boolean
     fresh?: boolean
     flawless?: boolean
+    playerCount?: number
+    minPlayerCount?: number
+    maxPlayerCount?: number
     minDurationSeconds?: number
     maxDurationSeconds?: number
     season?: number
@@ -65,6 +71,18 @@ export async function getInstances({
     if (flawless !== undefined) {
         params.push(flawless)
         conditions.push(`flawless = $${params.length}`)
+    }
+    if (playerCount !== undefined) {
+        params.push(playerCount)
+        conditions.push(`player_count = $${params.length}`)
+    }
+    if (minPlayerCount !== undefined) {
+        params.push(minPlayerCount)
+        conditions.push(`player_count >= $${params.length}`)
+    }
+    if (maxPlayerCount !== undefined) {
+        params.push(maxPlayerCount)
+        conditions.push(`player_count <= $${params.length}`)
     }
     if (minDurationSeconds !== undefined) {
         params.push(minDurationSeconds)
@@ -136,6 +154,7 @@ export async function getInstances({
                         'lastSeen', last_seen,
                         'isPrivate', is_private
                     )
+                    ORDER BY instance_player.completed DESC, instance_player.time_played_seconds DESC
                 ) as "players"
             FROM _player_instances _pi2
             INNER JOIN instance_player USING (instance_id)
