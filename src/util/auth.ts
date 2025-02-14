@@ -14,7 +14,7 @@ export const generateJWT = (data: z.infer<typeof zJWTAuthFormat>, expiresIn: num
     })
 }
 
-export const canAccessPrivateProfile = async (
+export const canAccessProtectedResource = async (
     destinyMembershipId: string | bigint,
     authHeader: string
 ) => {

@@ -8,7 +8,7 @@ describe("player search 200", () => {
 
         expectOk(result)
 
-        return result.parsed
+        return result
     }
 
     test("partial display name", async () => {
@@ -19,7 +19,9 @@ describe("player search 200", () => {
             global: true
         })
 
-        expect(data.results.length).toBeGreaterThan(5)
+        if (data.type === "ok") {
+            expect(data.parsed.results.length).toBeGreaterThan(5)
+        }
     })
 
     test("display name", () =>
@@ -54,7 +56,9 @@ describe("player search 200", () => {
             count: 23
         })
 
-        expect(data.results).toHaveLength(1)
+        if (data.type === "ok") {
+            expect(data.parsed.results).toHaveLength(1)
+        }
     })
 
     test("full bungie name wrong platform", async () => {
@@ -64,6 +68,8 @@ describe("player search 200", () => {
             count: 1
         })
 
-        expect(data.results).toHaveLength(0)
+        if (data.type === "ok") {
+            expect(data.parsed.results).toHaveLength(0)
+        }
     })
 })

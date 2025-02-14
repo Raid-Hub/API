@@ -52,6 +52,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'flawless', fastest.flawless,
                             'dateStarted', fastest.date_started,
                             'dateCompleted', fastest.date_completed,
+                            'season', fastest.season_id,
                             'duration', fastest.duration,
                             'platformType', fastest.platform_type,
                             'isDayOne', date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch'),

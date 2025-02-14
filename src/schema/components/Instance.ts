@@ -19,6 +19,7 @@ export const zInstance = registry.register(
             score: zWholeNumber(),
             dateStarted: zISODateString(),
             dateCompleted: zISODateString(),
+            season: zNaturalNumber(),
             duration: zNaturalNumber().openapi({
                 description: "Activity duration in seconds"
             }),

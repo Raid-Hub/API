@@ -43,14 +43,18 @@ describe("clan 404", () => {
         const result = await clanStatsRoute.$mock({ params: { groupId: "1" } })
 
         expectErr(result)
-        expect(result.code).toBe(ErrorCode.ClanNotFound)
+        if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.ClanNotFound)
+        }
     })
 
     test("not found", async () => {
         const result = await clanStatsRoute.$mock({ params: { groupId: "9999999999999" } })
 
         expectErr(result)
-        expect(result.code).toBe(ErrorCode.ClanNotFound)
+        if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.ClanNotFound)
+        }
     })
 })
 
@@ -84,6 +88,8 @@ test("clan 503", async () => {
         })
 
         expectErr(result)
-        expect(result.code).toBe(ErrorCode.BungieServiceOffline)
+        if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.BungieServiceOffline)
+        }
     })
 })

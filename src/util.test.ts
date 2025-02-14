@@ -1,15 +1,20 @@
 import { expect } from "bun:test"
+import { ErrorCode } from "./schema/errors/ErrorCode"
 
-export const expectOk = (
-    result:
+export const expectOk = <
+    R,
+    T extends
         | {
-              readonly type: "ok"
-              readonly parsed: unknown
+              type: "ok"
+              parsed: R
           }
         | {
-              readonly type: "err"
-              readonly parsed: unknown
+              type: "err"
+              code: ErrorCode
+              parsed: unknown
           }
+>(
+    result: T
 ) => {
     if (result.type === "err") {
         expect(result.parsed).toBe(null)
@@ -17,16 +22,20 @@ export const expectOk = (
     expect(result.type).toBe("ok")
 }
 
-export const expectErr = (
-    result:
+export const expectErr = <
+    E,
+    T extends
         | {
-              readonly type: "ok"
-              readonly parsed: unknown
+              type: "ok"
+              parsed: unknown
           }
         | {
-              readonly type: "err"
-              readonly parsed: unknown
+              type: "err"
+              code: ErrorCode
+              parsed: readonly E[]
           }
+>(
+    result: T
 ) => {
     if (result.type === "ok") {
         expect(result.parsed).toBe(null)

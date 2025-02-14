@@ -154,7 +154,7 @@ export class RaidHubRoute<
                 req.query = {}
                 return next()
             }
-            const parsed = this.querySchema.strip().safeParse(req.query)
+            const parsed = this.querySchema.strip().safeParse(req.query ?? {})
             if (parsed.success) {
                 req.query = parsed.data
                 next()
@@ -378,12 +378,22 @@ export class RaidHubRoute<
             body?: unknown
             headers?: IncomingHttpHeaders
         } = {}
-    ) {
+    ): Promise<
+        | {
+              type: "ok"
+              parsed: z.output<ResponseBody>
+          }
+        | {
+              type: "err"
+              code: ErrorCode
+              parsed: ErrorResponse
+          }
+    > {
         let after: () => Promise<void> = () => Promise.resolve()
         const res = await this.handler(
             {
                 params: this.paramsSchema?.parse(req.params) ?? {},
-                query: this.querySchema?.parse(req.query) ?? {},
+                query: this.querySchema?.parse(req.query ?? {}) ?? {},
                 body: this.bodySchema?.parse(req.body) ?? {},
                 headers: req.headers ?? {}
             },

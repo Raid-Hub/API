@@ -1,10 +1,27 @@
-import { ZodDateDef, ZodStringDef, ZodType, z } from "zod"
+import { ZodBooleanDef, ZodDateDef, ZodStringDef, ZodType, z } from "zod"
 
 export const zNaturalNumber = () => z.number().int().positive()
 
 export const zWholeNumber = () => z.number().int().nonnegative()
 
+export const zCoercedNaturalNumber = () => z.coerce.number().int().positive()
+
+export const zCoercedWholeNumber = () => z.coerce.number().int().nonnegative()
+
 export const zPage = () => z.coerce.number().int().positive().default(1)
+
+export const zSplitCommaSeparatedString = <T extends z.ZodTypeAny>(schema: T) =>
+    z.preprocess(val => {
+        if (typeof val === "string") {
+            return val.split(",")
+        }
+        return val
+    }, schema)
+
+export const zBoolString = () =>
+    z.coerce.boolean().openapi({
+        type: "boolean"
+    }) as ZodType<boolean, ZodBooleanDef, string | number | boolean>
 
 export const zISODateString = () =>
     z.coerce.date().openapi({

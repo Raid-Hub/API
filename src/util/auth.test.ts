@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import jwt from "jsonwebtoken"
-import { canAccessPrivateProfile, generateJWT } from "./auth"
+import { canAccessProtectedResource, generateJWT } from "./auth"
 
 describe("auth", () => {
     it("should generate a valid JWT token", async () => {
@@ -24,19 +24,21 @@ describe("auth", () => {
             })
         })
 
-        canAccessPrivateProfile("4611686018467346804", `Bearer ${token}`).then(result => {
+        canAccessProtectedResource("4611686018467346804", `Bearer ${token}`).then(result => {
             expect(result).toBe(true)
         })
 
-        canAccessPrivateProfile("4611686018467346803", `Bearer ${token}`).then(result => {
+        canAccessProtectedResource("4611686018467346803", `Bearer ${token}`).then(result => {
             expect(result).toBe(false)
         })
 
         await new Promise<void>(resolve => {
             setTimeout(() => {
-                canAccessPrivateProfile("4611686018467346804", `Bearer ${token}`).then(result => {
-                    expect(result).toBe(false)
-                })
+                canAccessProtectedResource("4611686018467346804", `Bearer ${token}`).then(
+                    result => {
+                        expect(result).toBe(false)
+                    }
+                )
                 resolve()
             }, 2000)
         })
@@ -55,7 +57,7 @@ describe("auth", () => {
 
         expect(token).toBeTruthy()
 
-        canAccessPrivateProfile("4611686018467346804", `Bearer ${token}`).then(result => {
+        canAccessProtectedResource("4611686018467346804", `Bearer ${token}`).then(result => {
             expect(result).toBe(false)
         })
     })
