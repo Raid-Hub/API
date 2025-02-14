@@ -16,7 +16,7 @@ const doc = new OpenApiGeneratorV3(registry.definitions).generateDocument({
     info: {
         title: "RaidHub API",
         description: "The Semi-public API for RaidHub",
-        version: "1.1.0",
+        version: "1.1.1",
         contact: {
             name: "RaidHub Admin",
             email: "admin@raidhub.io"

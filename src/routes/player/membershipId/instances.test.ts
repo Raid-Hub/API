@@ -22,6 +22,9 @@ describe("instances 200", () => {
         completed?: boolean
         flawless?: boolean
         fresh?: boolean
+        playerCount?: number
+        minPlayerCount?: number
+        maxPlayerCount?: number
         minDurationSeconds?: number
         maxDurationSeconds?: number
         minSeason?: number
@@ -65,6 +68,17 @@ describe("instances 200", () => {
             maxDate: new Date("2021-12-31")
         }))
 
+    test("player count", () =>
+        t({
+            playerCount: 6
+        }))
+
+    test("player count range", () =>
+        t({
+            minPlayerCount: 2,
+            maxPlayerCount: 4
+        }))
+
     test("duration range", () =>
         t({
             minDurationSeconds: 0,
@@ -80,6 +94,7 @@ describe("instances 200", () => {
             fresh: true,
             minDurationSeconds: 400,
             maxDurationSeconds: 1542,
+            playerCount: 6,
             minSeason: 12,
             maxSeason: 20,
             minDate: new Date("2021-01-01"),
