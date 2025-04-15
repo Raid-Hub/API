@@ -72,13 +72,11 @@ export const getClanStats = async (
                 'weightedContestScore', ROUND(clan_leaderboard."weighted_contest_score"),
                 'weightedContestScoreRank', clan_ranks."weighted_contest_score_rank"
             ) AS "aggregateStats",
-            JSONB_BUILD_OBJECT(
-                'members', member_stats."members"
-            ) AS "memberStats"
+            member_stats."members"
             FROM clan_leaderboard
             LEFT JOIN clan_ranks ON clan_leaderboard."group_id" = clan_ranks."group_id"
             LEFT JOIN LATERAL (SELECT JSONB_AGG(member_stats."playerInfo") AS "members" FROM "member_stats") AS member_stats ON true
-            WHERE clan_leaderboard."group_id" = $2`,
+            WHERE clan_leaderboard."group_id" = $2::bigint`,
         {
             params: [membershipIds, groupId]
         }
