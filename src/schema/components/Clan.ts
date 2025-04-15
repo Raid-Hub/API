@@ -33,9 +33,9 @@ export const zClan = registry.register(
     })
 )
 
-export type ClanAggregateStats = z.input<typeof zClanAggregateStats>
-export const zClanAggregateStats = registry.register(
-    "ClanAggregateStats",
+export type ClanLeaderboardAggregateStats = z.input<typeof zClanLeaderboardAggregateStats>
+export const zClanLeaderboardAggregateStats = registry.register(
+    "ClanLeaderboardAggregateStats",
     z.object({
         clears: zWholeNumber(),
         averageClears: zWholeNumber(),
@@ -50,6 +50,19 @@ export const zClanAggregateStats = registry.register(
     })
 )
 
+export type ClanAggregateStats = z.input<typeof zClanAggregateStats>
+export const zClanAggregateStats = registry.register(
+    "ClanAggregateStats",
+    zClanLeaderboardAggregateStats.extend({
+        clearsRank: zNaturalNumber(),
+        freshClearsRank: zNaturalNumber(),
+        sherpasRank: zNaturalNumber(),
+        timePlayedSecondsRank: zNaturalNumber(),
+        totalContestScoreRank: zNaturalNumber(),
+        weightedContestScoreRank: zNaturalNumber()
+    })
+)
+
 export type ClanLeaderboardEntry = z.input<typeof zClanLeaderboardEntry>
 export const zClanLeaderboardEntry = registry.register(
     "ClanLeaderboardEntry",
@@ -57,7 +70,7 @@ export const zClanLeaderboardEntry = registry.register(
         .object({
             clan: zClan
         })
-        .merge(zClanAggregateStats)
+        .merge(zClanLeaderboardAggregateStats)
 )
 
 export type ClanMemberStats = z.input<typeof zClanMemberStats>
