@@ -676,7 +676,7 @@
           "knownMemberCount"
         ]
       },
-      "ClanAggregateStats": {
+      "ClanLeaderboardAggregateStats": {
         "type": "object",
         "properties": {
           "clears": {
@@ -731,6 +731,56 @@
           "averageTimePlayedSeconds",
           "totalContestScore",
           "weightedContestScore"
+        ]
+      },
+      "ClanAggregateStats": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ClanLeaderboardAggregateStats"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "clearsRank": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "freshClearsRank": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "sherpasRank": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "timePlayedSecondsRank": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "totalContestScoreRank": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "weightedContestScoreRank": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              }
+            },
+            "required": [
+              "clearsRank",
+              "freshClearsRank",
+              "sherpasRank",
+              "timePlayedSecondsRank",
+              "totalContestScoreRank",
+              "weightedContestScoreRank"
+            ]
+          }
         ]
       },
       "ClanLeaderboardEntry": {

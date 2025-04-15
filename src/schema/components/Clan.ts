@@ -33,26 +33,33 @@ export const zClan = registry.register(
     })
 )
 
+export type ClanLeaderboardAggregateStats = z.input<typeof zClanLeaderboardAggregateStats>
+export const zClanLeaderboardAggregateStats = registry.register(
+    "ClanLeaderboardAggregateStats",
+    z.object({
+        clears: zWholeNumber(),
+        averageClears: zWholeNumber(),
+        freshClears: zWholeNumber(),
+        averageFreshClears: zWholeNumber(),
+        sherpas: zWholeNumber(),
+        averageSherpas: zWholeNumber(),
+        timePlayedSeconds: zWholeNumber(),
+        averageTimePlayedSeconds: zWholeNumber(),
+        totalContestScore: z.number().nonnegative(),
+        weightedContestScore: z.number().nonnegative()
+    })
+)
+
 export type ClanAggregateStats = z.input<typeof zClanAggregateStats>
 export const zClanAggregateStats = registry.register(
     "ClanAggregateStats",
-    z.object({
-        clears: zWholeNumber(),
-        clearsRank: zWholeNumber(),
-        averageClears: zWholeNumber(),
-        freshClears: zWholeNumber(),
-        freshClearsRank: zWholeNumber(),
-        averageFreshClears: zWholeNumber(),
-        sherpas: zWholeNumber(),
-        sherpasRank: zWholeNumber(),
-        averageSherpas: zWholeNumber(),
-        timePlayedSeconds: zWholeNumber(),
-        timePlayedSecondsRank: zWholeNumber(),
-        averageTimePlayedSeconds: zWholeNumber(),
-        totalContestScore: z.number().nonnegative(),
-        totalContestScoreRank: zWholeNumber(),
-        weightedContestScore: z.number().nonnegative(),
-        weightedContestScoreRank: zWholeNumber()
+    zClanLeaderboardAggregateStats.extend({
+        clearsRank: zNaturalNumber(),
+        freshClearsRank: zNaturalNumber(),
+        sherpasRank: zNaturalNumber(),
+        timePlayedSecondsRank: zNaturalNumber(),
+        totalContestScoreRank: zNaturalNumber(),
+        weightedContestScoreRank: zNaturalNumber()
     })
 )
 
@@ -63,7 +70,7 @@ export const zClanLeaderboardEntry = registry.register(
         .object({
             clan: zClan
         })
-        .merge(zClanAggregateStats)
+        .merge(zClanLeaderboardAggregateStats)
 )
 
 export type ClanMemberStats = z.input<typeof zClanMemberStats>
