@@ -38,15 +38,21 @@ export const zClanAggregateStats = registry.register(
     "ClanAggregateStats",
     z.object({
         clears: zWholeNumber(),
+        clearsRank: zWholeNumber(),
         averageClears: zWholeNumber(),
         freshClears: zWholeNumber(),
+        freshClearsRank: zWholeNumber(),
         averageFreshClears: zWholeNumber(),
         sherpas: zWholeNumber(),
+        sherpasRank: zWholeNumber(),
         averageSherpas: zWholeNumber(),
         timePlayedSeconds: zWholeNumber(),
+        timePlayedSecondsRank: zWholeNumber(),
         averageTimePlayedSeconds: zWholeNumber(),
         totalContestScore: z.number().nonnegative(),
-        weightedContestScore: z.number().nonnegative()
+        totalContestScoreRank: zWholeNumber(),
+        weightedContestScore: z.number().nonnegative(),
+        weightedContestScoreRank: zWholeNumber()
     })
 )
 

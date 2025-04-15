@@ -64,7 +64,10 @@ export const clanStatsRoute = new RaidHubRoute({
             return handleErr(err, groupId)
         }
 
-        const stats = await getClanStats(members.map(m => m.destinyUserInfo.membershipId))
+        const stats = await getClanStats(
+            groupId,
+            members.map(m => m.destinyUserInfo.membershipId)
+        )
 
         after(async () => {
             await clanQueue.send({ groupId })
