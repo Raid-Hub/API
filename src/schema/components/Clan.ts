@@ -53,13 +53,18 @@ export const zClanLeaderboardAggregateStats = registry.register(
 export type ClanAggregateStats = z.input<typeof zClanAggregateStats>
 export const zClanAggregateStats = registry.register(
     "ClanAggregateStats",
-    zClanLeaderboardAggregateStats.extend({
-        clearsRank: zNaturalNumber(),
-        freshClearsRank: zNaturalNumber(),
-        sherpasRank: zNaturalNumber(),
-        timePlayedSecondsRank: zNaturalNumber(),
-        totalContestScoreRank: zNaturalNumber(),
-        weightedContestScoreRank: zNaturalNumber()
+    z.object({
+        stats: zClanLeaderboardAggregateStats,
+        ranks: z
+            .object({
+                clearsRank: zNaturalNumber(),
+                freshClearsRank: zNaturalNumber(),
+                sherpasRank: zNaturalNumber(),
+                timePlayedSecondsRank: zNaturalNumber(),
+                totalContestScoreRank: zNaturalNumber(),
+                weightedContestScoreRank: zNaturalNumber()
+            })
+            .nullable()
     })
 )
 

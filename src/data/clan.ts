@@ -37,10 +37,23 @@ export const getClanStats = async (
                         'totalTimePlayedSeconds', COALESCE(player."total_time_played_seconds", 0),
                         'contestScore', COALESCE(rs."score", 0)
                     )
-                ) as "playerInfo"
+                ) as "_member"
             FROM membership_ids
             LEFT JOIN player USING (membership_id)
             LEFT JOIN ranked_scores rs USING (membership_id)
+        ),
+        "live_aggregates" AS (
+            SELECT 
+                SUM("_member"->'stats'->>'clears') AS clears,
+                AVG("_member"->'stats'->>'clears') AS average_clears,
+                SUM("_member"->'stats'->>'freshClears') AS fresh_clears,
+                AVG("_member"->'stats'->>'freshClears') AS average_fresh_clears,
+                SUM("_member"->'stats'->>'sherpas') AS sherpas,
+                AVG("_member"->'stats'->>'sherpas') AS average_sherpas,
+                SUM("_member"->'stats'->>'totalTimePlayedSeconds') AS time_played_seconds,
+                AVG("_member"->'stats'->>'totalTimePlayedSeconds') AS average_time_played_seconds,
+                SUM("_member"->'stats'->>'contestScore') AS total_contest_score
+            FROM "member_stats"
         ),
         "clan_ranks" AS (
             SELECT 
@@ -54,35 +67,40 @@ export const getClanStats = async (
             FROM clan_leaderboard
         )
         SELECT
+            member_stats."members",
             JSONB_BUILD_OBJECT(
-                'clears', clan_leaderboard."clears",
-                'clearsRank', clan_ranks."clears_rank",
-                'averageClears', ROUND(clan_leaderboard."average_clears"),
-                'freshClears', clan_leaderboard."fresh_clears",
-                'freshClearsRank', clan_ranks."fresh_clears_rank",
-                'averageFreshClears', ROUND(clan_leaderboard."average_fresh_clears"),
-                'sherpas', clan_leaderboard."sherpas",
-                'sherpasRank', clan_ranks."sherpas_rank",
-                'averageSherpas', ROUND(clan_leaderboard."average_sherpas"),
-                'timePlayedSeconds', clan_leaderboard."time_played_seconds",
-                'timePlayedSecondsRank', clan_ranks."time_played_seconds_rank",
-                'averageTimePlayedSeconds', ROUND(clan_leaderboard."average_time_played_seconds"),
-                'totalContestScore', clan_leaderboard."total_contest_score",
-                'totalContestScoreRank', clan_ranks."total_contest_score_rank",
-                'weightedContestScore', ROUND(clan_leaderboard."weighted_contest_score"),
-                'weightedContestScoreRank', clan_ranks."weighted_contest_score_rank"
-            ) AS "aggregateStats",
-            member_stats."members"
-            FROM clan_leaderboard
-            LEFT JOIN clan_ranks ON clan_leaderboard."group_id" = clan_ranks."group_id"
-            LEFT JOIN LATERAL (SELECT JSONB_AGG(member_stats."playerInfo") AS "members" FROM "member_stats") AS member_stats ON true
-            WHERE clan_leaderboard."group_id" = $2::bigint`,
+                'ranks', CASE WHEN clan_ranks IS NOT NULL THEN JSONB_BUILD_OBJECT(
+                    'clearsRank', clan_ranks."clears_rank",
+                    'freshClearsRank', clan_ranks."fresh_clears_rank",
+                    'sherpasRank', clan_ranks."sherpas_rank",
+                    'timePlayedSecondsRank', clan_ranks."time_played_seconds_rank",
+                    'totalContestScoreRank', clan_ranks."total_contest_score_rank",
+                    'weightedContestScoreRank', clan_ranks."weighted_contest_score_rank"
+                ) ELSE NULL END,
+                'stats', JSONB_BUILD_OBJECT(
+                    'clears', COALESCE(clan_leaderboard."clears", "live_aggregates"."clears", 0),
+                    'averageClears', ROUND(COALESCE(clan_leaderboard."average_clears", "live_aggregates"."average_clears", 0)),
+                    'freshClears', COALESCE(clan_leaderboard."fresh_clears", "live_aggregates"."fresh_clears", 0),
+                    'averageFreshClears', ROUND(COALESCE(clan_leaderboard."average_fresh_clears", "live_aggregates"."average_fresh_clears", 0)),
+                    'sherpas', COALESCE(clan_leaderboard."sherpas", "live_aggregates"."sherpas", 0),
+                    'averageSherpas', ROUND(COALESCE(clan_leaderboard."average_sherpas", "live_aggregates"."average_sherpas", 0)),
+                    'timePlayedSeconds', COALESCE(clan_leaderboard."time_played_seconds", "live_aggregates"."time_played_seconds", 0),
+                    'averageTimePlayedSeconds', ROUND(COALESCE(clan_leaderboard."average_time_played_seconds", "live_aggregates"."average_time_played_seconds", 0)),
+                    'totalContestScore', COALESCE(clan_leaderboard."total_contest_score", "live_aggregates"."total_contest_score", 0),
+                    'weightedContestScore', ROUND(COALESCE(clan_leaderboard."weighted_contest_score", 0)
+                )
+            ) AS "aggregateStats"
+            FROM (SELECT JSONB_AGG(member_stats."_member") AS "members" FROM "member_stats"),
+                "live_aggregates"
+            LEFT JOIN clan_leaderboard ON clan_leaderboard."group_id" = $2::bigint
+            LEFT JOIN clan_ranks ON clan_leaderboard."group_id" = clan_ranks."group_id"`,
         {
             params: [membershipIds, groupId]
         }
     )
+
     if (!clanStats) {
-        throw new TypeError("Unexpected null value")
+        throw new TypeError("Unexpected null result from clan stats query")
     }
 
     return clanStats
