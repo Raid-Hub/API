@@ -85,26 +85,26 @@ export async function getInstanceExtended(
                 WHERE "ap"."membership_id" = "ac"."membership_id"
                     AND "ap"."instance_id" = "ac"."instance_id"
                 ORDER BY "completed" DESC, "time_played_seconds" DESC
+                LEFT JOIN LATERAL (
+                    SELECT COALESCE(
+                        JSONB_AGG(
+                            JSONB_BUILD_OBJECT(
+                                'weaponHash', w."weapon_hash", 
+                                'kills', w."kills", 
+                                'precisionKills', w."precision_kills"
+                            )
+                        ), '[]'::jsonb
+                    ) AS "weapons_json"
+                    FROM (
+                        SELECT "weapon_hash", "kills", "precision_kills"
+                        FROM "instance_character_weapon"
+                        WHERE "character_id" = "ac"."character_id"
+                            AND "membership_id" = "ac"."membership_id" 
+                            AND "instance_id" = "ac"."instance_id"
+                        ORDER BY "kills" DESC
+                    ) AS w
+                ) as "t2" ON true
             ) AS "c"
-            LEFT JOIN LATERAL (
-                SELECT COALESCE(
-                    JSONB_AGG(
-                        JSONB_BUILD_OBJECT(
-                            'weaponHash', w."weapon_hash", 
-                            'kills', w."kills", 
-                            'precisionKills', w."precision_kills"
-                        )
-                    ), '[]'::jsonb
-                ) AS "weapons_json"
-                FROM (
-                    SELECT "weapon_hash", "kills", "precision_kills"
-                    FROM "instance_character_weapon"
-                    WHERE "character_id" = "ac"."character_id"
-                        AND "membership_id" = "ac"."membership_id" 
-                        AND "instance_id" = "ac"."instance_id"
-                    ORDER BY "kills" DESC
-                ) AS w
-            ) as "t2" ON true
         ) AS "t1" ON true 
         WHERE instance_id = $1::bigint
         ORDER BY completed DESC, time_played_seconds DESC;`,
