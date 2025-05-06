@@ -5,6 +5,7 @@ import { cacheControl } from "../middlewares/cache-control"
 import { zInstanceExtended } from "../schema/components/InstanceExtended"
 import { ErrorCode } from "../schema/errors/ErrorCode"
 import { zBigIntString } from "../schema/util"
+import { instanceCharacterQueue, playersQueue } from "../services/rabbitmq/queues"
 
 export const activityRoute = new RaidHubRoute({
     method: "get",
@@ -29,16 +30,40 @@ export const activityRoute = new RaidHubRoute({
             }
         ]
     },
-    async handler(req) {
+    async handler(req, after) {
         const instanceId = req.params.instanceId
 
         const data = await getInstanceExtended(instanceId)
 
         if (!data) {
             return RaidHubRoute.fail(ErrorCode.InstanceNotFoundError, {
-                instanceId: req.params.instanceId
+                instanceId: instanceId
             })
         } else {
+            after(async () => {
+                await Promise.allSettled([
+                    Promise.allSettled(
+                        data.players.flatMap(player =>
+                            player.characters
+                                .filter(c => !c.classHash || !c.emblemHash)
+                                .map(c =>
+                                    instanceCharacterQueue.send({
+                                        instanceId,
+                                        membershipId: player.playerInfo.membershipId,
+                                        characterId: c.characterId
+                                    })
+                                )
+                        )
+                    ),
+                    Promise.allSettled(
+                        data.players.slice(0, 12).map(p =>
+                            playersQueue.send({
+                                membershipId: p.playerInfo.membershipId
+                            })
+                        )
+                    )
+                ])
+            })
             return RaidHubRoute.ok(data)
         }
     }

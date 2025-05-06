@@ -10,8 +10,7 @@ import { zBigIntString } from "../schema/util"
 import { BungieApiError } from "../services/bungie/error"
 import { getClan } from "../services/bungie/getClan"
 import { getClanMembers } from "../services/bungie/getClanMembers"
-import { clanQueue } from "../services/rabbitmq/queues/clan"
-import { playersQueue } from "../services/rabbitmq/queues/player"
+import { clanQueue, playersQueue } from "../services/rabbitmq/queues"
 
 export const clanStatsRoute = new RaidHubRoute({
     method: "get",
@@ -70,14 +69,14 @@ export const clanStatsRoute = new RaidHubRoute({
         )
 
         after(async () => {
-            await clanQueue.send({ groupId })
-            await Promise.all(
-                members.map(member =>
+            await Promise.allSettled([
+                clanQueue.send({ groupId }),
+                ...members.map(member =>
                     playersQueue.send({
                         membershipId: BigInt(member.destinyUserInfo.membershipId)
                     })
                 )
-            )
+            ])
         })
 
         return RaidHubRoute.ok(stats)

@@ -1,17 +1,46 @@
-import { describe, test } from "bun:test"
+import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
+import { instanceCharacterQueue, playersQueue } from "../services/rabbitmq/queues"
 import { expectErr, expectOk } from "../util.test"
 import { activityRoute } from "./activity"
 
 describe("activity 200", () => {
+    const spyCharQueueSend = spyOn(instanceCharacterQueue, "send")
+    const spyPlayersQueueSend = spyOn(playersQueue, "send")
+
+    beforeEach(() => {
+        spyCharQueueSend.mockReset()
+        spyCharQueueSend.mockResolvedValueOnce(true)
+        spyPlayersQueueSend.mockReset()
+        spyPlayersQueueSend.mockResolvedValue(true)
+    })
+
+    afterAll(() => {
+        spyCharQueueSend.mockRestore()
+        spyPlayersQueueSend.mockRestore()
+    })
+
     const t = async (instanceId: string) => {
         const result = await activityRoute.$mock({ params: { instanceId } })
 
         expectOk(result)
     }
 
-    test("6318497407", () => t("6318497407"))
+    test("normal", async () => {
+        await t("6318497407")
+        expect(spyCharQueueSend).toHaveBeenCalledTimes(0)
+        expect(spyPlayersQueueSend).toHaveBeenCalledTimes(6)
+    })
 
-    test("11690445752 -- partial pgcr", () => t("11690445752"))
+    test("missing character", async () => {
+        await t("258758374")
+        expect(spyCharQueueSend).toHaveBeenCalledTimes(1)
+        expect(spyPlayersQueueSend).toHaveBeenCalledTimes(6)
+        expect(spyCharQueueSend).toHaveBeenCalledWith({
+            instanceId: 258758374n,
+            membershipId: "4611686018465791772",
+            characterId: "2305843009271027922"
+        })
+    })
 })
 
 describe("activity 404", () => {
