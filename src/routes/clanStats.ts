@@ -10,8 +10,7 @@ import { zBigIntString } from "../schema/util"
 import { BungieApiError } from "../services/bungie/error"
 import { getClan } from "../services/bungie/getClan"
 import { getClanMembers } from "../services/bungie/getClanMembers"
-import { clanQueue } from "../services/rabbitmq/queues/clan"
-import { playersQueue } from "../services/rabbitmq/queues/player"
+import { clanQueue, playersQueue } from "../services/rabbitmq/queues"
 
 export const clanStatsRoute = new RaidHubRoute({
     method: "get",
