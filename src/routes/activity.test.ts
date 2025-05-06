@@ -4,19 +4,19 @@ import { expectErr, expectOk } from "../util.test"
 import { activityRoute } from "./activity"
 
 describe("activity 200", () => {
-    const spyCharQueue = spyOn(instanceCharacterQueue, "send")
-    const spyPlayersQueue = spyOn(playersQueue, "send")
+    const spyCharQueueSend = spyOn(instanceCharacterQueue, "send")
+    const spyPlayersQueueSend = spyOn(playersQueue, "send")
 
     beforeEach(() => {
-        spyCharQueue.mockReset()
-        spyCharQueue.mockResolvedValueOnce(true)
-        spyPlayersQueue.mockReset()
-        spyPlayersQueue.mockResolvedValue(true)
+        spyCharQueueSend.mockReset()
+        spyCharQueueSend.mockResolvedValueOnce(true)
+        spyPlayersQueueSend.mockReset()
+        spyPlayersQueueSend.mockResolvedValue(true)
     })
 
     afterAll(() => {
-        spyCharQueue.mockRestore()
-        spyPlayersQueue.mockRestore()
+        spyCharQueueSend.mockRestore()
+        spyPlayersQueueSend.mockRestore()
     })
 
     const t = async (instanceId: string) => {
@@ -27,15 +27,15 @@ describe("activity 200", () => {
 
     test("normal", async () => {
         await t("6318497407")
-        expect(instanceCharacterQueue).toHaveBeenCalledTimes(0)
-        expect(spyPlayersQueue).toHaveBeenCalledTimes(6)
+        expect(spyCharQueueSend).toHaveBeenCalledTimes(0)
+        expect(spyPlayersQueueSend).toHaveBeenCalledTimes(6)
     })
 
     test("missing character", async () => {
         await t("258758374")
-        expect(instanceCharacterQueue).toHaveBeenCalledTimes(1)
-        expect(spyPlayersQueue).toHaveBeenCalledTimes(6)
-        expect(instanceCharacterQueue).toHaveBeenCalledWith({
+        expect(spyCharQueueSend).toHaveBeenCalledTimes(1)
+        expect(spyPlayersQueueSend).toHaveBeenCalledTimes(6)
+        expect(spyCharQueueSend).toHaveBeenCalledWith({
             instanceId: 258758374n,
             membershipId: "4611686018465791772",
             characterId: "2305843009271027922"
