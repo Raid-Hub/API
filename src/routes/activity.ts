@@ -5,7 +5,7 @@ import { cacheControl } from "../middlewares/cache-control"
 import { zInstanceExtended } from "../schema/components/InstanceExtended"
 import { ErrorCode } from "../schema/errors/ErrorCode"
 import { zBigIntString } from "../schema/util"
-import { instanceCharacterQueue } from "../services/rabbitmq/queues"
+import { instanceCharacterQueue, playersQueue } from "../services/rabbitmq/queues"
 
 export const activityRoute = new RaidHubRoute({
     method: "get",
@@ -41,24 +41,28 @@ export const activityRoute = new RaidHubRoute({
             })
         } else {
             after(async () => {
-                const incompleteChars = data.players
-                    .flatMap(player =>
-                        player.characters.map(c => ({
-                            membershipId: player.playerInfo.membershipId,
-                            ...c
-                        }))
+                await Promise.allSettled([
+                    Promise.allSettled(
+                        data.players.flatMap(player =>
+                            player.characters
+                                .filter(c => !c.classHash || !c.emblemHash)
+                                .map(c =>
+                                    instanceCharacterQueue.send({
+                                        instanceId,
+                                        membershipId: player.playerInfo.membershipId,
+                                        characterId: c.characterId
+                                    })
+                                )
+                        )
+                    ),
+                    Promise.allSettled(
+                        data.players.slice(0, 12).map(p =>
+                            playersQueue.send({
+                                membershipId: p.playerInfo.membershipId
+                            })
+                        )
                     )
-                    .filter(c => !c.classHash || !c.emblemHash)
-
-                await Promise.all(
-                    incompleteChars.map(c =>
-                        instanceCharacterQueue.send({
-                            instanceId,
-                            membershipId: c.membershipId,
-                            characterId: c.characterId
-                        })
-                    )
-                )
+                ])
             })
             return RaidHubRoute.ok(data)
         }

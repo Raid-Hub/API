@@ -93,9 +93,11 @@ export async function getInstanceExtended(
                 WHERE "acw"."character_id" = "ac"."character_id"
                     AND "acw"."membership_id" = "ac"."membership_id" 
                     AND "acw"."instance_id" = "ac"."instance_id" 
+                ORDER BY "acw"."kills" DESC
             ) as "t2" ON true
             WHERE "ap"."membership_id" = "ac"."membership_id"
                 AND "ap"."instance_id" = "ac"."instance_id"
+            ORDER BY "completed" DESC, "time_played_seconds" DESC
         ) AS "t1" ON true 
         WHERE instance_id = $1::bigint
         ORDER BY completed DESC, time_played_seconds DESC;`,
