@@ -77,14 +77,11 @@ export async function getInstanceExtended(
                     'superKills', "super_kills", 
                     'grenadeKills', "grenade_kills", 
                     'meleeKills', "melee_kills", 
-                    'weapons', "t2"."weapons_json"
+                    'weapons', "weapons_json"
                 )
             ) AS "characters_json"
             FROM (
-                SELECT * FROM "instance_character" "ac"
-                WHERE "ap"."membership_id" = "ac"."membership_id"
-                    AND "ap"."instance_id" = "ac"."instance_id"
-                ORDER BY "completed" DESC, "time_played_seconds" DESC
+                SELECT "ac".*, "t2".* FROM "instance_character" "ac"
                 LEFT JOIN LATERAL (
                     SELECT COALESCE(
                         JSONB_AGG(
@@ -104,6 +101,9 @@ export async function getInstanceExtended(
                         ORDER BY "kills" DESC
                     ) AS w
                 ) as "t2" ON true
+                WHERE "ap"."membership_id" = "ac"."membership_id"
+                    AND "ap"."instance_id" = "ac"."instance_id"
+                ORDER BY "completed" DESC, "time_played_seconds" DESC
             ) AS "c"
         ) AS "t1" ON true 
         WHERE instance_id = $1::bigint
