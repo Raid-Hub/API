@@ -16,18 +16,14 @@ const doc = new OpenApiGeneratorV3(registry.definitions).generateDocument({
     info: {
         title: "RaidHub API",
         description: "The Semi-public API for RaidHub",
-        version: "1.1.1",
+        version: "1.2.0",
         contact: {
             name: "RaidHub Admin",
             email: "admin@raidhub.io"
         }
     },
     servers: [{ url: "https://api.raidhub.io" }],
-    security: [
-        {
-            "API Key": []
-        }
-    ]
+    security: [{ "API Key": [] }]
 })
 
 doc.components!.securitySchemes = {
