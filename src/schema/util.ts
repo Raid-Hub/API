@@ -23,10 +23,12 @@ export const zBoolString = () =>
         type: "boolean"
     }) as ZodType<boolean, ZodBooleanDef, string | number | boolean>
 
-export const zISODateString = () =>
+export const zISODateString = ({ nullable = false } = {}) =>
+    // @ts-expect-error nullablle not supported in spec v3.1
     z.coerce.date().openapi({
         type: "string",
-        format: "date-time"
+        format: "date-time",
+        nullable: nullable
     }) as ZodType<Date, ZodDateDef, string | number | Date>
 
 // Intended to be used as an input param
