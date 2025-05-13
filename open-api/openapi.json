@@ -734,12 +734,14 @@
         ]
       },
       "ClanAggregateStats": {
-        "allOf": [
-          {
+        "type": "object",
+        "properties": {
+          "stats": {
             "$ref": "#/components/schemas/ClanLeaderboardAggregateStats"
           },
-          {
+          "ranks": {
             "type": "object",
+            "nullable": true,
             "properties": {
               "clearsRank": {
                 "type": "integer",
@@ -781,7 +783,8 @@
               "weightedContestScoreRank"
             ]
           }
-        ]
+        },
+        "required": ["stats", "ranks"]
       },
       "ClanLeaderboardEntry": {
         "type": "object",
