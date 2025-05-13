@@ -1,4 +1,4 @@
-import { ZodBooleanDef, ZodDateDef, ZodStringDef, ZodType, z } from "zod"
+import { ZodBooleanDef, ZodDateDef, ZodNullable, ZodStringDef, ZodType, z } from "zod"
 
 export const zNaturalNumber = () => z.number().int().positive()
 
@@ -23,13 +23,23 @@ export const zBoolString = () =>
         type: "boolean"
     }) as ZodType<boolean, ZodBooleanDef, string | number | boolean>
 
-export const zISODateString = ({ nullable = false } = {}) =>
+export const zISODateString = <N extends boolean = false>({
+    nullable
+}: {
+    nullable?: N
+} = {}): N extends true
+    ? ZodNullable<ZodType<Date, ZodDateDef, string | number | Date>>
+    : ZodType<Date, ZodDateDef, string | number | Date> => {
     // @ts-expect-error nullablle not supported in spec v3.1
-    z.coerce.date().openapi({
+    const base = z.coerce.date().openapi({
         type: "string",
         format: "date-time",
         nullable: nullable
-    }) as ZodType<Date, ZodDateDef, string | number | Date>
+    })
+
+    // @ts-expect-error generic hell
+    return nullable ? base.nullable() : base
+}
 
 // Intended to be used as an input param
 export const zDigitString = () =>

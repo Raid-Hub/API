@@ -52,8 +52,7 @@
             "properties": {
               "minted": {
                 "type": "string",
-                "format": "date-time",
-                "nullable": false
+                "format": "date-time"
               },
               "success": {
                 "type": "boolean",
@@ -71,8 +70,7 @@
             "properties": {
               "minted": {
                 "type": "string",
-                "format": "date-time",
-                "nullable": false
+                "format": "date-time"
               },
               "success": {
                 "type": "boolean",
@@ -268,13 +266,11 @@
           },
           "dateStarted": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "dateCompleted": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "season": {
             "type": "integer",
@@ -515,8 +511,7 @@
           },
           "lastSeen": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "isPrivate": {
             "type": "boolean",
@@ -661,8 +656,7 @@
           },
           "lastUpdated": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "knownMemberCount": {
             "type": "integer",
@@ -1210,8 +1204,7 @@
         "properties": {
           "period": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "startingPhaseIndex": {
             "type": "number"
@@ -1698,13 +1691,11 @@
         "properties": {
           "dateCompleted": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "dateResolved": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "instanceId": {
             "type": "string"
@@ -2044,8 +2035,7 @@
           },
           "lastSeen": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "isPrivate": {
             "type": "boolean",
@@ -2544,8 +2534,7 @@
         "properties": {
           "period": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           },
           "startingPhaseIndex": {
             "type": "number"
@@ -2883,8 +2872,7 @@
           "properties": {
             "hour": {
               "type": "string",
-              "format": "date-time",
-              "nullable": false
+              "format": "date-time"
             },
             "population": {
               "$ref": "#/components/schemas/PopulationByRaidMetric"
@@ -2979,8 +2967,7 @@
           },
           "expires": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           }
         },
         "required": ["value", "expires"]
@@ -2997,8 +2984,7 @@
           },
           "expires": {
             "type": "string",
-            "format": "date-time",
-            "nullable": false
+            "format": "date-time"
           }
         },
         "required": ["value", "expires"]
@@ -3040,8 +3026,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3065,8 +3050,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3094,8 +3078,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3131,8 +3114,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3156,8 +3138,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3185,8 +3166,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3271,8 +3251,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3296,8 +3275,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3325,8 +3303,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3354,8 +3331,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3410,8 +3386,7 @@
           {
             "schema": {
               "type": "string",
-              "format": "date-time",
-              "nullable": false
+              "format": "date-time"
             },
             "required": false,
             "name": "cursor",
@@ -3428,8 +3403,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3453,8 +3427,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3482,8 +3455,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3511,8 +3483,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3542,8 +3513,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -3564,8 +3534,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -3595,8 +3564,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3643,8 +3611,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3668,8 +3635,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3699,8 +3665,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -3721,8 +3686,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -3752,8 +3716,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3805,8 +3768,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3830,8 +3792,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3859,8 +3820,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3890,8 +3850,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -3912,8 +3871,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -3943,8 +3901,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -3996,8 +3953,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4021,8 +3977,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4050,8 +4005,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4081,8 +4035,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -4103,8 +4056,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -4134,8 +4086,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4313,8 +4264,7 @@
           {
             "schema": {
               "type": "string",
-              "format": "date-time",
-              "nullable": false
+              "format": "date-time"
             },
             "required": false,
             "name": "minDate",
@@ -4323,8 +4273,7 @@
           {
             "schema": {
               "type": "string",
-              "format": "date-time",
-              "nullable": false
+              "format": "date-time"
             },
             "required": false,
             "name": "maxDate",
@@ -4341,8 +4290,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4366,8 +4314,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4395,8 +4342,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4424,8 +4370,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4455,8 +4400,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -4477,8 +4421,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -4508,8 +4451,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4556,8 +4498,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4581,8 +4522,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4612,8 +4552,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -4634,8 +4573,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -4665,8 +4603,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4751,8 +4688,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4776,8 +4712,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4805,8 +4740,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4836,8 +4770,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -4858,8 +4791,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -4889,8 +4821,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -4977,8 +4908,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5002,8 +4932,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5031,8 +4960,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5062,8 +4990,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5084,8 +5011,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5106,8 +5032,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5137,8 +5062,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5225,8 +5149,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5250,8 +5173,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5279,8 +5201,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5310,8 +5231,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5332,8 +5252,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5354,8 +5273,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5385,8 +5303,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5472,8 +5389,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5497,8 +5413,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5526,8 +5441,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5557,8 +5471,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5579,8 +5492,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5601,8 +5513,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5632,8 +5543,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5711,8 +5621,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5736,8 +5645,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5765,8 +5673,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5796,8 +5703,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5818,8 +5724,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5840,8 +5745,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -5871,8 +5775,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5953,8 +5856,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -5978,8 +5880,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6007,8 +5908,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6036,8 +5936,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6084,8 +5983,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6109,8 +6007,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6140,8 +6037,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -6162,8 +6058,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -6193,8 +6088,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6241,8 +6135,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6266,8 +6159,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6297,8 +6189,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -6319,8 +6210,7 @@
                       "properties": {
                         "minted": {
                           "type": "string",
-                          "format": "date-time",
-                          "nullable": false
+                          "format": "date-time"
                         },
                         "success": {
                           "type": "boolean",
@@ -6350,8 +6240,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6379,8 +6268,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6441,8 +6329,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6466,8 +6353,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6495,8 +6381,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6524,8 +6409,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6561,8 +6445,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6586,8 +6469,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6615,8 +6497,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6680,8 +6561,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6705,8 +6585,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6734,8 +6613,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6763,8 +6641,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6792,8 +6669,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6821,8 +6697,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6877,8 +6752,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6902,8 +6776,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6931,8 +6804,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6960,8 +6832,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -6989,8 +6860,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -7056,8 +6926,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -7081,8 +6950,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -7110,8 +6978,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -7139,8 +7006,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
@@ -7168,8 +7034,7 @@
                   "properties": {
                     "minted": {
                       "type": "string",
-                      "format": "date-time",
-                      "nullable": false
+                      "format": "date-time"
                     },
                     "success": {
                       "type": "boolean",
