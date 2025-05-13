@@ -47,6 +47,29 @@ doc.components!.securitySchemes = {
     }
 }
 
+// Fixes some weird behavior where allOf with nullable: true is not being handled correctly
+const fixAllOfNullable = (schema: unknown) => {
+    if (!schema || typeof schema !== "object" || "$ref" in schema) return
+
+    if (Array.isArray(schema["allOf"])) {
+        schema["allOf"] = schema["allOf"]!.filter(item => {
+            if ("nullable" in item && item.nullable === true) {
+                Object.entries(item).forEach(([k, v]) => {
+                    schema[k] = v
+                })
+                return false
+            }
+            return true
+        })
+    } else {
+        Object.values(schema).forEach(child => {
+            fixAllOfNullable(child)
+        })
+    }
+}
+
+fixAllOfNullable(doc.components)
+
 console.log("Writing OpenAPI docs...")
 const redocOpts = JSON.stringify({})
 writeFile("open-api/openapi.json", JSON.stringify(doc, null, 2), err => {
