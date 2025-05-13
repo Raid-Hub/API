@@ -1,9 +1,9 @@
 import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi"
 import { exec } from "child_process"
 import { writeFile } from "fs"
-import { apiVersion } from "../src"
 import { router } from "../src/routes"
 import { registry } from "../src/schema"
+import { apiVersion } from "../src/version"
 
 const dir = "./open-api"
 const fileName = dir + "/openapi.json"

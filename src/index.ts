@@ -11,8 +11,6 @@ BigInt.prototype.toJSON = function () {
     return this.toString()
 }
 
-export const apiVersion = "1.2.0"
-
 const port = Number(process.env.PORT || 8000)
 
 const app = express()

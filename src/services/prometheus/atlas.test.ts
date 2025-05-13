@@ -17,7 +17,7 @@ describe("getAtlasStatus with mock", () => {
             new Response(
                 JSON.stringify({
                     status: "success",
-                    data: {}
+                    data: { result: [] }
                 }),
                 {
                     headers: {

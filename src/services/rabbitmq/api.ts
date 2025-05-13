@@ -28,14 +28,13 @@ export const getFloodgatesStatus = async () => {
     const data = await res.json()
 
     return {
-        total: (data.messages as number) || 0,
-        ready: (data.messages_ready as number) || 0,
-        unacknowledged: (data.messages_unacknowledged as number) || 0,
+        waiting: data.messages as number,
         ackRateSeconds:
-            Math.round(10_000 * (data.backing_queue_status?.avg_ack_ingress_rate as number) ?? 0) /
-            10_000,
+            Math.round(
+                10_000 * ((data.backing_queue_status?.avg_ack_ingress_rate as number) ?? 0)
+            ) / 10_000,
         ingressRateSeconds:
-            Math.round(10_000 * (data.backing_queue_status?.avg_ingress_rate as number) ?? 0) /
+            Math.round(10_000 * ((data.backing_queue_status?.avg_ingress_rate as number) ?? 0)) /
             10_000
     }
 }

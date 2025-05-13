@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import { zClanStats } from "../../schema/components/Clan"
-import { getClanMembers } from "../../services/bungie/getClanMembers"
+import { getClanMembers } from "../../services/bungie"
 import { getClanStats } from "../clan"
 
 describe("getClanStats", () => {
