@@ -67,7 +67,8 @@ export const statusState = {
 
 export const statusRoute = new RaidHubRoute({
     method: "get",
-    description: "Get the status of the RaidHub Services.",
+    description:
+        "Get the status of the RaidHub Services. Atlas: The PGCR crawler. Floodgates: The queue system for redacted PGCRs from bungie, almost exclusively during contest mode.",
     middleware: [cacheControl(10)],
     response: {
         success: {
