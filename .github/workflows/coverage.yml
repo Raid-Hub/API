@@ -35,7 +35,7 @@ jobs:
                   TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_GHA_CLIENT_ID }}
                   TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_GHA_CLIENT_SECRET }}
               run: |
-                  ssh -N -L 5432:localhost:5432 -L 8123:localhost:8123 -L 9090:localhost:9090 -o ProxyCommand="cloudflared access ssh --hostname %h" root@ssh.raidhub.io &
+                  ssh -N -L 5432:localhost:5432 -L 8123:localhost:8123 -L 9090:localhost:9090 -L 15672:localhost:15672 -o ProxyCommand="cloudflared access ssh --hostname %h" root@ssh.raidhub.io &
 
             - name: Run Tests
               env:
@@ -47,6 +47,8 @@ jobs:
                   CLICKHOUSE_USER: ${{ secrets.CLICKHOUSE_READONLY_USER }}
                   CLICKHOUSE_PASSWORD: ${{ secrets.CLICKHOUSE_READONLY_PASSWORD }}
                   BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
+                  RABBIT_API_USER: ${{ secrets.RABBIT_API_USER }}
+                  RABBIT_API_PASSWORD: ${{ secrets.RABBIT_API_PASSWORD }}
               run: bun test --timeout=30000 --coverage
               continue-on-error: true
 
