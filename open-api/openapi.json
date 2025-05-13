@@ -1700,6 +1700,93 @@
         ],
         "additionalProperties": false
       },
+      "LatestResolvedInstance": {
+        "type": "object",
+        "properties": {
+          "dateCompleted": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateResolved": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "instanceId": {
+            "type": "string"
+          }
+        },
+        "required": ["dateCompleted", "dateResolved", "instanceId"]
+      },
+      "AtlasStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["Crawling", "Idle", "Offline"]
+          },
+          "medianSecondsBehindNow": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0
+          },
+          "estimatedCatchUpTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "latestResolvedInstance": {
+            "$ref": "#/components/schemas/LatestResolvedInstance"
+          }
+        },
+        "required": [
+          "status",
+          "medianSecondsBehindNow",
+          "estimatedCatchUpTimestamp",
+          "latestResolvedInstance"
+        ]
+      },
+      "FloodgatesStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["Empty", "Blocked", "Crawling", "Live"]
+          },
+          "incomingRate": {
+            "type": "number",
+            "minimum": 0
+          },
+          "resolveRate": {
+            "type": "number",
+            "minimum": 0
+          },
+          "backlog": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "latestResolvedInstance": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatestResolvedInstance"
+              },
+              {
+                "nullable": true
+              }
+            ]
+          },
+          "estimatedBacklogEmptied": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "incomingRate",
+          "resolveRate",
+          "backlog",
+          "latestResolvedInstance",
+          "estimatedBacklogEmptied"
+        ]
+      },
       "ManifestResponse": {
         "type": "object",
         "properties": {
@@ -1850,43 +1937,13 @@
         "type": "object",
         "properties": {
           "AtlasPGCR": {
-            "type": "object",
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": ["Crawling", "Idle", "Offline"]
-              },
-              "medianSecondsBehindNow": {
-                "type": "number",
-                "nullable": true
-              },
-              "estimatedCatchUpTimestamp": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "latestActivity": {
-                "type": "object",
-                "properties": {
-                  "dateCompleted": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "instanceId": {
-                    "type": "string"
-                  }
-                },
-                "required": ["dateCompleted", "instanceId"]
-              }
-            },
-            "required": [
-              "status",
-              "medianSecondsBehindNow",
-              "estimatedCatchUpTimestamp",
-              "latestActivity"
-            ]
+            "$ref": "#/components/schemas/AtlasStatus"
+          },
+          "FloodgatesPGCR": {
+            "$ref": "#/components/schemas/FloodgatesStatus"
           }
         },
-        "required": ["AtlasPGCR"]
+        "required": ["AtlasPGCR", "FloodgatesPGCR"]
       },
       "PlayerSearchResponse": {
         "type": "object",

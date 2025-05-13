@@ -2,7 +2,7 @@ import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
 import * as BungieCoreEndpoints from "bungie-net-core/endpoints/Core"
 import { BungieNetResponse } from "bungie-net-core/interfaces"
 import { CoreSettingsConfiguration } from "bungie-net-core/models"
-import * as GetAtlasStatusModule from "../services/prometheus/getAtlasStatus"
+import * as GetAtlasStatusModule from "../services/prometheus/atlas"
 import { expectOk } from "../util.test"
 import { statusRoute, statusState } from "./status"
 

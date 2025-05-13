@@ -164,3 +164,49 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
         }
     )
 }
+
+export async function getInstanceBasic(instanceId: bigint | string) {
+    const instance = await postgres.queryRow<{
+        instanceId: string
+        hash: number
+        completed: boolean
+        playerCount: number
+        score: number
+        fresh: boolean | null
+        flawless: boolean | null
+        dateStarted: Date
+        dateCompleted: Date
+        season: number
+        duration: number | null
+        platformType: string | null
+        dateResolved: Date
+    }>(
+        `SELECT 
+            instance_id::text AS "instanceId",
+            hash AS "hash",
+            completed AS "completed",
+            player_count AS "playerCount",
+            score AS "score",
+            fresh AS "fresh",
+            flawless AS "flawless",
+            date_started AT TIME ZONE 'UTC' AS "dateStarted",
+            date_completed AT TIME ZONE 'UTC' AS "dateCompleted",
+            season_id AS "season",
+            duration AS "duration",
+            platform_type AS "platformType",
+            pgcr.date_crawled AS "dateResolved"
+        FROM instance
+        JOIN pgcr USING (instance_id)
+        WHERE instance_id = $1::bigint
+        LIMIT 1;`,
+        {
+            params: [instanceId]
+        }
+    )
+
+    if (!instance) {
+        throw new TypeError("Failed to fetch basic instance data")
+    }
+
+    return instance
+}
