@@ -1,5 +1,6 @@
 import { BungieFetchConfig } from "bungie-net-core"
 import { BungieNetResponse } from "bungie-net-core/interfaces"
+import { apiVersion } from "../.."
 import { BungieApiError } from "./error"
 
 const htmlRegex = /<title>(.*?)<\/title>/
@@ -27,6 +28,7 @@ export const bungiePlatformHttp = {
 
         const headers = new Headers(config.headers)
         headers.append("X-API-KEY", apiKey)
+        headers.append("User-Agent", `RaidHub-API/${apiVersion} (contact=admin@raidhub.io)`)
 
         const response = await fetch(config.url, {
             method: config.method,

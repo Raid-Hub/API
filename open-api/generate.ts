@@ -1,6 +1,7 @@
 import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi"
 import { exec } from "child_process"
 import { writeFile } from "fs"
+import { apiVersion } from "../src"
 import { router } from "../src/routes"
 import { registry } from "../src/schema"
 
@@ -16,7 +17,7 @@ const doc = new OpenApiGeneratorV3(registry.definitions).generateDocument({
     info: {
         title: "RaidHub API",
         description: "The Semi-public API for RaidHub",
-        version: "1.2.0",
+        version: apiVersion,
         contact: {
             name: "RaidHub Admin",
             email: "admin@raidhub.io"
