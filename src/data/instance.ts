@@ -204,9 +204,5 @@ export async function getInstanceBasic(instanceId: bigint | string) {
         }
     )
 
-    if (!instance) {
-        throw new TypeError("Failed to fetch basic instance data")
-    }
-
     return instance
 }

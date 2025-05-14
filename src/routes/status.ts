@@ -142,6 +142,9 @@ async function getFloodgatesPGCR(): Promise<FloodgatesStatus> {
         }
 
         const instance = await getInstanceBasic(latestInstanceId)
+        if (!instance) {
+            return null
+        }
 
         return {
             instanceId: instance.instanceId,
@@ -163,10 +166,10 @@ async function getFloodgatesPGCR(): Promise<FloodgatesStatus> {
 
     let status: FloodgatesStatus["status"] = "Empty"
     if (backlog > 100) {
-        status = floodgatesStatus.ackRateSeconds > 0.01 ? "Crawling" : "Blocked"
+        status = floodgatesStatus.ackRateSeconds > 0.05 ? "Crawling" : "Blocked"
     } else if (backlog > 0) {
         status =
-            floodgatesStatus.ackRateSeconds > 0 && floodgatesStatus.ingressRateSeconds > 0
+            floodgatesStatus.ackRateSeconds > 0.05 && floodgatesStatus.ingressRateSeconds > 0
                 ? "Live"
                 : "Blocked"
     } else if (
