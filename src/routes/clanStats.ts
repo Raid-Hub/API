@@ -7,9 +7,7 @@ import { cacheControl } from "../middlewares/cache-control"
 import { zClanStats } from "../schema/components/Clan"
 import { ErrorCode } from "../schema/errors/ErrorCode"
 import { zBigIntString } from "../schema/util"
-import { BungieApiError } from "../services/bungie/error"
-import { getClan } from "../services/bungie/getClan"
-import { getClanMembers } from "../services/bungie/getClanMembers"
+import { BungieApiError, getClan, getClanMembers } from "../services/bungie"
 import { clanQueue, playersQueue } from "../services/rabbitmq/queues"
 
 export const clanStatsRoute = new RaidHubRoute({

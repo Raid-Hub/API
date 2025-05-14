@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
-import { getAtlasStatus } from "./getAtlasStatus"
+import { getAtlasStatus } from "./atlas"
 
 describe("getAtlasStatus with mock", () => {
     const spyFetch = spyOn(globalThis, "fetch")
@@ -17,7 +17,7 @@ describe("getAtlasStatus with mock", () => {
             new Response(
                 JSON.stringify({
                     status: "success",
-                    data: {}
+                    data: { result: [] }
                 }),
                 {
                     headers: {

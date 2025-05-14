@@ -12,10 +12,10 @@ export const zActivityDefinition = registry.register(
             path: z.string(),
             isSunset: z.boolean(),
             isRaid: z.boolean(),
-            releaseDate: zISODateString().nullable(),
-            dayOneEnd: zISODateString().nullable(),
-            contestEnd: zISODateString().nullable(),
-            weekOneEnd: zISODateString().nullable(),
+            releaseDate: zISODateString({ nullable: true }),
+            dayOneEnd: zISODateString({ nullable: true }),
+            contestEnd: zISODateString({ nullable: true }),
+            weekOneEnd: zISODateString({ nullable: true }),
             milestoneHash: zUInt32().nullable()
         })
         .strict()

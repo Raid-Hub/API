@@ -3,7 +3,7 @@
   "info": {
     "title": "RaidHub API",
     "description": "The Semi-public API for RaidHub",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "contact": {
       "name": "RaidHub Admin",
       "email": "admin@raidhub.io"
@@ -487,12 +487,10 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/DestinyMembershipType"
-              },
-              {
-                "nullable": true,
-                "description": "The platform on which the player created their account."
               }
-            ]
+            ],
+            "nullable": true,
+            "description": "The platform on which the player created their account."
           },
           "iconPath": {
             "type": "string",
@@ -894,11 +892,9 @@
                   "allOf": [
                     {
                       "$ref": "#/components/schemas/PlayerInfo"
-                    },
-                    {
-                      "nullable": true
                     }
-                  ]
+                  ],
+                  "nullable": true
                 },
                 "stats": {
                   "$ref": "#/components/schemas/ClanMemberStats"
@@ -1070,19 +1066,23 @@
           },
           "releaseDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "dayOneEnd": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "contestEnd": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "weekOneEnd": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "milestoneHash": {
             "type": "integer",
@@ -1290,11 +1290,9 @@
                           "allOf": [
                             {
                               "$ref": "#/components/schemas/DestinyMembershipType"
-                            },
-                            {
-                              "nullable": true
                             }
-                          ]
+                          ],
+                          "nullable": true
                         },
                         "membershipId": {
                           "type": "string"
@@ -1513,11 +1511,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/Instance"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           }
         },
         "required": [
@@ -1550,41 +1546,33 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/GlobalStat"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "freshClears": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GlobalStat"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "sherpas": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GlobalStat"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "sumOfBest": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/GlobalStat"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           }
         },
         "required": ["clears", "freshClears", "sherpas", "sumOfBest"]
@@ -1661,11 +1649,9 @@
               "allOf": [
                 {
                   "$ref": "#/components/schemas/WorldFirstEntry"
-                },
-                {
-                  "nullable": true
                 }
-              ]
+              ],
+              "nullable": true
             }
           }
         },
@@ -1699,6 +1685,93 @@
           "playerInfo"
         ],
         "additionalProperties": false
+      },
+      "LatestResolvedInstance": {
+        "type": "object",
+        "properties": {
+          "dateCompleted": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateResolved": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "instanceId": {
+            "type": "string"
+          }
+        },
+        "required": ["dateCompleted", "dateResolved", "instanceId"]
+      },
+      "AtlasStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["Crawling", "Idle", "Offline"]
+          },
+          "medianSecondsBehindNow": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0
+          },
+          "estimatedCatchUpTimestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "latestResolvedInstance": {
+            "$ref": "#/components/schemas/LatestResolvedInstance"
+          }
+        },
+        "required": [
+          "status",
+          "medianSecondsBehindNow",
+          "estimatedCatchUpTimestamp",
+          "latestResolvedInstance"
+        ]
+      },
+      "FloodgatesStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["Empty", "Blocked", "Crawling", "Live"]
+          },
+          "incomingRate": {
+            "type": "number",
+            "minimum": 0
+          },
+          "resolveRate": {
+            "type": "number",
+            "minimum": 0
+          },
+          "backlog": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "latestResolvedInstance": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatestResolvedInstance"
+              }
+            ],
+            "nullable": true
+          },
+          "estimatedBacklogEmptied": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "status",
+          "incomingRate",
+          "resolveRate",
+          "backlog",
+          "latestResolvedInstance",
+          "estimatedBacklogEmptied"
+        ]
       },
       "ManifestResponse": {
         "type": "object",
@@ -1850,43 +1923,13 @@
         "type": "object",
         "properties": {
           "AtlasPGCR": {
-            "type": "object",
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": ["Crawling", "Idle", "Offline"]
-              },
-              "medianSecondsBehindNow": {
-                "type": "number",
-                "nullable": true
-              },
-              "estimatedCatchUpTimestamp": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "latestActivity": {
-                "type": "object",
-                "properties": {
-                  "dateCompleted": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "instanceId": {
-                    "type": "string"
-                  }
-                },
-                "required": ["dateCompleted", "instanceId"]
-              }
-            },
-            "required": [
-              "status",
-              "medianSecondsBehindNow",
-              "estimatedCatchUpTimestamp",
-              "latestActivity"
-            ]
+            "$ref": "#/components/schemas/AtlasStatus"
+          },
+          "FloodgatesPGCR": {
+            "$ref": "#/components/schemas/FloodgatesStatus"
           }
         },
-        "required": ["AtlasPGCR"]
+        "required": ["AtlasPGCR", "FloodgatesPGCR"]
       },
       "PlayerSearchResponse": {
         "type": "object",
@@ -1924,7 +1967,8 @@
           },
           "nextCursor": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "activities": {
             "type": "array",
@@ -1967,12 +2011,10 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/DestinyMembershipType"
-              },
-              {
-                "nullable": true,
-                "description": "The platform on which the player created their account."
               }
-            ]
+            ],
+            "nullable": true,
+            "description": "The platform on which the player created their account."
           },
           "iconPath": {
             "type": "string",
@@ -2049,11 +2091,9 @@
               "allOf": [
                 {
                   "$ref": "#/components/schemas/WorldFirstEntry"
-                },
-                {
-                  "nullable": true
                 }
-              ]
+              ],
+              "nullable": true
             }
           }
         },
@@ -2580,11 +2620,9 @@
                           "allOf": [
                             {
                               "$ref": "#/components/schemas/DestinyMembershipType"
-                            },
-                            {
-                              "nullable": true
                             }
-                          ]
+                          ],
+                          "nullable": true
                         },
                         "membershipId": {
                           "type": "string"
@@ -2767,11 +2805,9 @@
                   "allOf": [
                     {
                       "$ref": "#/components/schemas/PlayerInfo"
-                    },
-                    {
-                      "nullable": true
                     }
-                  ]
+                  ],
+                  "nullable": true
                 },
                 "stats": {
                   "$ref": "#/components/schemas/ClanMemberStats"
@@ -3067,7 +3103,7 @@
     "/status": {
       "get": {
         "summary": "/status",
-        "description": "Get the status of the RaidHub Services.",
+        "description": "Get the status of the RaidHub Services. Atlas: The PGCR crawler. Floodgates: The queue system for redacted PGCRs from bungie, almost exclusively during contest mode.",
         "responses": {
           "200": {
             "description": "Success",

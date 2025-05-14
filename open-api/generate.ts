@@ -3,6 +3,7 @@ import { exec } from "child_process"
 import { writeFile } from "fs"
 import { router } from "../src/routes"
 import { registry } from "../src/schema"
+import { apiVersion } from "../src/version"
 
 const dir = "./open-api"
 const fileName = dir + "/openapi.json"
@@ -16,18 +17,14 @@ const doc = new OpenApiGeneratorV3(registry.definitions).generateDocument({
     info: {
         title: "RaidHub API",
         description: "The Semi-public API for RaidHub",
-        version: "1.1.1",
+        version: apiVersion,
         contact: {
             name: "RaidHub Admin",
             email: "admin@raidhub.io"
         }
     },
     servers: [{ url: "https://api.raidhub.io" }],
-    security: [
-        {
-            "API Key": []
-        }
-    ]
+    security: [{ "API Key": [] }]
 })
 
 doc.components!.securitySchemes = {
@@ -49,6 +46,29 @@ doc.components!.securitySchemes = {
         in: "header"
     }
 }
+
+// Fixes some weird behavior where allOf with nullable: true is not being handled correctly
+const fixAllOfNullable = (schema: unknown) => {
+    if (!schema || typeof schema !== "object" || "$ref" in schema) return
+
+    if (Array.isArray(schema["allOf"])) {
+        schema["allOf"] = schema["allOf"]!.filter(item => {
+            if ("nullable" in item && item.nullable === true) {
+                Object.entries(item).forEach(([k, v]) => {
+                    schema[k] = v
+                })
+                return false
+            }
+            return true
+        })
+    } else {
+        Object.values(schema).forEach(child => {
+            fixAllOfNullable(child)
+        })
+    }
+}
+
+fixAllOfNullable(doc.components)
 
 console.log("Writing OpenAPI docs...")
 const redocOpts = JSON.stringify({})

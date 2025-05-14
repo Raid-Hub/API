@@ -1,16 +1,5 @@
-type QueryRangeResponse = {
-    status: "success"
-    data: {
-        result?: [
-            {
-                metric: unknown
-                values: [number, string][]
-            }
-        ]
-    }
-}
+import { queryRange } from "./api"
 
-const baseUrl = `http://localhost:${process.env.PROMETHEUS_HTTP_PORT ?? 9090}/api/v1/query_range?query=histogram_quantile(0.50, sum(rate(pgcr_crawl_summary_lag_bucket[2m])) by (le))`
 const intervalMins = 5
 const step = "15s"
 
@@ -25,16 +14,15 @@ export const getAtlasStatus = async (): Promise<
           lag: null
       }
 > => {
-    const start = Date.now()
-    const url = new URL(baseUrl)
-    url.searchParams.set("start", new Date(start - intervalMins * 60000).toISOString())
-    url.searchParams.set("end", new Date(start).toISOString())
-    url.searchParams.set("step", step)
+    const now = Date.now()
+    const queryRangeResponse = await queryRange({
+        query: "histogram_quantile(0.50, sum(rate(pgcr_crawl_summary_lag_bucket[2m])) by (le))",
+        start: new Date(now - intervalMins * 60000),
+        end: new Date(now),
+        step
+    })
 
-    const response = await fetch(url)
-    const queryRangeResponse = (await response.json()) as QueryRangeResponse
-
-    const values = queryRangeResponse.data?.result?.[0]?.values
+    const values = queryRangeResponse.data?.result[0]?.values
         .map(([timestamp, lag]) => ({
             timestamp: timestamp * 1000,
             lag: parseFloat(lag)
@@ -46,7 +34,7 @@ export const getAtlasStatus = async (): Promise<
     }
 
     const mostRecentTimestamp = values[values.length - 1].timestamp
-    const skew = start - mostRecentTimestamp
+    const skew = now - mostRecentTimestamp
 
     if (skew >= 30_000) {
         return { isCrawling: false, lag: null }

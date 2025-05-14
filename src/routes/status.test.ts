@@ -2,17 +2,24 @@ import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
 import * as BungieCoreEndpoints from "bungie-net-core/endpoints/Core"
 import { BungieNetResponse } from "bungie-net-core/interfaces"
 import { CoreSettingsConfiguration } from "bungie-net-core/models"
-import * as GetAtlasStatusModule from "../services/prometheus/getAtlasStatus"
+import * as GetAtlasStatusModule from "../services/prometheus/atlas"
+import * as GetFloodgatesRecentIdModule from "../services/prometheus/floodgates"
+import * as GetFloodgatesStatusModule from "../services/rabbitmq/api"
 import { expectOk } from "../util.test"
 import { statusRoute, statusState } from "./status"
 
 describe("status 200", async () => {
     const spyGetAtlasStatus = spyOn(GetAtlasStatusModule, "getAtlasStatus")
     const spyGetCommonSettings = spyOn(BungieCoreEndpoints, "getCommonSettings")
+    const spyGetFloodgatesRecentId = spyOn(GetFloodgatesRecentIdModule, "getFloodgatesRecentId")
+    const spyGetFloodgatesStatus = spyOn(GetFloodgatesStatusModule, "getFloodgatesStatus")
 
     beforeEach(() => {
         spyGetAtlasStatus.mockReset()
         spyGetCommonSettings.mockReset()
+        spyGetFloodgatesRecentId.mockReset()
+        spyGetFloodgatesStatus.mockReset()
+
         spyGetCommonSettings.mockResolvedValueOnce({
             Response: {
                 systems: {
@@ -27,6 +34,8 @@ describe("status 200", async () => {
     afterAll(() => {
         spyGetAtlasStatus.mockRestore()
         spyGetCommonSettings.mockRestore()
+        spyGetFloodgatesRecentId.mockRestore()
+        spyGetFloodgatesStatus.mockRestore()
     })
 
     const t = async () => {
@@ -40,35 +49,114 @@ describe("status 200", async () => {
         return result.parsed
     }
 
-    test("crawling", async () => {
-        statusState.isDestinyApiEnabled = true
-        spyGetAtlasStatus.mockResolvedValueOnce({
-            isCrawling: true,
-            lag: 32,
-            estimatedCatchUpTime: 0
+    describe("atlas", () => {
+        beforeEach(() => {
+            spyGetFloodgatesRecentId.mockResolvedValueOnce(null)
+            spyGetFloodgatesStatus.mockResolvedValueOnce({
+                waiting: 0,
+                ackRateSeconds: 0,
+                ingressRateSeconds: 0
+            })
         })
-        const data = await t()
-        expect(data.AtlasPGCR.status).toBe("Crawling")
+
+        test("atlas crawling", async () => {
+            statusState.isDestinyApiEnabled = true
+            spyGetAtlasStatus.mockResolvedValueOnce({
+                isCrawling: true,
+                lag: 32,
+                estimatedCatchUpTime: 0
+            })
+            const data = await t()
+            expect(data.AtlasPGCR.status).toBe("Crawling")
+        })
+
+        test("atlas offline", async () => {
+            statusState.isDestinyApiEnabled = true
+            spyGetAtlasStatus.mockResolvedValueOnce({
+                isCrawling: false,
+                lag: null
+            })
+            const data = await t()
+            expect(data.AtlasPGCR.status).toBe("Offline")
+        })
+
+        test("atlas idle", async () => {
+            statusState.isDestinyApiEnabled = false
+            spyGetAtlasStatus.mockResolvedValueOnce({
+                isCrawling: false,
+                lag: null
+            })
+            const data = await t()
+            expect(data.AtlasPGCR.status).toBe("Idle")
+        })
     })
 
-    test("offline", async () => {
-        statusState.isDestinyApiEnabled = true
-        spyGetAtlasStatus.mockResolvedValueOnce({
-            isCrawling: false,
-            lag: null
+    describe("floodgates", () => {
+        beforeEach(() => {
+            spyGetAtlasStatus.mockResolvedValueOnce({
+                isCrawling: true,
+                lag: 32,
+                estimatedCatchUpTime: 0
+            })
         })
-        const data = await t()
-        expect(data.AtlasPGCR.status).toBe("Offline")
-    })
 
-    test("idle", async () => {
-        statusState.isDestinyApiEnabled = false
-        spyGetAtlasStatus.mockResolvedValueOnce({
-            isCrawling: false,
-            lag: null
+        test("floodgates crawling", async () => {
+            spyGetAtlasStatus.mockResolvedValueOnce({
+                isCrawling: true,
+                lag: 32,
+                estimatedCatchUpTime: 0
+            })
+
+            spyGetFloodgatesRecentId.mockResolvedValueOnce("16142032033")
+
+            spyGetFloodgatesStatus.mockResolvedValueOnce({
+                waiting: 1000,
+                ackRateSeconds: 6.9,
+                ingressRateSeconds: 1.0
+            })
+            const data = await t()
+
+            expect(data.FloodgatesPGCR.status).toBe("Crawling")
         })
-        const data = await t()
-        expect(data.AtlasPGCR.status).toBe("Idle")
+
+        test("floodgates closed", async () => {
+            spyGetFloodgatesRecentId.mockResolvedValueOnce(null)
+
+            spyGetFloodgatesStatus.mockResolvedValueOnce({
+                waiting: 15421,
+                ackRateSeconds: 0,
+                ingressRateSeconds: 2.6
+            })
+            const data = await t()
+
+            expect(data.FloodgatesPGCR.status).toBe("Blocked")
+        })
+
+        test("floodgates empty", async () => {
+            spyGetFloodgatesRecentId.mockResolvedValueOnce(null)
+
+            spyGetFloodgatesStatus.mockResolvedValueOnce({
+                waiting: 0,
+                ackRateSeconds: 0,
+                ingressRateSeconds: 0
+            })
+            const data = await t()
+
+            expect(data.FloodgatesPGCR.status).toBe("Empty")
+        })
+
+        test("floodgates caught up", async () => {
+            spyGetFloodgatesRecentId.mockResolvedValueOnce("16142032033")
+
+            spyGetFloodgatesStatus.mockResolvedValueOnce({
+                waiting: 2,
+                ackRateSeconds: 2.5,
+                ingressRateSeconds: 2.1
+            })
+            const data = await t()
+
+            expect(data.FloodgatesPGCR.status).toBe("Live")
+        })
     })
 })
 
