@@ -1,6 +1,6 @@
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { InternalServerError } from "@/schema/errors/InternalServerError"
 import { ErrorRequestHandler } from "express"
-import { ErrorCode } from "../schema/errors/ErrorCode"
-import { InternalServerError } from "../schema/errors/InternalServerError"
 
 // This is the final middleware run, so it cannot point to next
 export const errorHandler: ErrorRequestHandler = (err: Error, _, res, __) => {

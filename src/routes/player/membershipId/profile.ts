@@ -1,17 +1,17 @@
-import { z } from "zod"
-import { RaidHubRoute } from "../../../RaidHubRoute"
+import { RaidHubRoute } from "@/RaidHubRoute"
 import {
     getPlayer,
     getPlayerActivityStats,
     getPlayerGlobalStats,
     getWorldFirstEntries
-} from "../../../data/player"
-import { cacheControl } from "../../../middlewares/cache-control"
-import { processPlayerAsync } from "../../../middlewares/processPlayerAsync"
-import { WorldFirstEntry, zPlayerProfile } from "../../../schema/components/PlayerProfile"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { zBigIntString } from "../../../schema/util"
-import { canAccessProtectedResource } from "../../../utils/auth"
+} from "@/data/player"
+import { cacheControl } from "@/middlewares/cache-control"
+import { processPlayerAsync } from "@/middlewares/processPlayerAsync"
+import { WorldFirstEntry, zPlayerProfile } from "@/schema/components/PlayerProfile"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zBigIntString } from "@/schema/util"
+import { canAccessProtectedResource } from "@/utils/auth"
+import { z } from "zod"
 
 export const playerProfileRoute = new RaidHubRoute({
     method: "get",

@@ -1,6 +1,6 @@
+import { instanceCharacterQueue, playersQueue } from "@/services/rabbitmq/queues"
+import { expectErr, expectOk } from "@/test"
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
-import { instanceCharacterQueue, playersQueue } from "../services/rabbitmq/queues"
-import { expectErr, expectOk } from "../util.test"
 import { activityRoute } from "./activity"
 
 describe("activity 200", () => {

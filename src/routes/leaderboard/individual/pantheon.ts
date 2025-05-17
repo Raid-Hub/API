@@ -1,16 +1,16 @@
-import { z } from "zod"
-import { RaidHubRoute } from "../../../RaidHubRoute"
-import { getVersionId } from "../../../data/definitions"
+import { RaidHubRoute } from "@/RaidHubRoute"
+import { getVersionId } from "@/data/definitions"
 import {
     getIndividualPantheonLeaderboard,
     individualPantheonLeaderboardSortColumns,
     searchIndividualPantheonLeaderboard
-} from "../../../data/leaderboard/individual/pantheon"
-import { cacheControl } from "../../../middlewares/cache-control"
-import { zLeaderboardData } from "../../../schema/components/LeaderboardData"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { zLeaderboardPagination } from "../../../schema/query/LeaderboardPagination"
-import { zBigIntString } from "../../../schema/util"
+} from "@/data/leaderboard/individual/pantheon"
+import { cacheControl } from "@/middlewares/cache-control"
+import { zLeaderboardData } from "@/schema/components/LeaderboardData"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
+import { zBigIntString } from "@/schema/util"
+import { z } from "zod"
 
 const zCategory = z.enum(["clears", "freshClears", "score"])
 

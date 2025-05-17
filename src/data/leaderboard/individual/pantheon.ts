@@ -1,5 +1,5 @@
-import { IndividualLeaderboardEntry } from "../../../schema/components/LeaderboardData"
-import { postgres } from "../../../services/postgres"
+import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
+import { postgres } from "@/services/postgres"
 
 export const individualPantheonLeaderboardSortColumns = ["clears", "fresh_clears", "score"] as const
 

@@ -1,5 +1,5 @@
-import { Teammate } from "../schema/components/Teammate"
-import { postgres } from "../services/postgres"
+import { Teammate } from "@/schema/components/Teammate"
+import { postgres } from "@/services/postgres"
 
 export const getTeammates = async (membershipId: bigint | string, { count }: { count: number }) => {
     return await postgres.queryRows<Teammate>(

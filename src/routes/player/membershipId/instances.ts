@@ -1,9 +1,8 @@
-import { z } from "zod"
-import { RaidHubRoute } from "../../../RaidHubRoute"
-import { getInstances } from "../../../data/instances"
-import { getPlayer } from "../../../data/player"
-import { zInstanceWithPlayers } from "../../../schema/components/InstanceWithPlayers"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
+import { RaidHubRoute } from "@/RaidHubRoute"
+import { getInstances } from "@/data/instances"
+import { getPlayer } from "@/data/player"
+import { zInstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import {
     zBigIntString,
     zBoolString,
@@ -11,8 +10,9 @@ import {
     zCoercedWholeNumber,
     zISODateString,
     zSplitCommaSeparatedString
-} from "../../../schema/util"
-import { canAccessProtectedResource } from "../../../utils/auth"
+} from "@/schema/util"
+import { canAccessProtectedResource } from "@/utils/auth"
+import { z } from "zod"
 
 export const playerInstancesRoute = new RaidHubRoute({
     method: "get",

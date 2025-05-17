@@ -1,6 +1,6 @@
-import { ActivityDefinition } from "../schema/components/ActivityDefinition"
-import { VersionDefinition } from "../schema/components/VersionDefinition"
-import { postgres } from "../services/postgres"
+import { ActivityDefinition } from "@/schema/components/ActivityDefinition"
+import { VersionDefinition } from "@/schema/components/VersionDefinition"
+import { postgres } from "@/services/postgres"
 
 export const getRaidId = async (raidPath: string) => {
     return await postgres.queryRow<{ id: number }>(

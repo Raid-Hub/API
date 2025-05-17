@@ -1,18 +1,18 @@
-import { z } from "zod"
-import { RaidHubRoute } from "../../../RaidHubRoute"
+import { RaidHubRoute } from "@/RaidHubRoute"
 import {
     getInstanceBlacklist,
     getInstanceFlags,
     getInstancePlayerFlags,
     getInstancePlayersStanding
-} from "../../../data/reporting/standing"
+} from "@/data/reporting/standing"
 import {
     zInstanceBlacklist,
     zInstanceFlag,
     zInstancePlayerStanding
-} from "../../../schema/components/InstanceStanding"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { zBigIntString, zInt64 } from "../../../schema/util"
+} from "@/schema/components/InstanceStanding"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zBigIntString, zInt64 } from "@/schema/util"
+import { z } from "zod"
 
 export const reportingStandingInstanceRoute = new RaidHubRoute({
     method: "get",

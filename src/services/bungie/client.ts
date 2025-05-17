@@ -1,6 +1,6 @@
+import { apiVersion } from "@/version"
 import { BungieFetchConfig } from "bungie-net-core"
 import { BungieNetResponse } from "bungie-net-core/interfaces"
-import { apiVersion } from "../../version"
 import { BungieApiError } from "./error"
 
 const htmlRegex = /<title>(.*?)<\/title>/

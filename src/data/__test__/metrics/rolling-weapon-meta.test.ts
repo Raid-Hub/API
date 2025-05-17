@@ -1,7 +1,7 @@
+import { getRollingWeaponMeta } from "@/data/metrics/rolling-weapon-meta"
+import { zWeaponMetric } from "@/schema/components/Metrics"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zWeaponMetric } from "../../../schema/components/Metrics"
-import { getRollingWeaponMeta } from "../../metrics/rolling-weapon-meta"
 
 describe("getRollingWeaponMeta", () => {
     it("returns the correct shape", async () => {

@@ -1,7 +1,7 @@
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { expectErr, expectOk } from "@/test"
+import { generateJWT } from "@/utils/auth"
 import { describe, expect, test } from "bun:test"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { expectErr, expectOk } from "../../../util.test"
-import { generateJWT } from "../../../utils/auth"
 import { playerInstancesRoute } from "./instances"
 
 describe("instances 200", () => {

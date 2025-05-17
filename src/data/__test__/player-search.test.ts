@@ -1,6 +1,6 @@
+import { zPlayerInfo } from "@/schema/components/PlayerInfo"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zPlayerInfo } from "../../schema/components/PlayerInfo"
 import { searchForPlayer } from "../player-search"
 
 describe("searchForPlayer", () => {

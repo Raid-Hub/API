@@ -1,10 +1,10 @@
+import { RaidHubRoute } from "@/RaidHubRoute"
+import { listActivityDefinitions, listHashes, listVersionDefinitions } from "@/data/definitions"
+import { cacheControl } from "@/middlewares/cache-control"
+import { zActivityDefinition } from "@/schema/components/ActivityDefinition"
+import { zVersionDefinition } from "@/schema/components/VersionDefinition"
+import { zNaturalNumber, zNumericalRecordKey } from "@/schema/util"
 import { z } from "zod"
-import { RaidHubRoute } from "../RaidHubRoute"
-import { listActivityDefinitions, listHashes, listVersionDefinitions } from "../data/definitions"
-import { cacheControl } from "../middlewares/cache-control"
-import { zActivityDefinition } from "../schema/components/ActivityDefinition"
-import { zVersionDefinition } from "../schema/components/VersionDefinition"
-import { zNaturalNumber, zNumericalRecordKey } from "../schema/util"
 
 export const manifestRoute = new RaidHubRoute({
     method: "get",

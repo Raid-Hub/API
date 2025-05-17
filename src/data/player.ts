@@ -1,12 +1,12 @@
-import { PlayerInfo } from "../schema/components/PlayerInfo"
+import { PlayerInfo } from "@/schema/components/PlayerInfo"
 import {
     PlayerProfileActivityStats,
     PlayerProfileGlobalStats,
     WorldFirstEntry
-} from "../schema/components/PlayerProfile"
-import { postgres } from "../services/postgres"
-import { playerProfileQueryTimer } from "../services/prometheus/metrics"
-import { withHistogramTimer } from "../services/prometheus/util"
+} from "@/schema/components/PlayerProfile"
+import { postgres } from "@/services/postgres"
+import { playerProfileQueryTimer } from "@/services/prometheus/metrics"
+import { withHistogramTimer } from "@/services/prometheus/util"
 
 export const getPlayer = async (membershipId: bigint | string) => {
     return await postgres.queryRow<PlayerInfo>(

@@ -1,11 +1,11 @@
-import { describe, expect, it } from "bun:test"
-import { z } from "zod"
-import { zIndividualLeaderboardEntry } from "../../../schema/components/LeaderboardData"
-import { zNaturalNumber } from "../../../schema/util"
 import {
     getIndividualPantheonLeaderboard,
     searchIndividualPantheonLeaderboard
-} from "../../leaderboard/individual/pantheon"
+} from "@/data/leaderboard/individual/pantheon"
+import { zIndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
+import { zNaturalNumber } from "@/schema/util"
+import { describe, expect, it } from "bun:test"
+import { z } from "zod"
 
 describe("getIndividualPantheonLeaderboard", () => {
     it("returns the correct shape", async () => {

@@ -1,8 +1,8 @@
-import { PlayerInfo } from "../schema/components/PlayerInfo"
-import { DestinyMembershipType } from "../schema/enums/DestinyMembershipType"
-import { postgres } from "../services/postgres"
-import { playerSearchQueryTimer } from "../services/prometheus/metrics"
-import { withHistogramTimer } from "../services/prometheus/util"
+import { PlayerInfo } from "@/schema/components/PlayerInfo"
+import { DestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
+import { postgres } from "@/services/postgres"
+import { playerSearchQueryTimer } from "@/services/prometheus/metrics"
+import { withHistogramTimer } from "@/services/prometheus/util"
 
 /**
  * Case insensitive search

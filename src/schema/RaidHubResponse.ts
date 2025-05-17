@@ -1,6 +1,6 @@
+import { ErrorData } from "@/RaidHubRouterTypes"
 import { ZodObject, ZodRawShape, ZodType, z } from "zod"
 import { registry } from "."
-import { ErrorData } from "../RaidHubRouterTypes"
 import { ErrorCode, zErrorCode } from "./errors/ErrorCode"
 import { zISODateString } from "./util"
 

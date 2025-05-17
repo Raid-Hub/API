@@ -1,5 +1,5 @@
-import { ClanStats } from "../schema/components/Clan"
-import { postgres } from "../services/postgres"
+import { ClanStats } from "@/schema/components/Clan"
+import { postgres } from "@/services/postgres"
 
 export const getClanStats = async (
     groupId: string | bigint,

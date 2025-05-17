@@ -1,6 +1,6 @@
+import { zDigitString } from "@/schema/util"
 import jwt from "jsonwebtoken"
 import { z } from "zod"
-import { zDigitString } from "../schema/util"
 
 const zJWTAuthFormat = z.object({
     isAdmin: z.boolean(),

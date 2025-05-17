@@ -1,5 +1,5 @@
-import { IndividualLeaderboardEntry } from "../../../schema/components/LeaderboardData"
-import { postgres } from "../../../services/postgres"
+import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
+import { postgres } from "@/services/postgres"
 
 export const getIndividualWorldFirstPowerRankingsLeaderboard = async ({
     skip,

@@ -1,4 +1,4 @@
-import { postgres } from "../services/postgres"
+import { postgres } from "@/services/postgres"
 
 export async function getRawCompressedPGCR(instanceId: bigint | string) {
     return await postgres.queryRow<{

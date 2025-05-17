@@ -1,5 +1,5 @@
-import { ClanLeaderboardEntry } from "../../schema/components/Clan"
-import { postgres } from "../../services/postgres"
+import { ClanLeaderboardEntry } from "@/schema/components/Clan"
+import { postgres } from "@/services/postgres"
 
 export const clanLeaderboardSortColumns = [
     "clears",

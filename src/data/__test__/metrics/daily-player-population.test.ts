@@ -1,8 +1,8 @@
+import { getDailyPlayerPopulation } from "@/data/metrics/daily-player-population"
+import { zPopulationByRaidMetric } from "@/schema/components/Metrics"
+import { zISODateString } from "@/schema/util"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zPopulationByRaidMetric } from "../../../schema/components/Metrics"
-import { zISODateString } from "../../../schema/util"
-import { getDailyPlayerPopulation } from "../../metrics/daily-player-population"
 
 describe("getDailyPlayerPopulation", () => {
     it("returns the correct shape", async () => {

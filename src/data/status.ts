@@ -1,4 +1,4 @@
-import { postgres } from "../services/postgres"
+import { postgres } from "@/services/postgres"
 
 export const getLatestActivityByDate = async () => {
     const latestActivity = await postgres.queryRow<{

@@ -1,5 +1,5 @@
+import { expectErr, expectOk } from "@/test"
 import { describe, test } from "bun:test"
-import { expectErr, expectOk } from "../util.test"
 import { pgcrRoute } from "./pgcr"
 
 describe("pgcr 200", () => {

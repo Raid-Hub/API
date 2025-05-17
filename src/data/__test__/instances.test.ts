@@ -1,6 +1,6 @@
+import { zInstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zInstanceWithPlayers } from "../../schema/components/InstanceWithPlayers"
 import { getInstances } from "../instances"
 
 describe("getInstances", () => {

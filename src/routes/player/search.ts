@@ -1,10 +1,10 @@
+import { RaidHubRoute } from "@/RaidHubRoute"
+import { searchForPlayer } from "@/data/player-search"
+import { cacheControl } from "@/middlewares/cache-control"
+import { zPlayerInfo } from "@/schema/components/PlayerInfo"
+import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
+import { zNaturalNumber } from "@/schema/util"
 import { z } from "zod"
-import { RaidHubRoute } from "../../RaidHubRoute"
-import { searchForPlayer } from "../../data/player-search"
-import { cacheControl } from "../../middlewares/cache-control"
-import { zPlayerInfo } from "../../schema/components/PlayerInfo"
-import { zDestinyMembershipType } from "../../schema/enums/DestinyMembershipType"
-import { zNaturalNumber } from "../../schema/util"
 
 export const playerSearchRoute = new RaidHubRoute({
     method: "get",

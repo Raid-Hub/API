@@ -1,5 +1,5 @@
-import { InstanceWithPlayers } from "../schema/components/InstanceWithPlayers"
-import { postgres } from "../services/postgres"
+import { InstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
+import { postgres } from "@/services/postgres"
 
 export async function getInstances({
     count,
