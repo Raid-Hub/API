@@ -1,5 +1,5 @@
+import { expectErr, expectOk } from "@/test"
 import { describe, expect, test } from "bun:test"
-import { expectErr, expectOk } from "../../../util.test"
 import { leaderboardIndividualGlobalRoute } from "./global"
 
 describe("global leaderboard 200", () => {

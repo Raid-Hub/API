@@ -1,12 +1,12 @@
-import { describe, expect, it } from "bun:test"
-import { z } from "zod"
-import { zPlayerInfo } from "../../schema/components/PlayerInfo"
+import { zPlayerInfo } from "@/schema/components/PlayerInfo"
 import {
     zPlayerProfileActivityStats,
     zPlayerProfileGlobalStats,
     zWorldFirstEntry
-} from "../../schema/components/PlayerProfile"
-import { zBigIntString } from "../../schema/util"
+} from "@/schema/components/PlayerProfile"
+import { zBigIntString } from "@/schema/util"
+import { describe, expect, it } from "bun:test"
+import { z } from "zod"
 import {
     getPlayer,
     getPlayerActivityStats,

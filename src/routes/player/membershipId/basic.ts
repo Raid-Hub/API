@@ -1,11 +1,11 @@
+import { RaidHubRoute } from "@/RaidHubRoute"
+import { getPlayer } from "@/data/player"
+import { cacheControl } from "@/middlewares/cache-control"
+import { processPlayerAsync } from "@/middlewares/processPlayerAsync"
+import { zPlayerInfo } from "@/schema/components/PlayerInfo"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zBigIntString } from "@/schema/util"
 import { z } from "zod"
-import { RaidHubRoute } from "../../../RaidHubRoute"
-import { getPlayer } from "../../../data/player"
-import { cacheControl } from "../../../middlewares/cache-control"
-import { processPlayerAsync } from "../../../middlewares/processPlayerAsync"
-import { zPlayerInfo } from "../../../schema/components/PlayerInfo"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { zBigIntString } from "../../../schema/util"
 
 export const playerBasicRoute = new RaidHubRoute({
     method: "get",

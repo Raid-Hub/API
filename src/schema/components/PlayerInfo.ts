@@ -1,7 +1,7 @@
+import { registry } from "@/schema"
+import { zInt64, zISODateString } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
 import { zDestinyMembershipType } from "../enums/DestinyMembershipType"
-import { zInt64, zISODateString } from "../util"
 
 export type PlayerInfo = z.input<typeof zPlayerInfo>
 export const zPlayerInfo = registry.register(

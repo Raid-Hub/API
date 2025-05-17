@@ -1,7 +1,7 @@
+import { registry } from "@/schema"
+import { zInt64, zISODateString, zNaturalNumber, zUInt32, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
 import { zDestinyMembershipType } from "../enums/DestinyMembershipType"
-import { zInt64, zISODateString, zNaturalNumber, zUInt32, zWholeNumber } from "../util"
 
 export type Instance = z.input<typeof zInstance>
 export const zInstance = registry.register(

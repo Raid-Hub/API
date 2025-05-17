@@ -1,7 +1,7 @@
-import { InstanceForPlayer } from "../schema/components/InstanceForPlayer"
-import { postgres } from "../services/postgres"
-import { activityHistoryQueryTimer } from "../services/prometheus/metrics"
-import { withHistogramTimer } from "../services/prometheus/util"
+import { InstanceForPlayer } from "@/schema/components/InstanceForPlayer"
+import { postgres } from "@/services/postgres"
+import { activityHistoryQueryTimer } from "@/services/prometheus/metrics"
+import { withHistogramTimer } from "@/services/prometheus/util"
 
 export const getActivities = async (
     membershipId: bigint | string,

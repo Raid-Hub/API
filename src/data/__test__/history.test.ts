@@ -1,6 +1,6 @@
+import { zInstanceForPlayer } from "@/schema/components/InstanceForPlayer"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zInstanceForPlayer } from "../../schema/components/InstanceForPlayer"
 import { getActivities } from "../history"
 
 describe("getActivities", () => {

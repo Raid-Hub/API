@@ -1,8 +1,8 @@
+import { zActivityDefinition } from "@/schema/components/ActivityDefinition"
+import { zVersionDefinition } from "@/schema/components/VersionDefinition"
+import { zNaturalNumber, zUInt32 } from "@/schema/util"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zActivityDefinition } from "../../schema/components/ActivityDefinition"
-import { zVersionDefinition } from "../../schema/components/VersionDefinition"
-import { zNaturalNumber, zUInt32 } from "../../schema/util"
 import {
     getActivityVersion,
     getRaidId,

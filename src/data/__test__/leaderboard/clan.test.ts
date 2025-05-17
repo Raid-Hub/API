@@ -1,7 +1,7 @@
+import { getClanLeaderboard } from "@/data/leaderboard/clan"
+import { zClanLeaderboardEntry } from "@/schema/components/Clan"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zClanLeaderboardEntry } from "../../../schema/components/Clan"
-import { getClanLeaderboard } from "../../leaderboard/clan"
 
 describe("getClanLeaderboard", () => {
     it("returns the correct shape", async () => {

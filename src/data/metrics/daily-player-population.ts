@@ -1,5 +1,5 @@
-import { PopulationByRaidMetric } from "../../schema/components/Metrics"
-import { clickhouse } from "../../services/clickhouse/client"
+import { PopulationByRaidMetric } from "@/schema/components/Metrics"
+import { clickhouse } from "@/services/clickhouse/client"
 
 export const getDailyPlayerPopulation = async () => {
     const results = await clickhouse.query({

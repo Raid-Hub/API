@@ -1,6 +1,6 @@
+import { registry } from "@/schema"
+import { zInt64, zISODateString, zNaturalNumber, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zInt64, zISODateString, zNaturalNumber, zWholeNumber } from "../util"
 import { zPlayerInfo } from "./PlayerInfo"
 
 export type ClanBannerData = z.input<typeof zClanBannerData>

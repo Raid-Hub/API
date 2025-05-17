@@ -1,8 +1,8 @@
-import { Instance } from "../schema/components/Instance"
-import { InstanceExtended } from "../schema/components/InstanceExtended"
-import { InstanceMetadata } from "../schema/components/InstanceMetadata"
-import { InstancePlayerExtended } from "../schema/components/InstancePlayerExtended"
-import { postgres } from "../services/postgres"
+import { Instance } from "@/schema/components/Instance"
+import { InstanceExtended } from "@/schema/components/InstanceExtended"
+import { InstanceMetadata } from "@/schema/components/InstanceMetadata"
+import { InstancePlayerExtended } from "@/schema/components/InstancePlayerExtended"
+import { postgres } from "@/services/postgres"
 
 export async function getInstance(instanceId: bigint | string): Promise<Instance | null> {
     return await postgres.queryRow<Instance>(

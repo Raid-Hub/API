@@ -1,4 +1,4 @@
-import { RaidHubRouter } from "../RaidHubRouter"
+import { RaidHubRouter } from "@/RaidHubRouter"
 import { activityRoute } from "./activity"
 import { adminRouter } from "./admin"
 import { adminAuthorizationRoute } from "./authorize/admin"

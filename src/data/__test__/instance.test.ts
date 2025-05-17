@@ -1,8 +1,8 @@
+import { zInstance } from "@/schema/components/Instance"
+import { zInstanceExtended } from "@/schema/components/InstanceExtended"
+import { zInstanceMetadata } from "@/schema/components/InstanceMetadata"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zInstance } from "../../schema/components/Instance"
-import { zInstanceExtended } from "../../schema/components/InstanceExtended"
-import { zInstanceMetadata } from "../../schema/components/InstanceMetadata"
 import {
     getInstance,
     getInstanceExtended,

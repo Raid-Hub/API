@@ -1,5 +1,5 @@
+import { playersQueue } from "@/services/rabbitmq/queues"
 import { RequestHandler } from "express"
-import { playersQueue } from "../services/rabbitmq/queues"
 
 export const processPlayerAsync: RequestHandler<{ membershipId: bigint }> = async (
     req,

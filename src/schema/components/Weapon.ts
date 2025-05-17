@@ -1,6 +1,6 @@
+import { registry } from "@/schema"
+import { zUInt32 } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zUInt32 } from "../util"
 
 export type WeaponType = z.input<typeof zWeaponType>
 export const zWeaponType = registry.register(

@@ -1,5 +1,5 @@
+import { expectOk } from "@/test"
 import { describe, expect, test } from "bun:test"
-import { expectOk } from "../../util.test"
 import { dailyPlayerPopulationRoute } from "./dailyPlayerPopulation"
 
 describe("player population 200", () => {

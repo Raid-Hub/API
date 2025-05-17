@@ -1,10 +1,10 @@
+import { RaidHubRoute } from "@/RaidHubRoute"
+import { cacheControl } from "@/middlewares/cache-control"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zNaturalNumber } from "@/schema/util"
+import { postgres } from "@/services/postgres"
 import { DatabaseError } from "postgresql-client"
 import { z } from "zod"
-import { RaidHubRoute } from "../../RaidHubRoute"
-import { cacheControl } from "../../middlewares/cache-control"
-import { ErrorCode } from "../../schema/errors/ErrorCode"
-import { zNaturalNumber } from "../../schema/util"
-import { postgres } from "../../services/postgres"
 
 export const adminQueryRoute = new RaidHubRoute({
     isAdministratorRoute: true,

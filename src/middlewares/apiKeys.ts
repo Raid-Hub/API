@@ -1,8 +1,8 @@
+import { ApiKeyError } from "@/schema/errors/ApiKeyError"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { file } from "bun"
 import { RequestHandler } from "express"
 import { z } from "zod"
-import { ApiKeyError } from "../schema/errors/ApiKeyError"
-import { ErrorCode } from "../schema/errors/ErrorCode"
 
 const KeySchema = z.object({
     contact: z.string().default(""),

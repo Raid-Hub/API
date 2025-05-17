@@ -1,7 +1,7 @@
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { InsufficientPermissionsError } from "@/schema/errors/InsufficientPermissionsError"
 import { RequestHandler } from "express"
 import jwt from "jsonwebtoken"
-import { ErrorCode } from "../schema/errors/ErrorCode"
-import { InsufficientPermissionsError } from "../schema/errors/InsufficientPermissionsError"
 
 const error = (): InsufficientPermissionsError => ({
     minted: new Date(),

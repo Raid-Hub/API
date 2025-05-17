@@ -1,11 +1,11 @@
-import { describe, expect, it } from "bun:test"
-import { z } from "zod"
-import { zIndividualLeaderboardEntry } from "../../../schema/components/LeaderboardData"
-import { zNaturalNumber } from "../../../schema/util"
 import {
     getIndividualWorldFirstPowerRankingsLeaderboard,
     searchIndividualWorldFirstPowerRankingsLeaderboard
-} from "../../leaderboard/individual/power-rankings"
+} from "@/data/leaderboard/individual/power-rankings"
+import { zIndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
+import { zNaturalNumber } from "@/schema/util"
+import { describe, expect, it } from "bun:test"
+import { z } from "zod"
 
 describe("getIndividualWorldFirstPowerRankingsLeaderboard", () => {
     it("returns the correct shape", async () => {

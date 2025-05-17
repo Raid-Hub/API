@@ -1,7 +1,7 @@
+import { playersQueue } from "@/services/rabbitmq/queues"
 import { afterAll, beforeAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
 import express from "express"
 import request from "supertest"
-import { playersQueue } from "../services/rabbitmq/queues"
 import { processPlayerAsync } from "./processPlayerAsync"
 
 const app = express()

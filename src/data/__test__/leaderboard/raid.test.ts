@@ -1,11 +1,11 @@
-import { describe, expect, it } from "bun:test"
-import { z } from "zod"
-import { zIndividualLeaderboardEntry } from "../../../schema/components/LeaderboardData"
-import { zNaturalNumber } from "../../../schema/util"
 import {
     getIndividualRaidLeaderboard,
     searchIndividualRaidLeaderboard
-} from "../../leaderboard/individual/raid"
+} from "@/data/leaderboard/individual/raid"
+import { zIndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
+import { zNaturalNumber } from "@/schema/util"
+import { describe, expect, it } from "bun:test"
+import { z } from "zod"
 
 describe("getIndividualRaidLeaderboard", () => {
     it("returns the correct shape", async () => {

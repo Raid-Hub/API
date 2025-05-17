@@ -1,5 +1,5 @@
-import { TeamLeaderboardEntry } from "../../../schema/components/LeaderboardData"
-import { postgres } from "../../../services/postgres"
+import { TeamLeaderboardEntry } from "@/schema/components/LeaderboardData"
+import { postgres } from "@/services/postgres"
 
 export const getFirstTeamActivityVersionLeaderboard = async ({
     activityId,

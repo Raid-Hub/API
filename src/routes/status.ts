@@ -1,18 +1,18 @@
-import { z } from "zod"
-import { RaidHubRoute } from "../RaidHubRoute"
-import { getInstanceBasic } from "../data/instance"
-import { getLatestActivityByDate } from "../data/status"
-import { cacheControl } from "../middlewares/cache-control"
+import { RaidHubRoute } from "@/RaidHubRoute"
+import { getInstanceBasic } from "@/data/instance"
+import { getLatestActivityByDate } from "@/data/status"
+import { cacheControl } from "@/middlewares/cache-control"
 import {
     AtlasStatus,
     FloodgatesStatus,
     zAtlasStatus,
     zFloodgatesStatus
-} from "../schema/components/Status"
-import { getDestiny2Status } from "../services/bungie"
-import { getAtlasStatus } from "../services/prometheus/atlas"
-import { getFloodgatesRecentId } from "../services/prometheus/floodgates"
-import { getFloodgatesStatus } from "../services/rabbitmq/api"
+} from "@/schema/components/Status"
+import { getDestiny2Status } from "@/services/bungie"
+import { getAtlasStatus } from "@/services/prometheus/atlas"
+import { getFloodgatesRecentId } from "@/services/prometheus/floodgates"
+import { getFloodgatesStatus } from "@/services/rabbitmq/api"
+import { z } from "zod"
 
 // This state tracks the status of the Destiny API and debounces it with a grace period of 60 seconds.
 export const statusState = {

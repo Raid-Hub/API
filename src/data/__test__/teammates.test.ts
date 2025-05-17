@@ -1,6 +1,6 @@
+import { zTeammate } from "@/schema/components/Teammate"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
-import { zTeammate } from "../../schema/components/Teammate"
 import { getTeammates } from "../teammates"
 
 describe("getPlayer", () => {

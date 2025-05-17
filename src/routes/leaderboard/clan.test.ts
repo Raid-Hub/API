@@ -1,5 +1,5 @@
+import { expectOk } from "@/test"
 import { describe, expect, test } from "bun:test"
-import { expectOk } from "../../util.test"
 import { clanLeaderboardRoute } from "./clan"
 
 describe("clan leaderboard 200", () => {

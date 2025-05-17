@@ -1,6 +1,6 @@
-import { WeaponMetric } from "../../schema/components/Metrics"
-import { WeaponSlot } from "../../schema/components/Weapon"
-import { clickhouse } from "../../services/clickhouse/client"
+import { WeaponMetric } from "@/schema/components/Metrics"
+import { WeaponSlot } from "@/schema/components/Weapon"
+import { clickhouse } from "@/services/clickhouse/client"
 
 export const getRollingWeaponMeta = async ({
     sort,
