@@ -1,6 +1,6 @@
+import { registry } from "@/schema"
+import { zWholeNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zWholeNumber } from "../util"
 
 export type InstancePlayer = z.input<typeof zInstancePlayer>
 export const zInstancePlayer = registry.register(

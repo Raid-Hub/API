@@ -1,6 +1,6 @@
+import { registry } from "@/schema"
+import { zISODateString, zInt64, zNaturalNumber, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zISODateString, zInt64, zNaturalNumber, zWholeNumber } from "../util"
 import { zPlayerInfo } from "./PlayerInfo"
 
 enum ReportSource {

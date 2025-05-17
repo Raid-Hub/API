@@ -1,6 +1,6 @@
+import { registry } from "@/schema"
+import { zISODateString, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zISODateString, zWholeNumber } from "../util"
 
 export type LatestResolvedInstance = z.input<typeof zLatestResolvedInstance>
 export const zLatestResolvedInstance = registry.register(

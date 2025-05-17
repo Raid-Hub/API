@@ -2,8 +2,8 @@ import {
     InstanceBlacklist,
     InstanceFlag,
     InstancePlayerStanding
-} from "../../schema/components/InstanceStanding"
-import { postgres } from "../../services/postgres"
+} from "@/schema/components/InstanceStanding"
+import { postgres } from "@/services/postgres"
 
 export const getInstanceFlags = async (instanceId: bigint | string) => {
     return await postgres.queryRows<InstanceFlag>(

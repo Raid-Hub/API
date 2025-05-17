@@ -1,6 +1,6 @@
+import { registry } from "@/schema"
+import { zNaturalNumber, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zNaturalNumber, zWholeNumber } from "../util"
 import { zPlayerInfo } from "./PlayerInfo"
 
 export type Teammate = z.input<typeof zTeammate>

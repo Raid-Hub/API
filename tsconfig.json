@@ -16,7 +16,17 @@
 
     "noEmit": true,
 
-    "rootDir": "."
+    "rootDir": ".",
+
+    "baseUrl": ".",
+    "paths": {
+      "@/data/*": ["src/data/*"],
+      "@/middlewares/*": ["src/middlewares/*"],
+      "@/schema/*": ["src/schema/*"],
+      "@/services/*": ["src/services/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*.ts", "api-keys.json"],
   "exclude": ["scripts/*"]

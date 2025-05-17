@@ -1,5 +1,5 @@
+import { registry } from "@/schema"
 import { z } from "zod"
-import { registry } from ".."
 
 export enum ErrorCode {
     /** Unauthorized */
