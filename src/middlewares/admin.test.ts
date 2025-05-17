@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import express from "express"
 import request from "supertest"
-import { generateJWT } from "../util/auth"
+import { generateJWT } from "../utils/auth"
 import { adminProtected } from "./admin"
 
 const app = express()

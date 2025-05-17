@@ -6,7 +6,7 @@ import { cacheControl } from "../../../middlewares/cache-control"
 import { zTeammate } from "../../../schema/components/Teammate"
 import { ErrorCode } from "../../../schema/errors/ErrorCode"
 import { zBigIntString } from "../../../schema/util"
-import { canAccessProtectedResource } from "../../../util/auth"
+import { canAccessProtectedResource } from "../../../utils/auth"
 
 export const playerTeammatesRoute = new RaidHubRoute({
     method: "get",

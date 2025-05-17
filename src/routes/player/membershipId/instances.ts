@@ -12,7 +12,7 @@ import {
     zISODateString,
     zSplitCommaSeparatedString
 } from "../../../schema/util"
-import { canAccessProtectedResource } from "../../../util/auth"
+import { canAccessProtectedResource } from "../../../utils/auth"
 
 export const playerInstancesRoute = new RaidHubRoute({
     method: "get",

@@ -5,7 +5,7 @@ import { getPlayer } from "../../../data/player"
 import { zInstanceForPlayer } from "../../../schema/components/InstanceForPlayer"
 import { ErrorCode } from "../../../schema/errors/ErrorCode"
 import { zBigIntString, zISODateString } from "../../../schema/util"
-import { canAccessProtectedResource } from "../../../util/auth"
+import { canAccessProtectedResource } from "../../../utils/auth"
 
 export const playerActivitiesRoute = new RaidHubRoute({
     method: "get",
