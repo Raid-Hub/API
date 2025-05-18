@@ -100,9 +100,10 @@ export type InstanceBlacklist = z.infer<typeof zInstanceBlacklist>
 export const zInstanceBlacklist = registry.register(
     "InstanceBlacklist",
     z.object({
+        instanceId: zInt64(),
         reportSource: z.nativeEnum(ReportSource),
-        reportId: zNaturalNumber(),
-        cheatCheckVersion: z.string(),
+        reportId: zNaturalNumber().nullable(),
+        cheatCheckVersion: z.string().nullable(),
         reason: z.string(),
         createdAt: zISODateString()
     })

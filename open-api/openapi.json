@@ -600,17 +600,23 @@
       "InstanceBlacklist": {
         "type": "object",
         "properties": {
+          "instanceId": {
+            "type": "string",
+            "format": "int64"
+          },
           "reportSource": {
             "type": "string",
             "enum": ["Manual", "CheatCheck", "WebReport"]
           },
           "reportId": {
             "type": "integer",
+            "nullable": true,
             "minimum": 0,
             "exclusiveMinimum": true
           },
           "cheatCheckVersion": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "reason": {
             "type": "string"
@@ -621,6 +627,7 @@
           }
         },
         "required": [
+          "instanceId",
           "reportSource",
           "reportId",
           "cheatCheckVersion",

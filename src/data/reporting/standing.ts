@@ -49,6 +49,7 @@ export const getInstancePlayerFlags = async (instanceId: bigint | string) => {
 export const getInstanceBlacklist = async (instanceId: bigint | string) => {
     return await postgres.queryRow<InstanceBlacklist>(
         `SELECT 
+            bi.instance_id AS "instanceId",
             bi.report_source AS "reportSource",
             bi.report_id AS "reportId",
             bi.cheat_check_version AS "cheatCheckVersion",
