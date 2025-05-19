@@ -45,4 +45,22 @@ describe("admin protected", () => {
             message: "Hello World"
         })
     })
+
+    test("should return 403 if valid authorization non-admin is provided", async () => {
+        const token = generateJWT(
+            {
+                isAdmin: false,
+                bungieMembershipId: "123",
+                destinyMembershipIds: []
+            },
+            600
+        )
+
+        const res = await request(app)
+            .get("/admin")
+            .set("Authorization", "Bearer " + token)
+        expect(res.status).toBe(403)
+        expect(res.body.success).toBe(false)
+        expect(res.body.code).toBe("InsufficientPermissionsError")
+    })
 })

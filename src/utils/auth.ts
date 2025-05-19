@@ -2,7 +2,7 @@ import { zDigitString } from "@/schema/util"
 import jwt from "jsonwebtoken"
 import { z } from "zod"
 
-const zJWTAuthFormat = z.object({
+export const zJWTAuthFormat = z.object({
     isAdmin: z.boolean(),
     bungieMembershipId: zDigitString(),
     destinyMembershipIds: z.array(zDigitString())

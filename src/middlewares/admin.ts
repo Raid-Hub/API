@@ -1,5 +1,6 @@
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { InsufficientPermissionsError } from "@/schema/errors/InsufficientPermissionsError"
+import { zJWTAuthFormat } from "@/utils/auth"
 import { RequestHandler } from "express"
 import jwt from "jsonwebtoken"
 
@@ -21,11 +22,16 @@ export const adminProtected: RequestHandler = (req, res, next) => {
         return
     }
 
-    jwt.verify(token, process.env.JWT_SECRET!, (err, _) => {
+    jwt.verify(token, process.env.JWT_SECRET!, (err, result) => {
         if (err) {
             res.status(403).json(error())
         } else {
-            next()
+            const data = zJWTAuthFormat.parse(result)
+            if (data.isAdmin) {
+                next()
+            } else {
+                res.status(403).json(error())
+            }
         }
     })
 }
