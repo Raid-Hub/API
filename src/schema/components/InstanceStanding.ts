@@ -120,12 +120,25 @@ export const zInstanceFlag = registry.register(
     })
 )
 
+export type InstancePlayerFlag = z.infer<typeof zInstancePlayerFlag>
+export const zInstancePlayerFlag = registry.register(
+    "InstancePlayerFlag",
+    z.object({
+        flaggedAt: zISODateString(),
+        cheatCheckVersion: z.string(),
+        cheatProbability: z.number().nonnegative(),
+        cheatCheckBitmask: zCheatCheckBitmask,
+        instanceId: zInt64(),
+        membershipId: zInt64()
+    })
+)
+
 export type InstancePlayerStanding = z.infer<typeof zInstancePlayerStanding>
 export const zInstancePlayerStanding = registry.register(
     "InstancePlayerStanding",
     z.object({
         playerInfo: zPlayerInfo,
-        flags: z.array(zInstanceFlag),
+        flags: z.array(zInstancePlayerFlag),
         clears: zWholeNumber(),
         cheatLevel: z.nativeEnum(CheatLevel),
         blacklistedInstances: z.array(
@@ -137,10 +150,6 @@ export const zInstancePlayerStanding = registry.register(
                 createdAt: zISODateString()
             })
         ),
-        otherRecentFlags: z.array(
-            zInstanceFlag.extend({
-                instanceId: zInt64()
-            })
-        )
+        otherRecentFlags: z.array(zInstancePlayerFlag)
     })
 )

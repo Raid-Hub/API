@@ -1,6 +1,7 @@
 import {
     InstanceBlacklist,
     InstanceFlag,
+    InstancePlayerFlag,
     InstancePlayerStanding
 } from "@/schema/components/InstanceStanding"
 import { postgres } from "@/services/postgres"
@@ -24,12 +25,9 @@ export const getInstanceFlags = async (instanceId: bigint | string) => {
 }
 
 export const getInstancePlayerFlags = async (instanceId: bigint | string) => {
-    return await postgres.queryRows<
-        InstanceFlag & {
-            membershipId: string
-        }
-    >(
+    return await postgres.queryRows<InstancePlayerFlag>(
         `SELECT 
+            fip.instance_id::text AS "instanceId",
             fip.membership_id::text AS "membershipId",
             fip.cheat_check_version AS "cheatCheckVersion",
             fip.cheat_check_bitmask::text AS "cheatCheckBitmask",
@@ -80,10 +78,11 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
             p.cheat_level AS "cheatLevel",
             p.clears,
             (
-                SELECT jsonb_agg(f.data)
+                SELECT COALESCE(jsonb_agg(f.data), '[]'::jsonb)
                 FROM (
                     SELECT jsonb_build_object(
                         'instanceId', fip.instance_id::text,
+                        'membershipId', fip.membership_id::text,
                         'instanceDate', i.date_started,
                         'cheatCheckVersion', fip.cheat_check_version,
                         'cheatCheckBitmask', fip.cheat_check_bitmask::text,

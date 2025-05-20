@@ -39,3 +39,22 @@ export const zInstance = registry.register(
         })
         .strict()
 )
+export type InstanceBasic = z.input<typeof zInstanceBasic>
+export const zInstanceBasic = registry.register(
+    "InstanceBasic",
+    z.object({
+        instanceId: zInt64(),
+        hash: zUInt32(),
+        completed: z.boolean(),
+        playerCount: zNaturalNumber(),
+        score: zWholeNumber(),
+        fresh: z.boolean().nullable(),
+        flawless: z.boolean().nullable(),
+        dateStarted: zISODateString(),
+        dateCompleted: zISODateString(),
+        season: zNaturalNumber(),
+        duration: zNaturalNumber(),
+        platformType: zDestinyMembershipType.nullable(),
+        dateResolved: zISODateString()
+    })
+)

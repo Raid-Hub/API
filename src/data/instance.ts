@@ -1,4 +1,4 @@
-import { Instance } from "@/schema/components/Instance"
+import { Instance, InstanceBasic } from "@/schema/components/Instance"
 import { InstanceExtended } from "@/schema/components/InstanceExtended"
 import { InstanceMetadata } from "@/schema/components/InstanceMetadata"
 import { InstancePlayerExtended } from "@/schema/components/InstancePlayerExtended"
@@ -166,21 +166,7 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
 }
 
 export async function getInstanceBasic(instanceId: bigint | string) {
-    const instance = await postgres.queryRow<{
-        instanceId: string
-        hash: number
-        completed: boolean
-        playerCount: number
-        score: number
-        fresh: boolean | null
-        flawless: boolean | null
-        dateStarted: Date
-        dateCompleted: Date
-        season: number
-        duration: number | null
-        platformType: string | null
-        dateResolved: Date
-    }>(
+    const instance = await postgres.queryRow<InstanceBasic>(
         `SELECT 
             instance_id::text AS "instanceId",
             hash AS "hash",

@@ -1,17 +1,19 @@
 import { RaidHubRoute } from "@/RaidHubRoute"
+import { getInstanceBasic } from "@/data/instance"
 import {
     getInstanceBlacklist,
     getInstanceFlags,
     getInstancePlayerFlags,
     getInstancePlayersStanding
 } from "@/data/reporting/standing"
+import { zInstanceBasic } from "@/schema/components/Instance"
 import {
     zInstanceBlacklist,
     zInstanceFlag,
     zInstancePlayerStanding
 } from "@/schema/components/InstanceStanding"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString, zInt64 } from "@/schema/util"
+import { zBigIntString } from "@/schema/util"
 import { z } from "zod"
 
 export const reportingStandingInstanceRoute = new RaidHubRoute({
@@ -25,7 +27,7 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
         success: {
             statusCode: 200,
             schema: z.object({
-                instanceId: zInt64(),
+                instanceDetails: zInstanceBasic,
                 blacklist: zInstanceBlacklist.nullable(),
                 flags: z.array(zInstanceFlag),
                 players: z.array(zInstancePlayerStanding)
@@ -44,15 +46,24 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
     async handler(req) {
         const instanceId = req.params.instanceId
 
-        const [blacklist, flags, playerFlags, playersStanding] = await Promise.all([
-            getInstanceBlacklist(instanceId),
-            getInstanceFlags(instanceId),
-            getInstancePlayerFlags(instanceId),
-            getInstancePlayersStanding(instanceId)
-        ])
+        const [instanceDetails, blacklist, flags, playerFlags, playersStanding] = await Promise.all(
+            [
+                getInstanceBasic(instanceId),
+                getInstanceBlacklist(instanceId),
+                getInstanceFlags(instanceId),
+                getInstancePlayerFlags(instanceId),
+                getInstancePlayersStanding(instanceId)
+            ]
+        )
+
+        if (!instanceDetails) {
+            return RaidHubRoute.fail(ErrorCode.InstanceNotFoundError, {
+                instanceId
+            })
+        }
 
         return RaidHubRoute.ok({
-            instanceId: String(instanceId),
+            instanceDetails,
             blacklist,
             flags,
             players: playersStanding.map(player => ({
@@ -60,6 +71,8 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
                 flags: playerFlags
                     .filter(flag => flag.membershipId === player.playerInfo.membershipId)
                     .map(flag => ({
+                        instanceId: flag.instanceId,
+                        membershipId: flag.membershipId,
                         flaggedAt: flag.flaggedAt,
                         cheatCheckVersion: flag.cheatCheckVersion,
                         cheatProbability: flag.cheatProbability,

@@ -327,6 +327,85 @@
         ],
         "additionalProperties": false
       },
+      "InstanceBasic": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "hash": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "uint32"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "playerCount": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "fresh": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "flawless": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "dateStarted": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateCompleted": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "season": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "duration": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "platformType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DestinyMembershipType"
+              }
+            ],
+            "nullable": true
+          },
+          "dateResolved": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "instanceId",
+          "hash",
+          "completed",
+          "playerCount",
+          "score",
+          "fresh",
+          "flawless",
+          "dateStarted",
+          "dateCompleted",
+          "season",
+          "duration",
+          "platformType",
+          "dateResolved"
+        ]
+      },
       "InstanceMetadata": {
         "type": "object",
         "properties": {
@@ -660,6 +739,41 @@
           "cheatCheckBitmask"
         ]
       },
+      "InstancePlayerFlag": {
+        "type": "object",
+        "properties": {
+          "flaggedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cheatCheckVersion": {
+            "type": "string"
+          },
+          "cheatProbability": {
+            "type": "number",
+            "minimum": 0
+          },
+          "cheatCheckBitmask": {
+            "$ref": "#/components/schemas/CheatCheckBitmask"
+          },
+          "instanceId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "membershipId": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "flaggedAt",
+          "cheatCheckVersion",
+          "cheatProbability",
+          "cheatCheckBitmask",
+          "instanceId",
+          "membershipId"
+        ]
+      },
       "InstancePlayerStanding": {
         "type": "object",
         "properties": {
@@ -669,7 +783,7 @@
           "flags": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/InstanceFlag"
+              "$ref": "#/components/schemas/InstancePlayerFlag"
             }
           },
           "clears": {
@@ -716,21 +830,7 @@
           "otherRecentFlags": {
             "type": "array",
             "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/InstanceFlag"
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "instanceId": {
-                      "type": "string",
-                      "format": "int64"
-                    }
-                  },
-                  "required": ["instanceId"]
-                }
-              ]
+              "$ref": "#/components/schemas/InstancePlayerFlag"
             }
           }
         },
@@ -3113,9 +3213,8 @@
       "AdminReportingStandingResponse": {
         "type": "object",
         "properties": {
-          "instanceId": {
-            "type": "string",
-            "format": "int64"
+          "instanceDetails": {
+            "$ref": "#/components/schemas/InstanceBasic"
           },
           "blacklist": {
             "allOf": [
@@ -3138,7 +3237,7 @@
             }
           }
         },
-        "required": ["instanceId", "blacklist", "flags", "players"]
+        "required": ["instanceDetails", "blacklist", "flags", "players"]
       },
       "AuthorizeAdminResponse": {
         "type": "object",
