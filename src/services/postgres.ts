@@ -33,6 +33,10 @@ class RaidHubPool extends Pool {
 
         return rows as T[]
     }
+
+    async tx() {
+        ;(await postgres.acquire()).startTransaction
+    }
 }
 export const postgres = new RaidHubPool({
     user: process.env.POSTGRES_USER,

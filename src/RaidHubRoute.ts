@@ -21,7 +21,7 @@ import { httpRequestTimer } from "./services/prometheus/metrics"
 
 // This class is used to define type-safe a route in the RaidHub API
 export class RaidHubRoute<
-    M extends "get" | "post",
+    M extends "get" | "post" | "patch",
     ResponseBody extends ZodType,
     ErrorResponse extends ErrorData,
     Params extends ZodObject<
@@ -199,7 +199,7 @@ export class RaidHubRoute<
 
     // This is the express router that is returned and used to create the actual express route
     get express() {
-        return this.router[this.method === "get" ? "get" : "post"](
+        return this.router[this.method](
             "/",
             this.measureDuration,
             this.validateParams,
