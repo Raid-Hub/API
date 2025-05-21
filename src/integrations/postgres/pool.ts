@@ -15,31 +15,20 @@ interface RaidHubQueries {
 }
 
 export class RaidHubPool extends Pool implements RaidHubQueries {
+    private connector: RaidHubConnector = new RaidHubConnector(this)
     constructor(config?: PoolConfiguration | string) {
         super(config)
     }
 
     async queryRow<T>(sql: string, options?: Omit<QueryOptions, "objectRows">): Promise<T | null> {
-        const conn = await this.acquire()
-        const rhConnection = new RaidHubConnection(conn)
-        try {
-            return await rhConnection.queryRow<T>(sql, options)
-        } finally {
-            await this.release(conn)
-        }
+        return await this.connector.queryRow<T>(sql, options)
     }
 
     async queryRows<T>(
         sql: string,
         options?: Omit<QueryOptions, "objectRows"> & { fetchCount: number }
     ): Promise<T[]> {
-        const conn = await this.acquire()
-        const rhConnection = new RaidHubConnection(conn)
-        try {
-            return await rhConnection.queryRows<T>(sql, options)
-        } finally {
-            await this.release(conn)
-        }
+        return await this.connector.queryRows<T>(sql, options)
     }
 }
 
@@ -48,9 +37,9 @@ const QueryOptions = {
     objectRows: true
 } as const
 
-export class RaidHubConnection implements RaidHubQueries {
-    private readonly connection: Connection
-    constructor(connection: Connection) {
+export class RaidHubConnector implements RaidHubQueries {
+    private readonly connection: Pool | Connection
+    constructor(connection: Pool | Connection) {
         this.connection = connection
     }
 
@@ -102,12 +91,11 @@ export class RaidHubConnection implements RaidHubQueries {
 }
 
 export class RaidHubPoolTransaction extends RaidHubPool {
-    async transaction(cb: (conn: RaidHubConnection) => Promise<void>) {
+    async transaction(cb: (conn: RaidHubConnector) => Promise<void>) {
         const conn = await this.acquire()
-        const rhConnection = new RaidHubConnection(conn)
         await conn.startTransaction()
         try {
-            const result = await cb(rhConnection)
+            const result = await cb(new RaidHubConnector(conn))
             await conn.commit()
             return result
         } catch (error) {

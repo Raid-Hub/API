@@ -1,3 +1,4 @@
+import * as MockRabbitAPI from "@/integrations/rabbitmq/api"
 import { afterAll, beforeEach, describe, expect, it, spyOn, test } from "bun:test"
 import { getFloodgatesRecentId, getFloodgatesStatus } from "."
 
@@ -98,37 +99,28 @@ describe("getFloodgatesRecentId no mock", () => {
 
 describe("getFloodgatesStatus", () => {
     describe("with mock", () => {
-        const spyFetch = spyOn(globalThis, "fetch")
+        const spyFetchQueue = spyOn(MockRabbitAPI, "fetchRabbitQueue")
 
         beforeEach(() => {
-            spyFetch.mockReset()
+            spyFetchQueue.mockReset()
         })
 
         afterAll(() => {
-            spyFetch.mockRestore()
+            spyFetchQueue.mockRestore()
         })
 
         it("queries correctly", async () => {
-            spyFetch.mockResolvedValueOnce(
-                new Response(
-                    JSON.stringify({
-                        messages: 10,
-                        backing_queue_status: {
-                            avg_ack_ingress_rate: 0.5,
-                            avg_ingress_rate: 1.0
-                        }
-                    }),
-                    {
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    }
-                )
-            )
+            spyFetchQueue.mockResolvedValueOnce({
+                messages: 10,
+                backing_queue_status: {
+                    avg_ack_ingress_rate: 0.5,
+                    avg_ingress_rate: 1.0
+                }
+            })
 
             const result = await getFloodgatesStatus()
 
-            expect(spyFetch).toHaveBeenCalledTimes(1)
+            expect(spyFetchQueue).toHaveBeenCalledTimes(1)
             expect(result).toEqual({
                 waiting: 10,
                 ackRateSeconds: 0.5,
