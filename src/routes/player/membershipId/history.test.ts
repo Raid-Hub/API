@@ -68,11 +68,6 @@ describe("player activities 403", () => {
 })
 
 describe("activities middleware test", () => {
-    // @ts-expect-error BigInt override
-    BigInt.prototype.toJSON = function () {
-        return this.toString()
-    }
-
     const app = express()
 
     app.use(express.json())
