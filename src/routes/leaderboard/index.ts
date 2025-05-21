@@ -1,4 +1,4 @@
-import { RaidHubRouter } from "@/RaidHubRouter"
+import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { clanLeaderboardRoute } from "./clan"
 import { leaderboardIndividualGlobalRoute } from "./individual/global"
 import { leaderboardIndividualPantheonRoute } from "./individual/pantheon"

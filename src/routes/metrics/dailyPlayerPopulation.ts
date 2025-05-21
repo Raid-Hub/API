@@ -1,8 +1,8 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getDailyPlayerPopulation } from "@/data/metrics/daily-player-population"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
 import { zPopulationByRaidMetric } from "@/schema/components/Metrics"
 import { zISODateString } from "@/schema/util"
+import { getDailyPlayerPopulation } from "@/services/metrics/daily-player-population"
 import { z } from "zod"
 
 export const dailyPlayerPopulationRoute = new RaidHubRoute({

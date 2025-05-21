@@ -1,16 +1,16 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
+import { canAccessProtectedResource } from "@/auth/protected-resource"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { playersQueue } from "@/integrations/rabbitmq/queues"
+import { cacheControl } from "@/middleware/cache-control"
+import { WorldFirstEntry, zPlayerProfile } from "@/schema/components/PlayerProfile"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zBigIntString } from "@/schema/util"
 import {
     getPlayer,
     getPlayerActivityStats,
     getPlayerGlobalStats,
     getWorldFirstEntries
-} from "@/data/player"
-import { cacheControl } from "@/middlewares/cache-control"
-import { processPlayerAsync } from "@/middlewares/processPlayerAsync"
-import { WorldFirstEntry, zPlayerProfile } from "@/schema/components/PlayerProfile"
-import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString } from "@/schema/util"
-import { canAccessProtectedResource } from "@/utils/auth"
+} from "@/services/player"
 import { z } from "zod"
 
 export const playerProfileRoute = new RaidHubRoute({
@@ -43,8 +43,8 @@ This is used to hydrate the RaidHub profile page`,
             }
         ]
     },
-    middleware: [cacheControl(30), processPlayerAsync],
-    async handler(req) {
+    middleware: [cacheControl(30)],
+    async handler(req, after) {
         const membershipId = req.params.membershipId
 
         // Prefetch, but don't await until permissions are checked
@@ -55,6 +55,10 @@ This is used to hydrate the RaidHub profile page`,
         ])
 
         const player = await getPlayer(membershipId)
+
+        after(async () => {
+            await playersQueue.send({ membershipId: req.params.membershipId })
+        })
 
         if (!player) {
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, { membershipId })

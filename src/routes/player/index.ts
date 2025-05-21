@@ -1,4 +1,4 @@
-import { RaidHubRouter } from "@/RaidHubRouter"
+import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { playerActivitiesRoute } from "./membershipId/activities"
 import { playerBasicRoute } from "./membershipId/basic"
 import { playerInstancesRoute } from "./membershipId/instances"

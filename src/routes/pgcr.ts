@@ -1,12 +1,12 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getRawCompressedPGCR } from "@/data/pgcr"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
 import {
     RaidHubPostGameCarnageReport,
     zRaidHubPostGameCarnageReport
 } from "@/schema/components/RaidHubPostGameCarnageReport"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/util"
+import { getRawCompressedPGCR } from "@/services/pgcr"
 import { gunzipSync } from "bun"
 import { z } from "zod"
 

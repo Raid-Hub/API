@@ -1,5 +1,5 @@
-import { RaidHubRouter } from "@/RaidHubRouter"
-import { adminProtected } from "@/middlewares/admin"
+import { adminProtected } from "@/auth/admin"
+import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { adminQueryRoute } from "./query"
 import { reportingRouter } from "./reporting"
 

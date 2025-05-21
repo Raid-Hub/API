@@ -1,9 +1,9 @@
+import { apiVersion } from "@/core/version"
+import { router } from "@/routes/index"
+import { registry } from "@/schema/registry"
 import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi"
 import { exec } from "child_process"
 import { writeFile } from "fs"
-import { router } from "../src/routes"
-import { registry } from "../src/schema"
-import { apiVersion } from "../src/version"
 
 const dir = "./open-api"
 const fileName = dir + "/openapi.json"
@@ -51,10 +51,11 @@ doc.components!.securitySchemes = {
 const fixAllOfNullable = (schema: unknown) => {
     if (!schema || typeof schema !== "object" || "$ref" in schema) return
 
-    if (Array.isArray(schema["allOf"])) {
+    if ("allOf" in schema && Array.isArray(schema["allOf"])) {
         schema["allOf"] = schema["allOf"]!.filter(item => {
             if ("nullable" in item && item.nullable === true) {
                 Object.entries(item).forEach(([k, v]) => {
+                    // @ts-expect-error Generic object
                     schema[k] = v
                 })
                 return false

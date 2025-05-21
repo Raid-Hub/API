@@ -1,4 +1,4 @@
-import { registry } from "@/schema"
+import { registry } from "@/schema/registry"
 import { zNaturalNumber } from "@/schema/util"
 import { z } from "zod"
 import { zInstance } from "./Instance"

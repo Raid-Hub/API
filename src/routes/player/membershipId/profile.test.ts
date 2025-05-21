@@ -1,5 +1,5 @@
-import { expectErr, expectOk } from "@/test"
-import { generateJWT } from "@/utils/auth"
+import { generateJWT } from "@/auth/jwt"
+import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, test } from "bun:test"
 import { playerProfileRoute } from "./profile"
 

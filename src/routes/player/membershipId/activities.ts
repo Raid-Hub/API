@@ -1,10 +1,10 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getActivities } from "@/data/history"
-import { getPlayer } from "@/data/player"
+import { canAccessProtectedResource } from "@/auth/protected-resource"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { zInstanceForPlayer } from "@/schema/components/InstanceForPlayer"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString, zISODateString } from "@/schema/util"
-import { canAccessProtectedResource } from "@/utils/auth"
+import { getPlayer } from "@/services/player"
+import { getActivities } from "@/services/player-instances/history"
 import { z } from "zod"
 
 export const playerActivitiesRoute = new RaidHubRoute({

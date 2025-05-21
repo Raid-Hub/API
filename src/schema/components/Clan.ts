@@ -1,4 +1,4 @@
-import { registry } from "@/schema"
+import { registry } from "@/schema/registry"
 import { zInt64, zISODateString, zNaturalNumber, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
 import { zPlayerInfo } from "./PlayerInfo"

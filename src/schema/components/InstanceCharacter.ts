@@ -1,4 +1,4 @@
-import { registry } from "@/schema"
+import { registry } from "@/schema/registry"
 import { zInt64, zUInt32, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
 import { zInstanceCharacterWeapon } from "./InstanceCharacterWeapon"

@@ -1,10 +1,10 @@
 import compression from "compression"
 import express, { Router, static as expressStatic, json } from "express"
 import path from "path"
-import { verifyApiKey } from "./middlewares/apiKeys"
-import { errorHandler } from "./middlewares/errorHandler"
+import { verifyApiKey } from "./auth/api-keys"
+import { servePrometheus } from "./integrations/prometheus/server"
+import { errorHandler } from "./middleware/error-handler"
 import { router } from "./routes"
-import { servePrometheus } from "./services/prometheus/server"
 
 // @ts-expect-error this is a hack to make BigInts work with JSON.stringify
 BigInt.prototype.toJSON = function () {
@@ -32,7 +32,7 @@ if (!process.env.PROD) {
 
 // handle OPTIONS pre-flight requests before any other middleware
 app.options("*", (_, res) => {
-    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+    res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS")
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "*")
     res.sendStatus(204)

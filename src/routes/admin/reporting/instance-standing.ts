@@ -1,11 +1,4 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getInstanceBasic } from "@/data/instance"
-import {
-    getInstanceBlacklist,
-    getInstanceFlags,
-    getInstancePlayerFlags,
-    getInstancePlayersStanding
-} from "@/data/reporting/standing"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { zInstanceBasic } from "@/schema/components/Instance"
 import {
     zInstanceBlacklist,
@@ -14,6 +7,13 @@ import {
 } from "@/schema/components/InstanceStanding"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/util"
+import { getInstanceBasic } from "@/services/instance/instance"
+import {
+    getInstanceBlacklist,
+    getInstanceFlags,
+    getInstancePlayerFlags,
+    getInstancePlayersStanding
+} from "@/services/reporting/standing"
 import { z } from "zod"
 
 export const reportingStandingInstanceRoute = new RaidHubRoute({

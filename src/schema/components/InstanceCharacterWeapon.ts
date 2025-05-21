@@ -1,4 +1,4 @@
-import { registry } from "@/schema"
+import { registry } from "@/schema/registry"
 import { zUInt32, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
 

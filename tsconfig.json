@@ -20,15 +20,20 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/data/*": ["./src/data/*"],
-      "@/middlewares/*": ["./src/middlewares/*"],
+      "@/auth/*": ["./src/auth/*"],
+      "@/core/*": ["src/core/*"],
+      "@/integrations/*": ["src/integrations/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/middleware/*": ["src/middleware/*"],
+      "@/routes/*": ["./src/routes/*"],
       "@/schema/*": ["./src/schema/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/test": ["./src/util.test.ts"],
-      "@/*": ["./src/*"]
+      "@/services/*": ["./src/services/*"]
     }
   },
-  "include": ["src/**/*.ts", "api-keys.json"],
-  "exclude": ["scripts/*"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.test.ts",
+    "open-api/generate.ts",
+    "api-keys.json"
+  ]
 }

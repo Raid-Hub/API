@@ -1,4 +1,4 @@
-import { registry } from "@/schema"
+import { registry } from "@/schema/registry"
 import { zISODateString, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
 

@@ -1,4 +1,4 @@
-import { registry } from "@/schema"
+import { registry } from "@/schema/registry"
 import { zBigIntString, zPage } from "@/schema/util"
 import { z } from "zod"
 

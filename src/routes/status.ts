@@ -1,17 +1,16 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getInstanceBasic } from "@/data/instance"
-import { getLatestActivityByDate } from "@/data/status"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { getDestiny2Status } from "@/integrations/bungie"
+import { cacheControl } from "@/middleware/cache-control"
 import {
     AtlasStatus,
     FloodgatesStatus,
     zAtlasStatus,
     zFloodgatesStatus
 } from "@/schema/components/Status"
-import { getDestiny2Status } from "@/services/bungie"
-import { getAtlasStatus } from "@/services/prometheus/atlas"
-import { getFloodgatesRecentId } from "@/services/prometheus/floodgates"
-import { getFloodgatesStatus } from "@/services/rabbitmq/api"
+import { getAtlasStatus } from "@/services/atlas"
+import { getFloodgatesRecentId, getFloodgatesStatus } from "@/services/floodgates"
+import { getInstanceBasic } from "@/services/instance/instance"
+import { getLatestInstanceByDate } from "@/services/instance/recent"
 import { z } from "zod"
 
 // This state tracks the status of the Destiny API and debounces it with a grace period of 60 seconds.
@@ -91,7 +90,7 @@ export const statusRoute = new RaidHubRoute({
 
 async function getAtlasPGCR(): Promise<AtlasStatus> {
     const [latestResolvedInstance, atlasStatus, isDestinyApiEnabled] = await Promise.all([
-        getLatestActivityByDate(),
+        getLatestInstanceByDate(),
         getAtlasStatus(),
         getDestiny2Status().catch(() => false)
     ])

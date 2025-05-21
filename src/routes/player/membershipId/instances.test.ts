@@ -1,6 +1,6 @@
+import { generateJWT } from "@/auth/jwt"
+import { expectErr, expectOk } from "@/lib/test-utils"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { expectErr, expectOk } from "@/test"
-import { generateJWT } from "@/utils/auth"
 import { describe, expect, test } from "bun:test"
 import { playerInstancesRoute } from "./instances"
 

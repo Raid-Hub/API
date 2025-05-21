@@ -1,4 +1,5 @@
-import { registry } from "@/schema"
+import { zCheatLevel } from "@/schema/enums/CheatLevel"
+import { registry } from "@/schema/registry"
 import { zISODateString, zInt64, zNaturalNumber, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
 import { zPlayerInfo } from "./PlayerInfo"
@@ -8,13 +9,7 @@ enum ReportSource {
     CheatCheck = "CheatCheck",
     WebReport = "WebReport"
 }
-enum CheatLevel {
-    None = 0,
-    Low = 1,
-    Medium = 2,
-    High = 3,
-    Extreme = 4
-}
+
 enum CheatFlagIndex {
     Manual,
     Leviathan,
@@ -140,7 +135,7 @@ export const zInstancePlayerStanding = registry.register(
         playerInfo: zPlayerInfo,
         flags: z.array(zInstancePlayerFlag),
         clears: zWholeNumber(),
-        cheatLevel: z.nativeEnum(CheatLevel),
+        cheatLevel: zCheatLevel,
         blacklistedInstances: z.array(
             z.object({
                 instanceId: zInt64(),

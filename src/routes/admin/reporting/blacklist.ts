@@ -1,32 +1,50 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getInstanceBasic } from "@/data/instance"
-import {
-    getInstanceBlacklist,
-    getInstanceFlags,
-    getInstancePlayerFlags,
-    getInstancePlayersStanding
-} from "@/data/reporting/standing"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString } from "@/schema/util"
+import { zBigIntString, zInt64, zNaturalNumber } from "@/schema/util"
+import { getInstancePlayerInfo } from "@/services/instance/instance"
+import { blacklistInstance } from "@/services/reporting/update-blacklist"
 import { z } from "zod"
 
-export const blacklistInstance = new RaidHubRoute({
+export const blacklistInstanceRoute = new RaidHubRoute({
     method: "patch",
-    description:
-        "Find a set of instances based on the query parameters. Some parameters will not work together, such as providing a season outside the range of the min/max season. Requires authentication.",
+    description: "Blacklist an instance from leaderboards, as well as the players involved.",
     params: z.object({
         instanceId: zBigIntString()
     }),
     body: z.object({
-        instance: z.object({}),
-        players: z.array(z.object({}))
+        reportId: zNaturalNumber().nullable(),
+        reason: z.string().min(1),
+        players: z.array(
+            z.object({
+                membershipId: zBigIntString(),
+                reason: z.string().min(1)
+            })
+        )
     }),
     response: {
         success: {
             statusCode: 200,
-            schema: z.null()
+            schema: z.object({
+                instanceId: zInt64(),
+                reportId: zNaturalNumber().nullable(),
+                reason: z.string(),
+                players: z.array(
+                    z.object({
+                        membershipId: zInt64(),
+                        reason: z.string()
+                    })
+                )
+            })
         },
         errors: [
+            {
+                statusCode: 400,
+                code: ErrorCode.PlayerNotInInstance,
+                schema: z.object({
+                    instanceId: zBigIntString(),
+                    players: z.array(zBigIntString())
+                })
+            },
             {
                 statusCode: 404,
                 code: ErrorCode.InstanceNotFoundError,
@@ -39,43 +57,37 @@ export const blacklistInstance = new RaidHubRoute({
     async handler(req) {
         const instanceId = req.params.instanceId
 
-        const [instanceDetails, blacklist, flags, playerFlags, playersStanding] = await Promise.all(
-            [
-                getInstanceBasic(instanceId),
-                getInstanceBlacklist(instanceId),
-                getInstanceFlags(instanceId),
-                getInstancePlayerFlags(instanceId),
-                getInstancePlayersStanding(instanceId)
-            ]
-        )
+        const players = await getInstancePlayerInfo(instanceId)
 
-        if (!instanceDetails) {
+        if (!players.length) {
             return RaidHubRoute.fail(ErrorCode.InstanceNotFoundError, {
                 instanceId
             })
         }
 
-        return RaidHubRoute.ok({
-            instanceDetails,
-            blacklist,
-            flags,
-            players: playersStanding.map(player => ({
-                playerInfo: player.playerInfo,
-                flags: playerFlags
-                    .filter(flag => flag.membershipId === player.playerInfo.membershipId)
-                    .map(flag => ({
-                        instanceId: flag.instanceId,
-                        membershipId: flag.membershipId,
-                        flaggedAt: flag.flaggedAt,
-                        cheatCheckVersion: flag.cheatCheckVersion,
-                        cheatProbability: flag.cheatProbability,
-                        cheatCheckBitmask: flag.cheatCheckBitmask
-                    })),
-                clears: player.clears,
-                cheatLevel: player.cheatLevel,
-                blacklistedInstances: player.blacklistedInstances,
-                otherRecentFlags: player.otherRecentFlags
+        const playersNotInInstance = req.body.players.filter(
+            player => !players.find(p => p.membershipId === String(player.membershipId))
+        )
+
+        if (playersNotInInstance.length) {
+            return RaidHubRoute.fail(ErrorCode.PlayerNotInInstance, {
+                instanceId,
+                players: playersNotInInstance.map(player => player.membershipId)
+            })
+        }
+
+        const args = {
+            instanceId: String(instanceId),
+            reportId: req.body.reportId,
+            reason: req.body.reason,
+            players: req.body.players.map(player => ({
+                membershipId: String(player.membershipId),
+                reason: player.reason
             }))
-        })
+        }
+
+        await blacklistInstance(args)
+
+        return RaidHubRoute.ok(args)
     }
 })

@@ -1,9 +1,13 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { listActivityDefinitions, listHashes, listVersionDefinitions } from "@/data/definitions"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
 import { zActivityDefinition } from "@/schema/components/ActivityDefinition"
 import { zVersionDefinition } from "@/schema/components/VersionDefinition"
 import { zNaturalNumber, zNumericalRecordKey } from "@/schema/util"
+import {
+    listActivityDefinitions,
+    listHashes,
+    listVersionDefinitions
+} from "@/services/manifest/definitions"
 import { z } from "zod"
 
 export const manifestRoute = new RaidHubRoute({

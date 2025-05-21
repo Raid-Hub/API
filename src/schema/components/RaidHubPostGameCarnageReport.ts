@@ -1,8 +1,8 @@
-import { registry } from "@/schema"
+import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
+import { registry } from "@/schema/registry"
 import { zInt64, zISODateString, zUInt32 } from "@/schema/util"
 import { DestinyActivityModeType } from "bungie-net-core/enums"
 import { z } from "zod"
-import { zDestinyMembershipType } from "../enums/DestinyMembershipType"
 
 const zDestinyHistoricalStatsValuePair = z
     .object({

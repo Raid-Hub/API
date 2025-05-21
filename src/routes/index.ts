@@ -1,4 +1,4 @@
-import { RaidHubRouter } from "@/RaidHubRouter"
+import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { activityRoute } from "./activity"
 import { adminRouter } from "./admin"
 import { adminAuthorizationRoute } from "./authorize/admin"
@@ -27,6 +27,10 @@ export const router = new RaidHubRouter({
         },
         {
             path: "/activity/:instanceId",
+            route: activityRoute
+        },
+        {
+            path: "/instance/:instanceId",
             route: activityRoute
         },
         {

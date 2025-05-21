@@ -1,4 +1,4 @@
-import { registry } from "@/schema"
+import { registry } from "@/schema/registry"
 import { ZodNativeEnumDef, ZodType, z } from "zod"
 
 /**

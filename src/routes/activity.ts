@@ -1,10 +1,10 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getInstanceExtended } from "@/data/instance"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { instanceCharacterQueue, playersQueue } from "@/integrations/rabbitmq/queues"
+import { cacheControl } from "@/middleware/cache-control"
 import { zInstanceExtended } from "@/schema/components/InstanceExtended"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/util"
-import { instanceCharacterQueue, playersQueue } from "@/services/rabbitmq/queues"
+import { getInstanceExtended } from "@/services/instance/instance"
 import { z } from "zod"
 
 export const activityRoute = new RaidHubRoute({

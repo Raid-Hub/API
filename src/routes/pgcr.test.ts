@@ -1,4 +1,4 @@
-import { expectErr, expectOk } from "@/test"
+import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, test } from "bun:test"
 import { pgcrRoute } from "./pgcr"
 

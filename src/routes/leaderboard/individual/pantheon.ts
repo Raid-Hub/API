@@ -1,15 +1,15 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getVersionId } from "@/data/definitions"
-import {
-    getIndividualPantheonLeaderboard,
-    individualPantheonLeaderboardSortColumns,
-    searchIndividualPantheonLeaderboard
-} from "@/data/leaderboard/individual/pantheon"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
 import { zLeaderboardData } from "@/schema/components/LeaderboardData"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
 import { zBigIntString } from "@/schema/util"
+import {
+    getIndividualPantheonLeaderboard,
+    individualPantheonLeaderboardSortColumns,
+    searchIndividualPantheonLeaderboard
+} from "@/services/leaderboard/individual/pantheon"
+import { getVersionId } from "@/services/manifest/definitions"
 import { z } from "zod"
 
 const zCategory = z.enum(["clears", "freshClears", "score"])

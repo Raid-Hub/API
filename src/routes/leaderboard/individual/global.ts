@@ -1,17 +1,17 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import {
-    getIndividualGlobalLeaderboard,
-    searchIndividualGlobalLeaderboard
-} from "@/data/leaderboard/individual/global"
-import {
-    getIndividualWorldFirstPowerRankingsLeaderboard,
-    searchIndividualWorldFirstPowerRankingsLeaderboard
-} from "@/data/leaderboard/individual/power-rankings"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
 import { zLeaderboardData } from "@/schema/components/LeaderboardData"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
 import { zBigIntString } from "@/schema/util"
+import {
+    getIndividualGlobalLeaderboard,
+    searchIndividualGlobalLeaderboard
+} from "@/services/leaderboard/individual/global"
+import {
+    getIndividualWorldFirstPowerRankingsLeaderboard,
+    searchIndividualWorldFirstPowerRankingsLeaderboard
+} from "@/services/leaderboard/individual/power-rankings"
 import { z } from "zod"
 
 const zCategory = z.enum(["clears", "freshClears", "sherpas", "speedrun", "powerRankings"])

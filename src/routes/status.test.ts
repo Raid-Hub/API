@@ -1,7 +1,6 @@
-import * as GetAtlasStatusModule from "@/services/prometheus/atlas"
-import * as GetFloodgatesRecentIdModule from "@/services/prometheus/floodgates"
-import * as GetFloodgatesStatusModule from "@/services/rabbitmq/api"
-import { expectOk } from "@/test"
+import { expectOk } from "@/lib/test-utils"
+import * as AtlasModule from "@/services/atlas"
+import * as FloodgateModule from "@/services/floodgates"
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
 import * as BungieCoreEndpoints from "bungie-net-core/endpoints/Core"
 import { BungieNetResponse } from "bungie-net-core/interfaces"
@@ -9,10 +8,10 @@ import { CoreSettingsConfiguration } from "bungie-net-core/models"
 import { statusRoute, statusState } from "./status"
 
 describe("status 200", async () => {
-    const spyGetAtlasStatus = spyOn(GetAtlasStatusModule, "getAtlasStatus")
+    const spyGetAtlasStatus = spyOn(AtlasModule, "getAtlasStatus")
     const spyGetCommonSettings = spyOn(BungieCoreEndpoints, "getCommonSettings")
-    const spyGetFloodgatesRecentId = spyOn(GetFloodgatesRecentIdModule, "getFloodgatesRecentId")
-    const spyGetFloodgatesStatus = spyOn(GetFloodgatesStatusModule, "getFloodgatesStatus")
+    const spyGetFloodgatesRecentId = spyOn(FloodgateModule, "getFloodgatesRecentId")
+    const spyGetFloodgatesStatus = spyOn(FloodgateModule, "getFloodgatesStatus")
 
     beforeEach(() => {
         spyGetAtlasStatus.mockReset()

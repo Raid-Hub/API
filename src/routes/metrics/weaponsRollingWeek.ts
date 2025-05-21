@@ -1,7 +1,7 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getRollingWeaponMeta } from "@/data/metrics/rolling-weapon-meta"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
 import { zWeaponMetric } from "@/schema/components/Metrics"
+import { getRollingWeaponMeta } from "@/services/metrics/rolling-weapon-meta"
 import { z } from "zod"
 
 export const weaponsRollingWeekRoute = new RaidHubRoute({

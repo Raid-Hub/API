@@ -1,11 +1,11 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { getPlayer } from "@/data/player"
-import { getTeammates } from "@/data/teammates"
-import { cacheControl } from "@/middlewares/cache-control"
+import { canAccessProtectedResource } from "@/auth/protected-resource"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
 import { zTeammate } from "@/schema/components/Teammate"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/util"
-import { canAccessProtectedResource } from "@/utils/auth"
+import { getPlayer } from "@/services/player"
+import { getTeammates } from "@/services/player-instances/teammates"
 import { z } from "zod"
 
 export const playerTeammatesRoute = new RaidHubRoute({

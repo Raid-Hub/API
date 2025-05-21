@@ -1,7 +1,7 @@
+import { BungieApiError, bungiePlatformHttp } from "@/integrations/bungie"
+import { clanQueue, playersQueue } from "@/integrations/rabbitmq/queues"
+import { expectErr, expectOk } from "@/lib/test-utils"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { BungieApiError, bungiePlatformHttp } from "@/services/bungie"
-import { clanQueue, playersQueue } from "@/services/rabbitmq/queues"
-import { expectErr, expectOk } from "@/test"
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
 import { PlatformErrorCodes } from "bungie-net-core/enums"
 import { clanStatsRoute } from "./clanStats"
@@ -57,7 +57,7 @@ describe("clan 404", () => {
 })
 
 test("clan 503", async () => {
-    const spyBungieFetch = spyOn(bungiePlatformHttp, "fetch")
+    const spyBungieFetch = spyOn(bungiePlatformHttp({ ttl: 30_000 }), "fetch")
 
     afterAll(() => {
         spyBungieFetch.mockRestore()

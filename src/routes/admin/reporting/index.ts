@@ -1,4 +1,5 @@
-import { RaidHubRouter } from "@/RaidHubRouter"
+import { RaidHubRouter } from "@/core/RaidHubRouter"
+import { blacklistInstanceRoute } from "./blacklist"
 import { reportingStandingInstanceRoute } from "./instance-standing"
 
 export const reportingRouter = new RaidHubRouter({
@@ -9,11 +10,11 @@ export const reportingRouter = new RaidHubRouter({
         },
         {
             path: "/blacklist/:instanceId",
-            route: reportingStandingInstanceRoute
-        },
-        {
-            path: "/cheat-level/:membershipId",
-            route: reportingStandingInstanceRoute
+            route: blacklistInstanceRoute
         }
+        // {
+        //     path: "/cheat-level/:membershipId",
+        //     route: reportingStandingInstanceRoute
+        // }
     ]
 })

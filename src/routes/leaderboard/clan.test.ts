@@ -1,4 +1,4 @@
-import { expectOk } from "@/test"
+import { expectOk } from "@/lib/test-utils"
 import { describe, expect, test } from "bun:test"
 import { clanLeaderboardRoute } from "./clan"
 

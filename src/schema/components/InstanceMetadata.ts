@@ -1,4 +1,4 @@
-import { registry } from "@/schema"
+import { registry } from "@/schema/registry"
 import { z } from "zod"
 
 export type InstanceMetadata = z.input<typeof zInstanceMetadata>

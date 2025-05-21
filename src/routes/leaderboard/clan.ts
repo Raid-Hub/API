@@ -1,8 +1,8 @@
-import { RaidHubRoute } from "@/RaidHubRoute"
-import { clanLeaderboardSortColumns, getClanLeaderboard } from "@/data/leaderboard/clan"
-import { cacheControl } from "@/middlewares/cache-control"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
 import { zClanLeaderboardEntry } from "@/schema/components/Clan"
 import { zPage } from "@/schema/util"
+import { clanLeaderboardSortColumns, getClanLeaderboard } from "@/services/clans/leaderboard"
 import { z } from "zod"
 
 export const clanLeaderboardRoute = new RaidHubRoute({
