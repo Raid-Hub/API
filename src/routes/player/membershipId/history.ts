@@ -7,9 +7,9 @@ import { getPlayer } from "@/services/player"
 import { getActivities } from "@/services/player-instances/history"
 import { z } from "zod"
 
-export const playerActivitiesRoute = new RaidHubRoute({
+export const playerHistoryRoute = new RaidHubRoute({
     method: "get",
-    description: `Get a player's activity history. This endpoint uses date cursors to paginate through a player's activity history. 
+    description: `/activities is deprecated. Use /history now. Get a player's activity history. This endpoint uses date cursors to paginate through a player's activity history. 
 The first request should not include a cursor. Subsequent requests should include the \`nextCursor\` 
 value from the previous response. Note that the first request may not return the full number of activities requested
 in order to optimize performance. Subsequent requests will return the full number of activities requested.`,

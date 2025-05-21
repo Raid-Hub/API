@@ -407,154 +407,9 @@
           "dateResolved"
         ]
       },
-      "InstanceMetadata": {
-        "type": "object",
-        "properties": {
-          "activityName": {
-            "type": "string"
-          },
-          "versionName": {
-            "type": "string"
-          },
-          "isRaid": {
-            "type": "boolean"
-          }
-        },
-        "required": ["activityName", "versionName", "isRaid"]
-      },
-      "InstanceCharacterWeapon": {
-        "type": "object",
-        "properties": {
-          "weaponHash": {
-            "type": "integer",
-            "minimum": 0,
-            "format": "uint32"
-          },
-          "kills": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "precisionKills": {
-            "type": "integer",
-            "minimum": 0
-          }
-        },
-        "required": ["weaponHash", "kills", "precisionKills"],
-        "additionalProperties": false
-      },
-      "InstanceCharacter": {
-        "type": "object",
-        "properties": {
-          "characterId": {
-            "type": "string",
-            "format": "int64"
-          },
-          "classHash": {
-            "type": "integer",
-            "nullable": true,
-            "minimum": 0,
-            "format": "uint32"
-          },
-          "emblemHash": {
-            "type": "integer",
-            "nullable": true,
-            "minimum": 0,
-            "format": "uint32"
-          },
-          "completed": {
-            "type": "boolean"
-          },
-          "timePlayedSeconds": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "startSeconds": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "score": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "kills": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "deaths": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "assists": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "precisionKills": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "superKills": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "grenadeKills": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "meleeKills": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "weapons": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InstanceCharacterWeapon"
-            }
-          }
-        },
-        "required": [
-          "characterId",
-          "classHash",
-          "emblemHash",
-          "completed",
-          "timePlayedSeconds",
-          "startSeconds",
-          "score",
-          "kills",
-          "deaths",
-          "assists",
-          "precisionKills",
-          "superKills",
-          "grenadeKills",
-          "meleeKills",
-          "weapons"
-        ],
-        "additionalProperties": false
-      },
-      "InstancePlayer": {
-        "type": "object",
-        "properties": {
-          "completed": {
-            "type": "boolean"
-          },
-          "isFirstClear": {
-            "type": "boolean"
-          },
-          "sherpas": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "timePlayedSeconds": {
-            "type": "integer",
-            "minimum": 0
-          }
-        },
-        "required": [
-          "completed",
-          "isFirstClear",
-          "sherpas",
-          "timePlayedSeconds"
-        ],
-        "additionalProperties": false
+      "CheatLevel": {
+        "type": "integer",
+        "enum": [0, 1, 2, 3, 4]
       },
       "PlayerInfo": {
         "type": "object",
@@ -619,62 +474,6 @@
           "lastSeen": "2021-05-01T00:00:00.000Z",
           "isPrivate": false
         }
-      },
-      "InstancePlayerExtended": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/InstancePlayer"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "playerInfo": {
-                "$ref": "#/components/schemas/PlayerInfo"
-              },
-              "characters": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/InstanceCharacter"
-                }
-              }
-            },
-            "required": ["playerInfo", "characters"],
-            "additionalProperties": false
-          }
-        ]
-      },
-      "InstanceExtended": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Instance"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "leaderboardRank": {
-                "type": "integer",
-                "nullable": true,
-                "minimum": 0,
-                "exclusiveMinimum": true
-              },
-              "metadata": {
-                "$ref": "#/components/schemas/InstanceMetadata"
-              },
-              "players": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/InstancePlayerExtended"
-                }
-              }
-            },
-            "required": ["leaderboardRank", "metadata", "players"],
-            "additionalProperties": false
-          }
-        ]
-      },
-      "CheatLevel": {
-        "type": "integer",
-        "enum": [0, 1, 2, 3, 4]
       },
       "CheatCheckBitmask": {
         "type": "string",
@@ -1160,6 +959,207 @@
           }
         },
         "required": ["aggregateStats", "members"]
+      },
+      "InstanceMetadata": {
+        "type": "object",
+        "properties": {
+          "activityName": {
+            "type": "string"
+          },
+          "versionName": {
+            "type": "string"
+          },
+          "isRaid": {
+            "type": "boolean"
+          }
+        },
+        "required": ["activityName", "versionName", "isRaid"]
+      },
+      "InstanceCharacterWeapon": {
+        "type": "object",
+        "properties": {
+          "weaponHash": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "uint32"
+          },
+          "kills": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "precisionKills": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": ["weaponHash", "kills", "precisionKills"],
+        "additionalProperties": false
+      },
+      "InstanceCharacter": {
+        "type": "object",
+        "properties": {
+          "characterId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "classHash": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "format": "uint32"
+          },
+          "emblemHash": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "format": "uint32"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "timePlayedSeconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "startSeconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "kills": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "deaths": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "assists": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "precisionKills": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "superKills": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "grenadeKills": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "meleeKills": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "weapons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InstanceCharacterWeapon"
+            }
+          }
+        },
+        "required": [
+          "characterId",
+          "classHash",
+          "emblemHash",
+          "completed",
+          "timePlayedSeconds",
+          "startSeconds",
+          "score",
+          "kills",
+          "deaths",
+          "assists",
+          "precisionKills",
+          "superKills",
+          "grenadeKills",
+          "meleeKills",
+          "weapons"
+        ],
+        "additionalProperties": false
+      },
+      "InstancePlayer": {
+        "type": "object",
+        "properties": {
+          "completed": {
+            "type": "boolean"
+          },
+          "isFirstClear": {
+            "type": "boolean"
+          },
+          "sherpas": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "timePlayedSeconds": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "completed",
+          "isFirstClear",
+          "sherpas",
+          "timePlayedSeconds"
+        ],
+        "additionalProperties": false
+      },
+      "InstancePlayerExtended": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InstancePlayer"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "playerInfo": {
+                "$ref": "#/components/schemas/PlayerInfo"
+              },
+              "characters": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/InstanceCharacter"
+                }
+              }
+            },
+            "required": ["playerInfo", "characters"],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "InstanceExtended": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Instance"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "leaderboardRank": {
+                "type": "integer",
+                "nullable": true,
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "metadata": {
+                "$ref": "#/components/schemas/InstanceMetadata"
+              },
+              "players": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/InstancePlayerExtended"
+                }
+              }
+            },
+            "required": ["leaderboardRank", "metadata", "players"],
+            "additionalProperties": false
+          }
+        ]
       },
       "TeamLeaderboardEntry": {
         "type": "object",
@@ -3692,7 +3692,7 @@
     "/player/{membershipId}/activities": {
       "get": {
         "summary": "/player/{membershipId}/activities",
-        "description": "Get a player's activity history. This endpoint uses date cursors to paginate through a player's activity history. \nThe first request should not include a cursor. Subsequent requests should include the `nextCursor` \nvalue from the previous response. Note that the first request may not return the full number of activities requested\nin order to optimize performance. Subsequent requests will return the full number of activities requested.",
+        "description": "/activities is deprecated. Use /history now. Get a player's activity history. This endpoint uses date cursors to paginate through a player's activity history. \nThe first request should not include a cursor. Subsequent requests should include the `nextCursor` \nvalue from the previous response. Note that the first request may not return the full number of activities requested\nin order to optimize performance. Subsequent requests will return the full number of activities requested.",
         "security": [
           {
             "Bearer Token": []
@@ -4812,7 +4812,7 @@
     "/activity/{instanceId}": {
       "get": {
         "summary": "/activity/{instanceId}",
-        "description": "This endpoint replaces the PGCR endpoint. It returns an object with a shape more aligned with how RaidHub displays PGCRs.",
+        "description": "/activity is deprecated. Use /instance now. This returns a PGCR object with a shape more aligned with how RaidHub displays PGCRs.",
         "parameters": [
           {
             "schema": {

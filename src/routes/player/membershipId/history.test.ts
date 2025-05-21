@@ -2,11 +2,11 @@ import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, expect, test } from "bun:test"
 import express from "express"
 import request from "supertest"
-import { playerActivitiesRoute } from "./activities"
+import { playerHistoryRoute } from "./history"
 
 describe("player activities 200", () => {
     const t = async (membershipId: string, cursor?: Date) => {
-        const result = await playerActivitiesRoute.$mock({
+        const result = await playerHistoryRoute.$mock({
             params: { membershipId },
             query: { cursor }
         })
@@ -39,7 +39,7 @@ describe("player activities 200", () => {
 
 describe("player activities 404", () => {
     const t = async (membershipId: string) => {
-        const result = await playerActivitiesRoute.$mock({
+        const result = await playerHistoryRoute.$mock({
             params: {
                 membershipId
             },
@@ -54,7 +54,7 @@ describe("player activities 404", () => {
 
 describe("player activities 403", () => {
     const t = async (membershipId: string) => {
-        const result = await playerActivitiesRoute.$mock({
+        const result = await playerHistoryRoute.$mock({
             params: {
                 membershipId
             },
@@ -77,7 +77,7 @@ describe("activities middleware test", () => {
 
     app.use(express.json())
 
-    app.use("/test/:membershipId", playerActivitiesRoute.express)
+    app.use("/test/:membershipId", playerHistoryRoute.express)
 
     test("1 day cache on 200 cursor query", async () => {
         const res = await request(app)

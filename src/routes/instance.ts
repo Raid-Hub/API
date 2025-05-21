@@ -7,10 +7,10 @@ import { zBigIntString } from "@/schema/util"
 import { getInstanceExtended } from "@/services/instance/instance"
 import { z } from "zod"
 
-export const activityRoute = new RaidHubRoute({
+export const instanceRoute = new RaidHubRoute({
     method: "get",
     description:
-        "This endpoint replaces the PGCR endpoint. It returns an object with a shape more aligned with how RaidHub displays PGCRs.",
+        "/activity is deprecated. Use /instance now. This returns a PGCR object with a shape more aligned with how RaidHub displays PGCRs.",
     params: z.object({
         instanceId: zBigIntString()
     }),

@@ -1,7 +1,7 @@
 import { instanceCharacterQueue, playersQueue } from "@/integrations/rabbitmq/queues"
 import { expectErr, expectOk } from "@/lib/test-utils"
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
-import { activityRoute } from "./activity"
+import { instanceRoute } from "./instance"
 
 describe("activity 200", () => {
     const spyCharQueueSend = spyOn(instanceCharacterQueue, "send")
@@ -20,7 +20,7 @@ describe("activity 200", () => {
     })
 
     const t = async (instanceId: string) => {
-        const result = await activityRoute.$mock({ params: { instanceId } })
+        const result = await instanceRoute.$mock({ params: { instanceId } })
 
         expectOk(result)
     }
@@ -45,7 +45,7 @@ describe("activity 200", () => {
 
 describe("activity 404", () => {
     const t = async (instanceId: string) => {
-        const result = await activityRoute.$mock({
+        const result = await instanceRoute.$mock({
             params: {
                 instanceId
             }

@@ -43,6 +43,7 @@ export class RaidHubRoute<
 {
     readonly method: M
     readonly description: string
+    readonly deprecated: boolean = false
     readonly paramsSchema: Params | null
     readonly querySchema: Query | null
     readonly bodySchema: Body | null
