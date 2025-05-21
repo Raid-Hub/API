@@ -1,12 +1,12 @@
 import { registry } from "@/schema/registry"
 import { z } from "zod"
 
-enum CheatLevelEnum {
+export enum CheatLevelEnum {
     None = 0,
-    Low = 1,
-    Medium = 2,
-    High = 3,
-    Extreme = 4
+    Suspicious = 1,
+    Moderate = 2,
+    Extreme = 3,
+    Blacklisted = 4
 }
 
 export type CheatLevel = z.infer<typeof zCheatLevel>

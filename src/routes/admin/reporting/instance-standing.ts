@@ -6,7 +6,7 @@ import {
     zInstancePlayerStanding
 } from "@/schema/components/InstanceStanding"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString } from "@/schema/util"
+import { zBigIntString, zInt64 } from "@/schema/util"
 import { getInstanceBasic } from "@/services/instance/instance"
 import {
     getInstanceBlacklist,
@@ -38,7 +38,7 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
                 statusCode: 404,
                 code: ErrorCode.InstanceNotFoundError,
                 schema: z.object({
-                    instanceId: zBigIntString()
+                    instanceId: zInt64()
                 })
             }
         ]
@@ -58,7 +58,7 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
 
         if (!instanceDetails) {
             return RaidHubRoute.fail(ErrorCode.InstanceNotFoundError, {
-                instanceId
+                instanceId: String(instanceId)
             })
         }
 

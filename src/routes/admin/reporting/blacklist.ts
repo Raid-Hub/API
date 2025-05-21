@@ -1,18 +1,18 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString, zInt64, zNaturalNumber } from "@/schema/util"
+import { zBigIntString, zNaturalNumber } from "@/schema/util"
 import { getInstancePlayerInfo } from "@/services/instance/instance"
 import { blacklistInstance } from "@/services/reporting/update-blacklist"
 import { z } from "zod"
 
 export const blacklistInstanceRoute = new RaidHubRoute({
-    method: "patch",
+    method: "put",
     description: "Blacklist an instance from leaderboards, as well as the players involved.",
     params: z.object({
         instanceId: zBigIntString()
     }),
     body: z.object({
-        reportId: zNaturalNumber().nullable(),
+        reportId: zNaturalNumber().optional(),
         reason: z.string().min(1),
         players: z.array(
             z.object({
@@ -24,17 +24,7 @@ export const blacklistInstanceRoute = new RaidHubRoute({
     response: {
         success: {
             statusCode: 200,
-            schema: z.object({
-                instanceId: zInt64(),
-                reportId: zNaturalNumber().nullable(),
-                reason: z.string(),
-                players: z.array(
-                    z.object({
-                        membershipId: zInt64(),
-                        reason: z.string()
-                    })
-                )
-            })
+            schema: z.string()
         },
         errors: [
             {
@@ -76,18 +66,16 @@ export const blacklistInstanceRoute = new RaidHubRoute({
             })
         }
 
-        const args = {
+        await blacklistInstance({
             instanceId: String(instanceId),
-            reportId: req.body.reportId,
+            reportId: req.body.reportId ?? null,
             reason: req.body.reason,
             players: req.body.players.map(player => ({
                 membershipId: String(player.membershipId),
                 reason: player.reason
             }))
-        }
+        })
 
-        await blacklistInstance(args)
-
-        return RaidHubRoute.ok(args)
+        return RaidHubRoute.ok(`Blacklisted entry for instance ${instanceId} updated or created`)
     }
 })

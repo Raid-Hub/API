@@ -26,12 +26,12 @@ export const router = new RaidHubRouter({
             route: playerRouter
         },
         {
-            path: "/activity/:instanceId",
+            path: "/instance/:instanceId",
             route: instanceRoute
         },
         {
-            path: "/instance/:instanceId",
-            route: instanceRoute
+            path: "/activity/:instanceId",
+            route: instanceRoute.deprecatedCopy()
         },
         {
             path: "/leaderboard",

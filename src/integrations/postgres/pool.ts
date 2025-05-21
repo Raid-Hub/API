@@ -2,19 +2,21 @@ import {
     Connection,
     Pool,
     PoolConfiguration,
+    PreparedStatement,
     QueryOptions,
     ScriptExecuteOptions
 } from "postgresql-client"
 
-interface RaidHubQueries {
+interface RaidHubQuerier {
     queryRow<T>(sql: string, options?: Omit<QueryOptions, "objectRows">): Promise<T | null>
     queryRows<T>(
         sql: string,
         options?: Omit<QueryOptions, "objectRows"> & { fetchCount: number }
     ): Promise<T[]>
+    prepareStatement(sql: string): Promise<RaidHubStatement>
 }
 
-export class RaidHubPool extends Pool implements RaidHubQueries {
+export class RaidHubPool extends Pool implements RaidHubQuerier {
     private connector: RaidHubConnector = new RaidHubConnector(this)
     constructor(config?: PoolConfiguration | string) {
         super(config)
@@ -30,6 +32,9 @@ export class RaidHubPool extends Pool implements RaidHubQueries {
     ): Promise<T[]> {
         return await this.connector.queryRows<T>(sql, options)
     }
+    async prepareStatement(sql: string) {
+        return await this.connector.prepareStatement(sql)
+    }
 }
 
 const QueryOptions = {
@@ -37,7 +42,7 @@ const QueryOptions = {
     objectRows: true
 } as const
 
-export class RaidHubConnector implements RaidHubQueries {
+export class RaidHubConnector implements RaidHubQuerier {
     private readonly connection: Pool | Connection
     constructor(connection: Pool | Connection) {
         this.connection = connection
@@ -75,18 +80,24 @@ export class RaidHubConnector implements RaidHubQueries {
         return rows as T[]
     }
 
-    async prepare(sql: string) {
-        return await this.connection.prepare(sql)
+    async prepareStatement(sql: string) {
+        const stmnt = await this.connection.prepare(sql)
+        return new RaidHubStatement(stmnt)
     }
 
-    async executeCommand(
-        sql: string,
-        options?: Omit<ScriptExecuteOptions, keyof typeof QueryOptions>
-    ) {
-        return await this.connection.execute(sql, {
+    async execute(sql: string, options?: Omit<ScriptExecuteOptions, keyof typeof QueryOptions>) {
+        const { results, totalTime } = await this.connection.execute(sql, {
             ...options,
             ...QueryOptions
         })
+        if (!process.env.PROD && process.env.NODE_ENV !== "test") {
+            results.forEach(({ executeTime }) => {
+                console.log(executeTime, executeTime)
+            })
+            console.log(totalTime, sql)
+        }
+
+        return results.map(r => (r.rows ?? []) as unknown[])
     }
 }
 
@@ -104,5 +115,24 @@ export class RaidHubPoolTransaction extends RaidHubPool {
         } finally {
             await this.release(conn)
         }
+    }
+}
+
+class RaidHubStatement {
+    private readonly stmnt: PreparedStatement
+    constructor(stmnt: PreparedStatement) {
+        this.stmnt = stmnt
+    }
+
+    async execute(options?: Omit<QueryOptions, keyof typeof QueryOptions>) {
+        const { rows, executeTime } = await this.stmnt.execute({
+            ...options,
+            ...QueryOptions
+        })
+        if (!process.env.PROD && process.env.NODE_ENV !== "test") {
+            console.log(executeTime, this.stmnt.sql)
+        }
+
+        return (rows ?? []) as unknown[]
     }
 }

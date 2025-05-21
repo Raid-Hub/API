@@ -12,7 +12,7 @@ export const postgres = new RaidHubPool({
 
 export const postgresWritable = new RaidHubPoolTransaction({
     user: process.env.POSTGRES_WRITABLE_USER,
-    password: process.env.POSTGRES_WRITABLE_USER,
+    password: process.env.POSTGRES_WRITABLE_PASSWORD,
     database: "raidhub",
     min: 1,
     max: 3

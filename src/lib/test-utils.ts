@@ -1,3 +1,4 @@
+import "@/lib/extensions"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { expect } from "bun:test"
 

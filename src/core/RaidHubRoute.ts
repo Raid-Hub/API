@@ -21,7 +21,7 @@ import {
 
 // This class is used to define type-safe a route in the RaidHub API
 export class RaidHubRoute<
-    M extends "get" | "post" | "patch",
+    M extends "get" | "post" | "patch" | "put" | "delete",
     ResponseBody extends ZodType,
     ErrorResponse extends ErrorData,
     Params extends ZodObject<
@@ -43,7 +43,6 @@ export class RaidHubRoute<
 {
     readonly method: M
     readonly description: string
-    readonly deprecated: boolean = false
     readonly paramsSchema: Params | null
     readonly querySchema: Query | null
     readonly bodySchema: Body | null
@@ -53,6 +52,7 @@ export class RaidHubRoute<
     private parent: RaidHubRouter | null = null
     private readonly isAdministratorRoute: boolean = false
     private readonly isProtectedPlayerRoute: boolean = false
+    private readonly isDeprecated: boolean = false
     private readonly middlewares: RequestHandler<
         z.output<Params>,
         any,
@@ -72,11 +72,12 @@ export class RaidHubRoute<
     constructor(args: {
         method: M
         description: string
-        params?: Params
-        query?: Query
-        body?: Body
+        params?: Params | null
+        query?: Query | null
+        body?: Body | null
         isAdministratorRoute?: boolean
         isProtectedPlayerRoute?: boolean
+        isDeprecated?: boolean
         middleware?: RequestHandler<z.output<Params>, any, z.output<Body>, z.output<Query>>[]
         handler: RaidHubHandler<
             Params,
@@ -90,7 +91,7 @@ export class RaidHubRoute<
                 statusCode: 200 | 201 | 207
                 schema: ResponseBody
             }
-            errors?: ErrorResponse
+            errors?: ErrorResponse | never[]
         }
     }) {
         this.router = Router({
@@ -104,6 +105,7 @@ export class RaidHubRoute<
         this.bodySchema = args.body ?? null
         this.isAdministratorRoute = args.isAdministratorRoute ?? false
         this.isProtectedPlayerRoute = args.isProtectedPlayerRoute ?? false
+        this.isDeprecated = args.isDeprecated ?? false
         this.middlewares = args.middleware ?? []
         this.handler = args.handler
         this.responseSchema = args.response.success.schema
@@ -284,6 +286,28 @@ export class RaidHubRoute<
         return this.parent ? this.parent.getFullPath(this) : "/"
     }
 
+    deprecatedCopy() {
+        return new RaidHubRoute({
+            isDeprecated: true,
+            method: this.method,
+            description: this.description,
+            params: this.paramsSchema,
+            query: this.querySchema,
+            body: this.bodySchema,
+            isAdministratorRoute: this.isAdministratorRoute,
+            isProtectedPlayerRoute: this.isProtectedPlayerRoute,
+            middleware: this.middlewares,
+            handler: this.handler,
+            response: {
+                success: {
+                    statusCode: this.successCode,
+                    schema: this.responseSchema
+                },
+                errors: this.errors
+            }
+        })
+    }
+
     $generateOpenApiRoutes() {
         const path = this.getFullPath().replace(/\/:(\w+)/g, "/{$1}")
 
@@ -329,6 +353,7 @@ export class RaidHubRoute<
             {
                 path,
                 summary: path,
+                deprecated: this.isDeprecated ? true : undefined,
                 method: this.method,
                 description: this.description,
                 security,
@@ -337,6 +362,7 @@ export class RaidHubRoute<
                     query: (this.querySchema as ZodObject<any>) ?? undefined,
                     body: this.bodySchema
                         ? {
+                              required: true,
                               content: {
                                   "application/json": {
                                       schema: this.bodySchema

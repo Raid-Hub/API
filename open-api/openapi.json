@@ -477,7 +477,7 @@
       },
       "CheatCheckBitmask": {
         "type": "string",
-        "description": "A bitmask of flagged heuristics:\n2^0 = Manual\n2^1 = Leviathan\n2^2 = EaterOfWorlds\n2^3 = SpireOfStars\n2^4 = LastWish\n2^5 = ScourgeOfThePast\n2^6 = CrownOfSorrow\n2^7 = GardenOfSalvation\n2^8 = DeepStoneCrypt\n2^9 = VaultOfGlass\n2^10 = VowOfTheDisciple\n2^11 = KingsFall\n2^12 = RootOfNightmares\n2^13 = CrotasEnd\n2^14 = SalvationsEdge\n2^15 = Raid15\n2^16 = Raid16\n2^17 = Raid17\n2^18 = Raid18\n2^19 = Raid19\n2^20 = Raid20\n2^21 = Raid21\n2^22 = Raid22\n2^23 = Raid23\n2^24 = Raid24\n2^25 = Raid25\n2^26 = Raid26\n2^27 = Raid27\n2^28 = Raid28\n2^29 = Raid29\n2^30 = Raid30\n2^31 = Raid31\n2^32 = Raid32\n2^33 = Pantheon\n2^34 = Bit34\n2^35 = Bit35\n2^36 = Bit36\n2^37 = Bit37\n2^38 = Bit38\n2^39 = Bit39\n2^40 = Bit40\n2^41 = Bit41\n2^42 = Bit42\n2^43 = Bit43\n2^44 = Bit44\n2^45 = Bit45\n2^46 = Bit46\n2^47 = Bit47\n2^48 = Bit48\n2^49 = Bit49\n2^50 = Bit50\n2^51 = Bit51\n2^52 = Bit52\n2^53 = Bit53\n2^54 = TotalInstanceKills\n2^55 = TwoPlusCheaters\n2^56 = PlayerTotalKills\n2^57 = PlayerWeaponDiversity\n2^58 = PlayerSuperKills\n2^59 = PlayerGrenadeKills\n2^60 = TooFast\n2^61 = TooFewPlayersFresh\n2^62 = TooFewPlayersCheckpoint",
+        "description": "A bitmask of flagged heuristics:\n2^0 = Manual\n2^1 = Leviathan\n2^2 = EaterOfWorlds\n2^3 = SpireOfStars\n2^4 = LastWish\n2^5 = ScourgeOfThePast\n2^6 = CrownOfSorrow\n2^7 = GardenOfSalvation\n2^8 = DeepStoneCrypt\n2^9 = VaultOfGlass\n2^10 = VowOfTheDisciple\n2^11 = KingsFall\n2^12 = RootOfNightmares\n2^13 = CrotasEnd\n2^14 = SalvationsEdge\n2^15 = Raid15\n2^16 = Raid16\n2^17 = Raid17\n2^18 = Raid18\n2^19 = Raid19\n2^20 = Raid20\n2^21 = Raid21\n2^22 = Raid22\n2^23 = Raid23\n2^24 = Raid24\n2^25 = Raid25\n2^26 = Raid26\n2^27 = Raid27\n2^28 = Raid28\n2^29 = Raid29\n2^30 = Raid30\n2^31 = Raid31\n2^32 = Raid32\n2^33 = Pantheon\n2^34 = Bit34\n2^35 = Bit35\n2^36 = Bit36\n2^37 = Bit37\n2^38 = Bit38\n2^39 = Bit39\n2^40 = Bit40\n2^41 = Bit41\n2^42 = Bit42\n2^43 = Bit43\n2^44 = Bit44\n2^45 = Bit45\n2^46 = Bit46\n2^47 = Bit47\n2^48 = Bit48\n2^49 = Bit49\n2^50 = Bit50\n2^51 = Bit51\n2^52 = Bit52\n2^53 = Solo\n2^54 = TotalInstanceKills\n2^55 = TwoPlusCheaters\n2^56 = PlayerTotalKills\n2^57 = PlayerWeaponDiversity\n2^58 = PlayerSuperKills\n2^59 = PlayerGrenadeKills\n2^60 = TooFast\n2^61 = TooFewPlayersFresh\n2^62 = TooFewPlayersCheckpoint",
         "format": "int64"
       },
       "InstanceBlacklist": {
@@ -2213,7 +2213,7 @@
         "required": ["params", "results"],
         "additionalProperties": false
       },
-      "PlayerActivitiesResponse": {
+      "PlayerHistoryResponse": {
         "type": "object",
         "properties": {
           "membershipId": {
@@ -2254,6 +2254,28 @@
           }
         },
         "required": ["membershipId"]
+      },
+      "PlayerActivitiesResponse": {
+        "type": "object",
+        "properties": {
+          "membershipId": {
+            "type": "string",
+            "pattern": "^\\d+n?$"
+          },
+          "nextCursor": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InstanceForPlayer"
+            }
+          }
+        },
+        "required": ["membershipId", "nextCursor", "activities"],
+        "additionalProperties": false
       },
       "PlayerBasicResponse": {
         "type": "object",
@@ -2379,7 +2401,7 @@
         },
         "required": ["message", "membershipId"]
       },
-      "ActivityResponse": {
+      "InstanceResponse": {
         "allOf": [
           {
             "$ref": "#/components/schemas/Instance"
@@ -2417,6 +2439,35 @@
           }
         },
         "required": ["instanceId"]
+      },
+      "ActivityResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Instance"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "leaderboardRank": {
+                "type": "integer",
+                "nullable": true,
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "metadata": {
+                "$ref": "#/components/schemas/InstanceMetadata"
+              },
+              "players": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/InstancePlayerExtended"
+                }
+              }
+            },
+            "required": ["leaderboardRank", "metadata", "players"],
+            "additionalProperties": false
+          }
+        ]
       },
       "LeaderboardIndividualGlobalResponse": {
         "oneOf": [
@@ -3244,39 +3295,7 @@
         "required": ["instanceDetails", "blacklist", "flags", "players"]
       },
       "AdminReportingBlacklistResponse": {
-        "type": "object",
-        "properties": {
-          "instanceId": {
-            "type": "string",
-            "format": "int64"
-          },
-          "reportId": {
-            "type": "integer",
-            "nullable": true,
-            "minimum": 0,
-            "exclusiveMinimum": true
-          },
-          "reason": {
-            "type": "string"
-          },
-          "players": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "membershipId": {
-                  "type": "string",
-                  "format": "int64"
-                },
-                "reason": {
-                  "type": "string"
-                }
-              },
-              "required": ["membershipId", "reason"]
-            }
-          }
-        },
-        "required": ["instanceId", "reportId", "reason", "players"]
+        "type": "string"
       },
       "PlayerNotInInstance": {
         "type": "object",
@@ -3294,6 +3313,9 @@
           }
         },
         "required": ["instanceId", "players"]
+      },
+      "AdminReportingPlayerResponse": {
+        "type": "string"
       },
       "AuthorizeAdminResponse": {
         "type": "object",
@@ -3689,9 +3711,243 @@
         }
       }
     },
+    "/player/{membershipId}/history": {
+      "get": {
+        "summary": "/player/{membershipId}/history",
+        "description": "/activities is deprecated. Use /history now. Get a player's activity history. This endpoint uses date cursors to paginate through a player's activity history. \nThe first request should not include a cursor. Subsequent requests should include the `nextCursor` \nvalue from the previous response. Note that the first request may not return the full number of activities requested\nin order to optimize performance. Subsequent requests will return the full number of activities requested.",
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+n?$"
+            },
+            "required": true,
+            "name": "membershipId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 5000,
+              "default": 2000
+            },
+            "required": false,
+            "name": "count",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "cursor",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "response": {
+                      "$ref": "#/components/schemas/PlayerHistoryResponse"
+                    }
+                  },
+                  "required": ["minted", "success", "response"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["QueryValidationError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/QueryValidationError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["ApiKeyError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "PlayerPrivateProfileError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["PlayerPrivateProfileError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/PlayerPrivateProfileError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["PlayerNotFoundError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/PlayerNotFoundError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["PathValidationError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/PathValidationError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InternalServerError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InternalServerError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/player/{membershipId}/activities": {
       "get": {
         "summary": "/player/{membershipId}/activities",
+        "deprecated": true,
         "description": "/activities is deprecated. Use /history now. Get a player's activity history. This endpoint uses date cursors to paginate through a player's activity history. \nThe first request should not include a cursor. Subsequent requests should include the `nextCursor` \nvalue from the previous response. Note that the first request may not return the full number of activities requested\nin order to optimize performance. Subsequent requests will return the full number of activities requested.",
         "security": [
           {
@@ -4809,9 +5065,162 @@
         }
       }
     },
+    "/instance/{instanceId}": {
+      "get": {
+        "summary": "/instance/{instanceId}",
+        "description": "/activity is deprecated. Use /instance now. This returns a PGCR object with a shape more aligned with how RaidHub displays PGCRs.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+n?$"
+            },
+            "required": true,
+            "name": "instanceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "response": {
+                      "$ref": "#/components/schemas/InstanceResponse"
+                    }
+                  },
+                  "required": ["minted", "success", "response"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["ApiKeyError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["InstanceNotFoundError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/InstanceNotFoundError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["PathValidationError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/PathValidationError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InternalServerError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InternalServerError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/activity/{instanceId}": {
       "get": {
         "summary": "/activity/{instanceId}",
+        "deprecated": true,
         "description": "/activity is deprecated. Use /instance now. This returns a PGCR object with a shape more aligned with how RaidHub displays PGCRs.",
         "parameters": [
           {
@@ -6865,6 +7274,7 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -7145,7 +7555,19 @@
                           "enum": ["InstanceNotFoundError"]
                         },
                         "error": {
-                          "$ref": "#/components/schemas/InstanceNotFoundError"
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/InstanceNotFoundError"
+                            },
+                            {
+                              "properties": {
+                                "instanceId": {
+                                  "type": "string",
+                                  "format": "int64"
+                                }
+                              }
+                            }
+                          ]
                         }
                       },
                       "required": ["minted", "success", "code", "error"]
@@ -7208,7 +7630,7 @@
       }
     },
     "/admin/reporting/blacklist/{instanceId}": {
-      "patch": {
+      "put": {
         "summary": "/admin/reporting/blacklist/{instanceId}",
         "description": "Blacklist an instance from leaderboards, as well as the players involved.",
         "parameters": [
@@ -7223,6 +7645,7 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -7230,7 +7653,6 @@
                 "properties": {
                   "reportId": {
                     "type": "integer",
-                    "nullable": true,
                     "minimum": 0,
                     "exclusiveMinimum": true
                   },
@@ -7256,7 +7678,7 @@
                     }
                   }
                 },
-                "required": ["reportId", "reason", "players"]
+                "required": ["reason", "players"]
               }
             }
           }
@@ -7451,11 +7873,219 @@
         }
       }
     },
+    "/admin/reporting/player/{membershipId}": {
+      "patch": {
+        "summary": "/admin/reporting/player/{membershipId}",
+        "description": "Update fields on a player. Currently, only the cheat level can be updated.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+n?$"
+            },
+            "required": true,
+            "name": "membershipId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cheatLevel": {
+                    "$ref": "#/components/schemas/CheatLevel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "response": {
+                      "$ref": "#/components/schemas/AdminReportingPlayerResponse"
+                    }
+                  },
+                  "required": ["minted", "success", "response"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["BodyValidationError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/BodyValidationError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["ApiKeyError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["PlayerNotFoundError"]
+                        },
+                        "error": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PlayerNotFoundError"
+                            },
+                            {
+                              "properties": {
+                                "membershipId": {
+                                  "type": "string",
+                                  "format": "int64"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["PathValidationError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/PathValidationError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InternalServerError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InternalServerError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/authorize/admin": {
       "post": {
         "summary": "/authorize/admin",
         "description": "Authorize an admin user. Requires the client secret.",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -7619,6 +8249,7 @@
         "summary": "/authorize/user",
         "description": "Authenticate a user. Grants permission to access restricted resources.",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {

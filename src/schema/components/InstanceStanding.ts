@@ -64,7 +64,7 @@ enum CheatFlagIndex {
     Bit50,
     Bit51,
     Bit52,
-    Bit53,
+    Solo,
     TotalInstanceKills,
     TwoPlusCheaters,
     PlayerTotalKills,

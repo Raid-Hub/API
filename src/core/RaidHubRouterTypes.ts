@@ -42,7 +42,7 @@ export type RaidHubHandlerReturn<T, E extends ErrorData> =
     | {
           [K in keyof E]: {
               success: false
-              error: z.input<E[K]["schema"]>
+              error: z.output<E[K]["schema"]>
               code: E[K]["code"]
           }
       }[number]

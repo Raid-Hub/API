@@ -4,9 +4,9 @@ import { registry } from "@/schema/registry"
 import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi"
 import { exec } from "child_process"
 import { writeFile } from "fs"
+import path from "path"
 
-const dir = "./open-api"
-const fileName = dir + "/openapi.json"
+const filePath = path.join(__dirname, "openapi.json")
 
 console.log("Generating OpenAPI spec...")
 
@@ -79,20 +79,23 @@ writeFile("open-api/openapi.json", JSON.stringify(doc, null, 2), err => {
         process.exit(1)
     }
     console.log("Formatting OpenAPI docs...")
-    exec(`prettier --write ${fileName}`, err => {
+    exec(`prettier --write ${filePath}`, err => {
         if (err) {
             console.error(err)
             process.exit(1)
         }
 
         console.log("Generating static HTML docs...")
-        exec(`redoc-cli bundle -o ${dir}/index.html ${fileName} --options='${redocOpts}'`, err => {
-            if (err) {
-                console.error(err)
-                process.exit(1)
+        exec(
+            `redoc-cli bundle -o ${__dirname}/index.html ${filePath} --options='${redocOpts}'`,
+            err => {
+                if (err) {
+                    console.error(err)
+                    process.exit(1)
+                }
+                console.log("Done.")
+                process.exit(0)
             }
-            console.log("Done.")
-            process.exit(0)
-        })
+        )
     })
 })
