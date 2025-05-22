@@ -4,6 +4,8 @@ declare global {
     }
 }
 
-BigInt.prototype.toJSON = BigInt.prototype.toString
+BigInt.prototype.toJSON = function () {
+    return this.toString()
+}
 
 export {}
