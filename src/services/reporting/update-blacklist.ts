@@ -39,18 +39,10 @@ export const blacklistInstance = async (data: {
 }
 
 export const removeInstanceBlacklist = async (instanceId: bigint | string) => {
-    return await postgresWritable.transaction(async conn => {
-        // Delete from blacklist_instance_flag
-        await conn.queryRow(
-            `DELETE FROM blacklist_instance_player WHERE instance_id = $1::bigint`,
-            {
-                params: [instanceId]
-            }
-        )
-
-        // Delete from blacklist_instance
-        await conn.queryRow(`DELETE FROM blacklist_instance WHERE instance_id = $1::bigint`, {
+    return await postgresWritable.queryRow(
+        `DELETE FROM blacklist_instance WHERE instance_id = $1::bigint`,
+        {
             params: [instanceId]
-        })
-    })
+        }
+    )
 }

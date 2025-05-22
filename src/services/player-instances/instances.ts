@@ -154,7 +154,8 @@ export async function getInstances({
                         'bungieGlobalDisplayName', bungie_global_display_name,
                         'bungieGlobalDisplayNameCode', bungie_global_display_name_code,
                         'lastSeen', last_seen,
-                        'isPrivate', is_private
+                        'isPrivate', is_private,
+                        'cheatLevel', cheat_level,
                     )
                     ORDER BY instance_player.completed DESC, instance_player.time_played_seconds DESC
                 ) as "players"

@@ -25,23 +25,10 @@ export const getInstanceFlags = async (instanceId: bigint | string) => {
 }
 
 export const getInstancePlayerFlags = async (instanceId: bigint | string) => {
-    return await postgres.queryRows<InstancePlayerFlag>(
-        `SELECT 
-            fip.instance_id::text AS "instanceId",
-            fip.membership_id::text AS "membershipId",
-            fip.cheat_check_version AS "cheatCheckVersion",
-            fip.cheat_check_bitmask::text AS "cheatCheckBitmask",
-            fip.flagged_at AS "flaggedAt",
-            fip.cheat_probability AS "cheatProbability"
-        FROM flag_instance_player fip
-        WHERE fip.instance_id = $1::bigint AND NOT fip.false_positive
-        ORDER BY fip.cheat_probability, fip.flagged_at DESC
-        LIMIT 12`,
-        {
-            params: [instanceId],
-            fetchCount: 12
-        }
-    )
+    return await postgres.queryRows<InstancePlayerFlag>(``, {
+        params: [instanceId],
+        fetchCount: 12
+    })
 }
 
 export const getInstanceBlacklist = async (instanceId: bigint | string) => {
@@ -62,6 +49,7 @@ export const getInstanceBlacklist = async (instanceId: bigint | string) => {
     )
 }
 
+// getInstancePlayerFlags(instanceId),
 export const getInstancePlayersStanding = async (instanceId: bigint | string) => {
     return await postgres.queryRows<InstancePlayerStanding>(
         `SELECT 
@@ -79,9 +67,24 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
             p.clears,
             ip.completed,
             ip.time_played_seconds AS "timePlayedSeconds",
-            ip.kills,
-            ip.deaths,
-            ip.assists,
+            (
+                SELECT COALESCE(jsonb_agg(f.data), '[]'::jsonb)
+                FROM (
+                    SELECT jsonb_build_object(
+                        'instanceId', fip.instance_id::text,
+                        'membershipId', fip.membership_id::text,
+                        'cheatCheckVersion', fip.cheat_check_version,
+                        'cheatCheckBitmask', fip.cheat_check_bitmask::text,
+                        'cheatProbability', fip.cheat_probability,
+                        'flaggedAt', fip.flagged_at
+                    ) AS "data"
+                    FROM flag_instance_player fip
+                    WHERE fip.instance_id = $1::bigint AND NOT fip.false_positive
+                        AND fip.membership_id = p.membership_id
+                    ORDER BY date_trunc('week', fip.flagged_at) DESC, fip.cheat_probability DESC
+                    LIMIT 12
+                ) AS f
+            ) AS "flags",
             (
                 SELECT COALESCE(jsonb_agg(f.data), '[]'::jsonb)
                 FROM (
@@ -99,7 +102,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                     WHERE fip.membership_id = p.membership_id 
                         AND fip.instance_id <> $1::bigint
                         AND NOT fip.false_positive
-                    ORDER BY fip.cheat_probability DESC, fip.flagged_at DESC
+                    ORDER BY date_trunc('week', fip.flagged_at) DESC, fip.cheat_probability DESC
                     LIMIT 10
                 ) AS f
             ) AS "otherRecentFlags",

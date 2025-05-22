@@ -135,9 +135,6 @@ export const zInstancePlayerStanding = registry.register(
         flags: z.array(zInstancePlayerFlag),
         clears: zWholeNumber(),
         completed: z.boolean(),
-        kills: zWholeNumber(),
-        assists: zWholeNumber(),
-        deaths: zWholeNumber(),
         timePlayedSeconds: zWholeNumber(),
         blacklistedInstances: z.array(
             z.object({

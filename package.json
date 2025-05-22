@@ -15,7 +15,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "bun --watch ./src/index.ts",
-    "types": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.json",
     "format": "prettier '**/*.{ts,json}'",
     "docs": "bun run ./open-api/generate.ts",

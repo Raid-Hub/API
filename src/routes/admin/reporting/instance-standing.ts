@@ -11,7 +11,6 @@ import { getInstanceBasic } from "@/services/instance/instance"
 import {
     getInstanceBlacklist,
     getInstanceFlags,
-    getInstancePlayerFlags,
     getInstancePlayersStanding
 } from "@/services/reporting/standing"
 import { z } from "zod"
@@ -46,15 +45,12 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
     async handler(req) {
         const instanceId = req.params.instanceId
 
-        const [instanceDetails, blacklist, flags, playerFlags, playersStanding] = await Promise.all(
-            [
-                getInstanceBasic(instanceId),
-                getInstanceBlacklist(instanceId),
-                getInstanceFlags(instanceId),
-                getInstancePlayerFlags(instanceId),
-                getInstancePlayersStanding(instanceId)
-            ]
-        )
+        const [instanceDetails, blacklist, flags, playersStanding] = await Promise.all([
+            getInstanceBasic(instanceId),
+            getInstanceBlacklist(instanceId),
+            getInstanceFlags(instanceId),
+            getInstancePlayersStanding(instanceId)
+        ])
 
         if (!instanceDetails) {
             return RaidHubRoute.fail(ErrorCode.InstanceNotFoundError, {
@@ -66,24 +62,7 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
             instanceDetails,
             blacklist,
             flags,
-            players: playersStanding.map(player => ({
-                playerInfo: player.playerInfo,
-                flags: playerFlags
-                    .filter(flag => flag.membershipId === player.playerInfo.membershipId)
-                    .map(flag => ({
-                        instanceId: flag.instanceId,
-                        membershipId: flag.membershipId,
-                        flaggedAt: flag.flaggedAt,
-                        cheatCheckVersion: flag.cheatCheckVersion,
-                        cheatProbability: flag.cheatProbability,
-                        cheatCheckBitmask: flag.cheatCheckBitmask
-                    })),
-                clears: player.clears,
-                cheatLevel: player.cheatLevel,
-                completed: player.completed,
-                blacklistedInstances: player.blacklistedInstances,
-                otherRecentFlags: player.otherRecentFlags
-            }))
+            players: playersStanding
         })
     }
 })

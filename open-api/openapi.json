@@ -608,18 +608,6 @@
           "completed": {
             "type": "boolean"
           },
-          "kills": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "assists": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "deaths": {
-            "type": "integer",
-            "minimum": 0
-          },
           "timePlayedSeconds": {
             "type": "integer",
             "minimum": 0
@@ -669,9 +657,6 @@
           "flags",
           "clears",
           "completed",
-          "kills",
-          "assists",
-          "deaths",
           "timePlayedSeconds",
           "blacklistedInstances",
           "otherRecentFlags"
