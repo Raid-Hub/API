@@ -58,7 +58,8 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'platformType', fastest.platform_type,
                             'isDayOne', date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch'),
                             'isContest', date_completed < COALESCE(contest_end, TIMESTAMP 'epoch'),
-                            'isWeekOne', date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch')
+                            'isWeekOne', date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch'),
+                            'isBlacklisted', bi.instance_id IS NOT NULL
                         ) 
                         ELSE NULL 
                     END as "fastestInstance"
@@ -66,6 +67,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                 LEFT JOIN player_stats ON activity_definition.id = player_stats.activity_id
                     AND player_stats.membership_id = $1::bigint 
                 LEFT JOIN instance fastest ON player_stats.fastest_instance_id = fastest.instance_id
+                LEFT JOIN blacklist_instance bi ON player_stats.fastest_instance_id = bi.instance_id
                 LEFT JOIN activity_version fastest_ah ON fastest.hash = fastest_ah.hash
                 ORDER BY activity_definition.id`,
                 {
