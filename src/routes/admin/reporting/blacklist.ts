@@ -2,7 +2,7 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString, zNaturalNumber } from "@/schema/util"
 import { getInstancePlayerInfo } from "@/services/instance/instance"
-import { blacklistInstance } from "@/services/reporting/update-blacklist"
+import { blacklistInstance, removeInstanceBlacklist } from "@/services/reporting/update-blacklist"
 import { z } from "zod"
 
 export const blacklistInstanceRoute = new RaidHubRoute({
@@ -14,17 +14,22 @@ export const blacklistInstanceRoute = new RaidHubRoute({
     body: z.object({
         reportId: zNaturalNumber().optional(),
         reason: z.string().min(1),
-        players: z.array(
-            z.object({
-                membershipId: zBigIntString(),
-                reason: z.string().min(1)
-            })
-        )
+        removeBlacklist: z.boolean().optional().default(false),
+        players: z
+            .array(
+                z.object({
+                    membershipId: zBigIntString(),
+                    reason: z.string().min(1)
+                })
+            )
+            .optional()
     }),
     response: {
         success: {
             statusCode: 200,
-            schema: z.string()
+            schema: z.object({
+                blacklisted: z.boolean()
+            })
         },
         errors: [
             {
@@ -55,27 +60,34 @@ export const blacklistInstanceRoute = new RaidHubRoute({
             })
         }
 
-        const playersNotInInstance = req.body.players.filter(
+        const playersNotInInstance = req.body.players?.filter(
             player => !players.find(p => p.membershipId === String(player.membershipId))
         )
 
-        if (playersNotInInstance.length) {
+        if (playersNotInInstance?.length) {
             return RaidHubRoute.fail(ErrorCode.PlayerNotInInstance, {
                 instanceId,
                 players: playersNotInInstance.map(player => player.membershipId)
             })
         }
 
-        await blacklistInstance({
-            instanceId: String(instanceId),
-            reportId: req.body.reportId ?? null,
-            reason: req.body.reason,
-            players: req.body.players.map(player => ({
-                membershipId: String(player.membershipId),
-                reason: player.reason
-            }))
-        })
+        if (req.body.removeBlacklist) {
+            await removeInstanceBlacklist(instanceId)
 
-        return RaidHubRoute.ok(`Blacklisted entry for instance ${instanceId} updated or created`)
+            return RaidHubRoute.ok({
+                blacklisted: false
+            })
+        } else {
+            await blacklistInstance({
+                instanceId,
+                reportId: req.body.reportId ?? null,
+                reason: req.body.reason,
+                players: req.body.players ?? []
+            })
+
+            return RaidHubRoute.ok({
+                blacklisted: true
+            })
+        }
     }
 })

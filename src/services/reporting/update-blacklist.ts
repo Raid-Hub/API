@@ -5,26 +5,21 @@ export const blacklistInstance = async (data: {
     reportId: number | null
     reason: string
     players: {
-        membershipId: string
+        membershipId: string | bigint
         reason: string
     }[]
 }) => {
     return await postgresWritable.transaction(async conn => {
         // Insert into blacklist_instance
-        const stmnt = await conn.prepareStatement(
-            `INSERT INTO blacklist_instance (instance_id, report_source, report_id, reason)
-            VALUES ($1::bigint, $2, $3, $4)
-            ON CONFLICT (instance_id) DO NOTHING`
-        )
-
         const reportSource = data.reportId ? "WebReport" : "Manual"
-        await stmnt.execute({
-            params: [data.instanceId, reportSource, data.reportId, data.reason]
-        })
-
-        if (!data.players.length) {
-            return
-        }
+        await conn.queryRow(
+            `INSERT INTO blacklist_instance (instance_id, report_source, report_id, reason)
+            VALUES ($1::bigint, $2::"BlacklistReportSource", $3, $4)
+            ON CONFLICT (instance_id) DO NOTHING`,
+            {
+                params: [data.instanceId, reportSource, data.reportId, data.reason]
+            }
+        )
 
         // Insert into blacklist_instance_flag
         const playerStmnt = await conn.prepareStatement(
@@ -40,5 +35,22 @@ export const blacklistInstance = async (data: {
                 })
             )
         )
+    })
+}
+
+export const removeInstanceBlacklist = async (instanceId: bigint | string) => {
+    return await postgresWritable.transaction(async conn => {
+        // Delete from blacklist_instance_flag
+        await conn.queryRow(
+            `DELETE FROM blacklist_instance_player WHERE instance_id = $1::bigint`,
+            {
+                params: [instanceId]
+            }
+        )
+
+        // Delete from blacklist_instance
+        await conn.queryRow(`DELETE FROM blacklist_instance WHERE instance_id = $1::bigint`, {
+            params: [instanceId]
+        })
     })
 }

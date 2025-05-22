@@ -597,6 +597,9 @@
           "cheatLevel": {
             "$ref": "#/components/schemas/CheatLevel"
           },
+          "completed": {
+            "type": "boolean"
+          },
           "blacklistedInstances": {
             "type": "array",
             "items": {
@@ -642,6 +645,7 @@
           "flags",
           "clears",
           "cheatLevel",
+          "completed",
           "blacklistedInstances",
           "otherRecentFlags"
         ]
@@ -3295,7 +3299,13 @@
         "required": ["instanceDetails", "blacklist", "flags", "players"]
       },
       "AdminReportingBlacklistResponse": {
-        "type": "string"
+        "type": "object",
+        "properties": {
+          "blacklisted": {
+            "type": "boolean"
+          }
+        },
+        "required": ["blacklisted"]
       },
       "PlayerNotInInstance": {
         "type": "object",
@@ -7660,6 +7670,10 @@
                     "type": "string",
                     "minLength": 1
                   },
+                  "removeBlacklist": {
+                    "type": "boolean",
+                    "default": false
+                  },
                   "players": {
                     "type": "array",
                     "items": {
@@ -7678,7 +7692,7 @@
                     }
                   }
                 },
-                "required": ["reason", "players"]
+                "required": ["reason"]
               }
             }
           }

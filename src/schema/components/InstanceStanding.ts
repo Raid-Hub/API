@@ -136,6 +136,7 @@ export const zInstancePlayerStanding = registry.register(
         flags: z.array(zInstancePlayerFlag),
         clears: zWholeNumber(),
         cheatLevel: zCheatLevel,
+        completed: z.boolean(),
         blacklistedInstances: z.array(
             z.object({
                 instanceId: zInt64(),

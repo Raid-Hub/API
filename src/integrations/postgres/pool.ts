@@ -109,11 +109,11 @@ export class RaidHubPoolTransaction extends RaidHubPool {
             const result = await cb(new RaidHubConnector(conn))
             await conn.commit()
             return result
-        } catch (error) {
+        } catch (err) {
             await conn.rollback()
-            throw error
+            throw err
         } finally {
-            await this.release(conn)
+            void this.release(conn)
         }
     }
 }

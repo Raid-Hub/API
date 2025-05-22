@@ -77,6 +77,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
             ) AS "playerInfo",
             p.cheat_level AS "cheatLevel",
             p.clears,
+            ip.completed,
             (
                 SELECT COALESCE(jsonb_agg(f.data), '[]'::jsonb)
                 FROM (
@@ -120,7 +121,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
         FROM instance_player ip
         JOIN player p USING (membership_id)
         WHERE ip.instance_id = $1::bigint
-        ORDER BY p.cheat_level DESC, ip.time_played_seconds DESC
+        ORDER BY ip.completed DESC, ip.time_played_seconds DESC
         LIMIT 12`,
         {
             params: [instanceId],

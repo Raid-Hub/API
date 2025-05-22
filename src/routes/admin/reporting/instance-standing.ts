@@ -80,6 +80,7 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
                     })),
                 clears: player.clears,
                 cheatLevel: player.cheatLevel,
+                completed: player.completed,
                 blacklistedInstances: player.blacklistedInstances,
                 otherRecentFlags: player.otherRecentFlags
             }))
