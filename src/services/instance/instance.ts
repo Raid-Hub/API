@@ -24,10 +24,12 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
             platform_type AS "platformType",
             date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
             date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
-            date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne"
+            date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
+            b.instance_id IS NOT NULL AS "isBlacklisted"
         FROM instance
         INNER JOIN activity_version USING (hash)
         INNER JOIN activity_definition ON activity_definition.id = activity_version.activity_id
+        LEFT JOIN blacklist_instance b USING (instance_id)
         WHERE instance_id = $1::bigint
         LIMIT 1;`,
         {
@@ -56,7 +58,8 @@ export async function getInstanceExtended(
                 'bungieGlobalDisplayName', "bungie_global_display_name", 
                 'bungieGlobalDisplayNameCode', "bungie_global_display_name_code", 
                 'lastSeen', "last_seen",
-                'isPrivate', "is_private"
+                'isPrivate', "is_private",
+                'cheatLevel', "cheat_level"
             ) AS "playerInfo", 
             "t1"."characters_json" AS "characters"
         FROM "instance_player" "ap"
@@ -204,7 +207,8 @@ export async function getInstancePlayerInfo(instanceId: bigint | string) {
             player.bungie_global_display_name AS "bungieGlobalDisplayName",
             player.bungie_global_display_name_code AS "bungieGlobalDisplayNameCode",
             player.last_seen AS "lastSeen",
-            player.is_private AS "isPrivate"
+            player.is_private AS "isPrivate",
+            player.cheat_level AS "cheatLevel"
         FROM "instance_player" "ap"
         INNER JOIN "player" USING (membership_id)
         WHERE instance_id = $1::bigint

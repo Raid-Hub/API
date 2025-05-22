@@ -73,11 +73,15 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                 'bungieGlobalDisplayName', p.bungie_global_display_name,
                 'bungieGlobalDisplayNameCode', p.bungie_global_display_name_code,
                 'lastSeen', p.last_seen,
-                'isPrivate', p.is_private
+                'isPrivate', p.is_private,
+                'cheatLevel', p.cheat_level
             ) AS "playerInfo",
-            p.cheat_level AS "cheatLevel",
             p.clears,
             ip.completed,
+            ip.time_played_seconds AS "timePlayedSeconds",
+            ip.kills,
+            ip.deaths,
+            ip.assists,
             (
                 SELECT COALESCE(jsonb_agg(f.data), '[]'::jsonb)
                 FROM (

@@ -10,4 +10,14 @@ export enum CheatLevelEnum {
 }
 
 export type CheatLevel = z.infer<typeof zCheatLevel>
-export const zCheatLevel = registry.register("CheatLevel", z.nativeEnum(CheatLevelEnum))
+export const zCheatLevel = registry.register(
+    "CheatLevel",
+    z.nativeEnum(CheatLevelEnum).openapi({
+        description:
+            "The level of cheating detected on the account.\n" +
+            Object.values(CheatLevelEnum)
+                .filter((level): level is number => typeof level === "number")
+                .map(level => `${level}: ${CheatLevelEnum[level]}`)
+                .join("\n")
+    })
+)

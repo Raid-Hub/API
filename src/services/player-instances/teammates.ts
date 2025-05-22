@@ -33,7 +33,8 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
                 'bungieGlobalDisplayName', "bungie_global_display_name", 
                 'bungieGlobalDisplayNameCode', "bungie_global_display_name_code", 
                 'lastSeen', "last_seen",
-                'isPrivate', "is_private"
+                'isPrivate', "is_private",
+                'cheatLevel', cheat_level
             ) AS "playerInfo"
         FROM agg_data
         JOIN player USING (membership_id);`,

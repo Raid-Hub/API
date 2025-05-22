@@ -28,7 +28,8 @@ export const getClanStats = async (
                         'bungieGlobalDisplayName', player."bungie_global_display_name",
                         'bungieGlobalDisplayNameCode', player."bungie_global_display_name_code",
                         'lastSeen', player."last_seen",
-                        'isPrivate', player."is_private"
+                        'isPrivate', player."is_private",
+                        'cheatLevel', player."cheat_level",
                     ) END,
                     'stats', JSONB_BUILD_OBJECT(
                         'clears', COALESCE(player."clears", 0),

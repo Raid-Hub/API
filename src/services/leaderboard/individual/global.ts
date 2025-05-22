@@ -39,7 +39,8 @@ export const getIndividualGlobalLeaderboard = async ({
                 'bungieGlobalDisplayName', bungie_global_display_name,
                 'bungieGlobalDisplayNameCode', bungie_global_display_name_code,
                 'lastSeen', last_seen,
-                'isPrivate', is_private
+                'isPrivate', is_private,
+                'cheatLevel', cheat_level
             ) as "playerInfo"
         FROM individual_global_leaderboard
         JOIN player USING (membership_id)

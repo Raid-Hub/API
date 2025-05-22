@@ -1,4 +1,3 @@
-import { zCheatLevel } from "@/schema/enums/CheatLevel"
 import { registry } from "@/schema/registry"
 import { zISODateString, zInt64, zNaturalNumber, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
@@ -135,8 +134,11 @@ export const zInstancePlayerStanding = registry.register(
         playerInfo: zPlayerInfo,
         flags: z.array(zInstancePlayerFlag),
         clears: zWholeNumber(),
-        cheatLevel: zCheatLevel,
         completed: z.boolean(),
+        kills: zWholeNumber(),
+        assists: zWholeNumber(),
+        deaths: zWholeNumber(),
+        timePlayedSeconds: zWholeNumber(),
         blacklistedInstances: z.array(
             z.object({
                 instanceId: zInt64(),

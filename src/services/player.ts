@@ -18,7 +18,8 @@ export const getPlayer = async (membershipId: bigint | string) => {
             bungie_global_display_name AS "bungieGlobalDisplayName",
             bungie_global_display_name_code AS "bungieGlobalDisplayNameCode",
             last_seen AS "lastSeen",
-            is_private AS "isPrivate"
+            is_private AS "isPrivate",
+            cheat_level AS "cheatLevel"
         FROM player 
         WHERE membership_id = $1::bigint`,
         {

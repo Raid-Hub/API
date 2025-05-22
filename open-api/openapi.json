@@ -282,7 +282,7 @@
             "type": "integer",
             "minimum": 0,
             "exclusiveMinimum": true,
-            "description": "Activity duration in seconds"
+            "description": "Instance duration in seconds"
           },
           "platformType": {
             "allOf": [
@@ -296,15 +296,19 @@
           },
           "isDayOne": {
             "type": "boolean",
-            "description": "If the activity was completed before the day one end date"
+            "description": "If the instance was completed before the day one end date"
           },
           "isContest": {
             "type": "boolean",
-            "description": "If the activity was completed before the contest end date"
+            "description": "If the instance was completed before the contest end date"
           },
           "isWeekOne": {
             "type": "boolean",
-            "description": "If the activity was completed before the week one end date"
+            "description": "If the instance was completed before the week one end date"
+          },
+          "isBlacklisted": {
+            "type": "boolean",
+            "description": "If the instance is blacklisted from leaderboards"
           }
         },
         "required": [
@@ -324,7 +328,8 @@
           "platformType",
           "isDayOne",
           "isContest",
-          "isWeekOne"
+          "isWeekOne",
+          "isBlacklisted"
         ],
         "additionalProperties": false
       },
@@ -409,7 +414,8 @@
       },
       "CheatLevel": {
         "type": "integer",
-        "enum": [0, 1, 2, 3, 4]
+        "enum": [0, 1, 2, 3, 4],
+        "description": "The level of cheating detected on the account.\n0: None\n1: Suspicious\n2: Moderate\n3: Extreme\n4: Blacklisted"
       },
       "PlayerInfo": {
         "type": "object",
@@ -451,6 +457,9 @@
           "isPrivate": {
             "type": "boolean",
             "description": "Whether or not the player has chosen to hide their on Bungie.net."
+          },
+          "cheatLevel": {
+            "$ref": "#/components/schemas/CheatLevel"
           }
         },
         "required": [
@@ -461,7 +470,8 @@
           "bungieGlobalDisplayName",
           "bungieGlobalDisplayNameCode",
           "lastSeen",
-          "isPrivate"
+          "isPrivate",
+          "cheatLevel"
         ],
         "additionalProperties": false,
         "example": {
@@ -472,7 +482,8 @@
           "iconPath": "/common/destiny2_content/icons/93844c8b76ea80683a880479e3506980.jpg",
           "membershipType": 3,
           "lastSeen": "2021-05-01T00:00:00.000Z",
-          "isPrivate": false
+          "isPrivate": false,
+          "cheatLevel": 0
         }
       },
       "CheatCheckBitmask": {
@@ -594,11 +605,24 @@
             "type": "integer",
             "minimum": 0
           },
-          "cheatLevel": {
-            "$ref": "#/components/schemas/CheatLevel"
-          },
           "completed": {
             "type": "boolean"
+          },
+          "kills": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "assists": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "deaths": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "timePlayedSeconds": {
+            "type": "integer",
+            "minimum": 0
           },
           "blacklistedInstances": {
             "type": "array",
@@ -644,8 +668,11 @@
           "playerInfo",
           "flags",
           "clears",
-          "cheatLevel",
           "completed",
+          "kills",
+          "assists",
+          "deaths",
+          "timePlayedSeconds",
           "blacklistedInstances",
           "otherRecentFlags"
         ]
@@ -2321,6 +2348,9 @@
           "isPrivate": {
             "type": "boolean",
             "description": "Whether or not the player has chosen to hide their on Bungie.net."
+          },
+          "cheatLevel": {
+            "$ref": "#/components/schemas/CheatLevel"
           }
         },
         "required": [
@@ -2331,7 +2361,8 @@
           "bungieGlobalDisplayName",
           "bungieGlobalDisplayNameCode",
           "lastSeen",
-          "isPrivate"
+          "isPrivate",
+          "cheatLevel"
         ],
         "additionalProperties": false,
         "example": {
@@ -2342,7 +2373,8 @@
           "iconPath": "/common/destiny2_content/icons/93844c8b76ea80683a880479e3506980.jpg",
           "membershipType": 3,
           "lastSeen": "2021-05-01T00:00:00.000Z",
-          "isPrivate": false
+          "isPrivate": false,
+          "cheatLevel": 0
         }
       },
       "PlayerProfileResponse": {

@@ -136,11 +136,13 @@ export async function getInstances({
             date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
             date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
             date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
+            b.instance_id IS NOT NULL AS "isBlacklisted",
             "_lateral".players AS "players"
         FROM _player_instances
         INNER JOIN instance USING (instance_id)
         INNER JOIN activity_version USING (hash)
         INNER JOIN activity_definition ON activity_definition.id = activity_version.activity_id
+        LEFT JOIN blacklist_instance b USING (instance_id)
         LEFT JOIN LATERAL (
             SELECT
                 JSONB_AGG(
