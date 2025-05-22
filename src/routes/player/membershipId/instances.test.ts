@@ -39,7 +39,9 @@ describe("instances 200", () => {
         })
 
         expectOk(result)
-        expect(result.parsed.length).toBeGreaterThan(0)
+        if (result.type === "ok") {
+            expect(result.parsed.length).toBeGreaterThan(0)
+        }
     }
 
     test("no filters", () => t())
