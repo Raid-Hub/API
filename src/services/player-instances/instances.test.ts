@@ -13,7 +13,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.length).toBeGreaterThan(0)
@@ -31,7 +31,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.length).toBeGreaterThan(0)
@@ -53,7 +53,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.length).toBeGreaterThan(0)
@@ -79,7 +79,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.length).toBeGreaterThan(0)
@@ -100,7 +100,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.length).toBeGreaterThan(0)
@@ -127,7 +127,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.length).toBeGreaterThan(0)
@@ -154,7 +154,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.length).toBeGreaterThan(0)
@@ -177,7 +177,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.every(instance => instance.season == season)).toBe(true)
@@ -197,7 +197,7 @@ describe("getInstances", () => {
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
             expect(parsed.data.length).toBeGreaterThan(0)

@@ -17,7 +17,7 @@ describe("getIndividualWorldFirstPowerRankingsLeaderboard", () => {
         const parsed = z.array(zIndividualLeaderboardEntry).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
@@ -39,7 +39,7 @@ describe("searchIndividualWorldFirstPowerRankingsLeaderboard", () => {
             })
             .safeParse(data)
         if (!parsed.success) {
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.entries.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)

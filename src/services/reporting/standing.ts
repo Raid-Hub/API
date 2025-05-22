@@ -2,7 +2,6 @@ import { postgres } from "@/integrations/postgres"
 import {
     InstanceBlacklist,
     InstanceFlag,
-    InstancePlayerFlag,
     InstancePlayerStanding
 } from "@/schema/components/InstanceStanding"
 
@@ -24,13 +23,6 @@ export const getInstanceFlags = async (instanceId: bigint | string) => {
     )
 }
 
-export const getInstancePlayerFlags = async (instanceId: bigint | string) => {
-    return await postgres.queryRows<InstancePlayerFlag>(``, {
-        params: [instanceId],
-        fetchCount: 12
-    })
-}
-
 export const getInstanceBlacklist = async (instanceId: bigint | string) => {
     return await postgres.queryRow<InstanceBlacklist>(
         `SELECT 
@@ -49,7 +41,6 @@ export const getInstanceBlacklist = async (instanceId: bigint | string) => {
     )
 }
 
-// getInstancePlayerFlags(instanceId),
 export const getInstancePlayersStanding = async (instanceId: bigint | string) => {
     return await postgres.queryRows<InstancePlayerStanding>(
         `SELECT 

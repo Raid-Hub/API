@@ -12,7 +12,7 @@ describe("getPlayer", () => {
         const parsed = z.array(zTeammate).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)

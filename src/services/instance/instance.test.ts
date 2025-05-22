@@ -17,7 +17,7 @@ describe("getInstance", () => {
         const parsed = zInstance.safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
         }
@@ -31,7 +31,7 @@ describe("getInstanceExtended", () => {
         const parsed = zInstanceExtended.safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
         }
@@ -45,7 +45,7 @@ describe("getInstanceMetadataByHash", () => {
         const parsed = zInstanceMetadata.safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
         }
@@ -63,7 +63,7 @@ describe("getLeaderboardEntryForInstance", () => {
             .safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
         }

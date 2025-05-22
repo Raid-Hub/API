@@ -33,7 +33,7 @@ export const expectErr = <
         | {
               type: "err"
               code: ErrorCode
-              parsed: readonly E[]
+              parsed: E
           }
 >(
     result: T

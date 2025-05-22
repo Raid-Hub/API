@@ -413,7 +413,7 @@ export class RaidHubRoute<
         | {
               type: "err"
               code: ErrorCode
-              parsed: ErrorResponse
+              parsed: ErrorResponse[number]["schema"]
           }
     > {
         let after: () => Promise<void> = () => Promise.resolve()

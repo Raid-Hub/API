@@ -13,7 +13,7 @@ describe("getActivities", () => {
         const parsed = z.array(zInstanceForPlayer).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
@@ -28,7 +28,7 @@ describe("getActivities", () => {
 
         const parsed = z.array(zInstanceForPlayer).safeParse(data)
         if (!parsed.success) {
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)

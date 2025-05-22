@@ -18,7 +18,7 @@ describe("getRaidId", () => {
 
         const parsed = z.object({ id: zNaturalNumber() }).safeParse(data)
         if (!parsed.success) {
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
         }
@@ -31,7 +31,7 @@ describe("getVersionId", () => {
 
         const parsed = z.object({ id: zNaturalNumber() }).safeParse(data)
         if (!parsed.success) {
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
         }
@@ -46,7 +46,7 @@ describe("getActivityVersion", () => {
             .object({ activityId: zNaturalNumber(), versionId: zNaturalNumber() })
             .safeParse(data)
         if (!parsed.success) {
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
         }
@@ -60,7 +60,7 @@ describe("listActivityDefinitions", () => {
         const parsed = z.array(zActivityDefinition).safeParse(data)
         if (!parsed.success) {
             console.error(parsed.error.errors)
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
@@ -74,7 +74,7 @@ describe("listVersionDefinitions", () => {
 
         const parsed = z.array(zVersionDefinition).safeParse(data)
         if (!parsed.success) {
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
@@ -98,7 +98,7 @@ describe("listHashes", () => {
             )
             .safeParse(data)
         if (!parsed.success) {
-            expect(parsed.error.errors).toHaveLength(0)
+            expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
