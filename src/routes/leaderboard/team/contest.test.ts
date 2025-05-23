@@ -1,5 +1,5 @@
+import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, expect, test } from "bun:test"
-import { expectErr, expectOk } from "../../../util.test"
 import { leaderboardTeamContestRoute } from "./contest"
 
 describe("contest leaderboard 200", () => {
@@ -10,7 +10,9 @@ describe("contest leaderboard 200", () => {
         const result = await leaderboardTeamContestRoute.$mock({ params, query })
 
         expectOk(result)
-        expect(result.parsed.entries.length).toBeGreaterThan(0)
+        if (result.type === "ok") {
+            expect(result.parsed.entries.length).toBeGreaterThan(0)
+        }
     }
 
     test("vow", () =>

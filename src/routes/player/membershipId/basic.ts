@@ -1,11 +1,11 @@
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { playersQueue } from "@/integrations/rabbitmq/queues"
+import { cacheControl } from "@/middleware/cache-control"
+import { zPlayerInfo } from "@/schema/components/PlayerInfo"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zBigIntString } from "@/schema/util"
+import { getPlayer } from "@/services/player"
 import { z } from "zod"
-import { RaidHubRoute } from "../../../RaidHubRoute"
-import { getPlayer } from "../../../data/player"
-import { cacheControl } from "../../../middlewares/cache-control"
-import { processPlayerAsync } from "../../../middlewares/processPlayerAsync"
-import { zPlayerInfo } from "../../../schema/components/PlayerInfo"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { zBigIntString } from "../../../schema/util"
 
 export const playerBasicRoute = new RaidHubRoute({
     method: "get",
@@ -15,7 +15,7 @@ you only have the membershipId available.`,
     params: z.object({
         membershipId: zBigIntString()
     }),
-    middleware: [cacheControl(300), processPlayerAsync],
+    middleware: [cacheControl(300)],
     response: {
         success: {
             statusCode: 200,
@@ -31,8 +31,12 @@ you only have the membershipId available.`,
             }
         ]
     },
-    async handler(req) {
+    async handler(req, after) {
         const member = await getPlayer(req.params.membershipId)
+
+        after(async () => {
+            await playersQueue.send({ membershipId: req.params.membershipId })
+        })
 
         if (!member) {
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, {

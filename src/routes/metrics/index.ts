@@ -1,4 +1,4 @@
-import { RaidHubRouter } from "../../RaidHubRouter"
+import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { dailyPlayerPopulationRoute } from "./dailyPlayerPopulation"
 import { weaponsRollingWeekRoute } from "./weaponsRollingWeek"
 

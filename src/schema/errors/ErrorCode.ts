@@ -1,5 +1,5 @@
+import { registry } from "@/schema/registry"
 import { z } from "zod"
-import { registry } from ".."
 
 export enum ErrorCode {
     /** Unauthorized */
@@ -15,6 +15,7 @@ export enum ErrorCode {
     InstanceNotFoundError = "InstanceNotFoundError",
     PGCRNotFoundError = "PGCRNotFoundError",
     PlayerNotOnLeaderboardError = "PlayerNotOnLeaderboardError",
+    PlayerNotInInstance = "PlayerNotInInstance",
     RaidNotFoundError = "RaidNotFoundError",
     PantheonVersionNotFoundError = "PantheonVersionNotFoundError",
     InvalidActivityVersionComboError = "InvalidActivityVersionComboError",

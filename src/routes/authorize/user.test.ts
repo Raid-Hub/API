@@ -1,6 +1,6 @@
+import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, expect, test } from "bun:test"
 import jwt from "jsonwebtoken"
-import { expectErr, expectOk } from "../../util.test"
 import { userAuthorizationRoute } from "./user"
 
 describe("authorize 200", () => {

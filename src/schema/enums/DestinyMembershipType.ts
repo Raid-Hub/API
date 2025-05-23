@@ -1,5 +1,5 @@
+import { registry } from "@/schema/registry"
 import { ZodNativeEnumDef, ZodType, z } from "zod"
-import { registry } from ".."
 
 /**
  * Subset of BungieMembershipType.

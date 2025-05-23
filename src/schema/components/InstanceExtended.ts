@@ -1,6 +1,6 @@
+import { registry } from "@/schema/registry"
+import { zNaturalNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zNaturalNumber } from "../util"
 import { zInstance } from "./Instance"
 import { zInstanceMetadata } from "./InstanceMetadata"
 import { zInstancePlayerExtended } from "./InstancePlayerExtended"

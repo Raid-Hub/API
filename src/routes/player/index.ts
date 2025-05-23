@@ -1,6 +1,6 @@
-import { RaidHubRouter } from "../../RaidHubRouter"
-import { playerActivitiesRoute } from "./membershipId/activities"
+import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { playerBasicRoute } from "./membershipId/basic"
+import { playerHistoryRoute } from "./membershipId/history"
 import { playerInstancesRoute } from "./membershipId/instances"
 import { playerProfileRoute } from "./membershipId/profile"
 import { playerTeammatesRoute } from "./membershipId/teammates"
@@ -14,8 +14,12 @@ export const playerRouter = new RaidHubRouter({
             route: new RaidHubRouter({
                 routes: [
                     {
+                        path: "/history",
+                        route: playerHistoryRoute
+                    },
+                    {
                         path: "/activities",
-                        route: playerActivitiesRoute
+                        route: playerHistoryRoute.deprecatedCopy()
                     },
                     {
                         path: "/basic",

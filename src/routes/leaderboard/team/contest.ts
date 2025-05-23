@@ -1,15 +1,15 @@
-import { z } from "zod"
-import { RaidHubRoute } from "../../../RaidHubRoute"
-import { getRaidId } from "../../../data/definitions"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
+import { zLeaderboardData } from "@/schema/components/LeaderboardData"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
+import { zBigIntString } from "@/schema/util"
 import {
     getContestTeamLeaderboard,
     searchContestTeamLeaderboard
-} from "../../../data/leaderboard/team/contest"
-import { cacheControl } from "../../../middlewares/cache-control"
-import { zLeaderboardData } from "../../../schema/components/LeaderboardData"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { zLeaderboardPagination } from "../../../schema/query/LeaderboardPagination"
-import { zBigIntString } from "../../../schema/util"
+} from "@/services/leaderboard/team/contest"
+import { getRaidId } from "@/services/manifest/definitions"
+import { z } from "zod"
 
 export const leaderboardTeamContestRoute = new RaidHubRoute({
     method: "get",

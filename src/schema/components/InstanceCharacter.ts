@@ -1,6 +1,6 @@
+import { registry } from "@/schema/registry"
+import { zInt64, zUInt32, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zInt64, zUInt32, zWholeNumber } from "../util"
 import { zInstanceCharacterWeapon } from "./InstanceCharacterWeapon"
 
 export type InstanceCharacter = z.input<typeof zInstanceCharacter>

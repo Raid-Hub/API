@@ -1,5 +1,5 @@
+import { registry } from "@/schema/registry"
 import { z } from "zod"
-import { registry } from ".."
 
 export type InstanceMetadata = z.input<typeof zInstanceMetadata>
 export const zInstanceMetadata = registry.register(

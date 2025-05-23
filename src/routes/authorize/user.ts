@@ -1,8 +1,8 @@
+import { generateJWT } from "@/auth/jwt"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zBigIntString, zDigitString, zISODateString } from "@/schema/util"
 import { z } from "zod"
-import { RaidHubRoute } from "../../RaidHubRoute"
-import { ErrorCode } from "../../schema/errors/ErrorCode"
-import { zBigIntString, zDigitString, zISODateString } from "../../schema/util"
-import { generateJWT } from "../../util/auth"
 
 const TOKEN_EXPIRY = 30 * 24 * 3600
 

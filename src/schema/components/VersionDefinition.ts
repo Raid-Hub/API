@@ -1,6 +1,6 @@
+import { registry } from "@/schema/registry"
+import { zNaturalNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zNaturalNumber } from "../util"
 
 export type VersionDefinition = z.input<typeof zVersionDefinition>
 export const zVersionDefinition = registry.register(

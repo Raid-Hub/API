@@ -1,5 +1,5 @@
+import { registerError } from "@/core/RaidHubResponse"
 import { z } from "zod"
-import { registerError } from "../RaidHubResponse"
 import { ErrorCode } from "./ErrorCode"
 import { zZodIssue } from "./ZodIssue"
 

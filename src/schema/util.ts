@@ -50,7 +50,7 @@ export const zBigIntString = () => zDigitString().pipe(z.coerce.bigint())
 
 // Intended to be used as an output param for a BigInt
 export const zInt64 = () =>
-    z.string().regex(/^\d+/).openapi({
+    z.coerce.string().regex(/^\d+/).openapi({
         type: "string",
         format: "int64"
     })

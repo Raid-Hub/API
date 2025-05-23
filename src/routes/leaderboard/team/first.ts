@@ -1,15 +1,15 @@
-import { z } from "zod"
-import { RaidHubRoute } from "../../../RaidHubRoute"
-import { getActivityVersion } from "../../../data/definitions"
+import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { cacheControl } from "@/middleware/cache-control"
+import { zLeaderboardData } from "@/schema/components/LeaderboardData"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
+import { zBigIntString } from "@/schema/util"
 import {
     getFirstTeamActivityVersionLeaderboard,
     searchFirstTeamActivityVersionLeaderboard
-} from "../../../data/leaderboard/team/first"
-import { cacheControl } from "../../../middlewares/cache-control"
-import { zLeaderboardData } from "../../../schema/components/LeaderboardData"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { zLeaderboardPagination } from "../../../schema/query/LeaderboardPagination"
-import { zBigIntString } from "../../../schema/util"
+} from "@/services/leaderboard/team/first"
+import { getActivityVersion } from "@/services/manifest/definitions"
+import { z } from "zod"
 
 export const leaderboardTeamFirstActivityVersionRoute = new RaidHubRoute({
     method: "get",

@@ -1,6 +1,6 @@
+import { registry } from "@/schema/registry"
+import { zBigIntString, zPage } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zBigIntString, zPage } from "../util"
 
 export const zLeaderboardPagination = registry.register(
     "LeaderboardPagination",

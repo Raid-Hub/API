@@ -1,5 +1,5 @@
+import { registry } from "@/schema/registry"
 import { z } from "zod"
-import { registry } from ".."
 import { zInstanceCharacter } from "./InstanceCharacter"
 import { zInstancePlayer } from "./InstancePlayer"
 import { zPlayerInfo } from "./PlayerInfo"

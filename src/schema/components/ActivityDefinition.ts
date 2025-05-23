@@ -1,6 +1,6 @@
+import { registry } from "@/schema/registry"
+import { zISODateString, zNaturalNumber, zUInt32 } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zISODateString, zNaturalNumber, zUInt32 } from "../util"
 
 export type ActivityDefinition = z.input<typeof zActivityDefinition>
 export const zActivityDefinition = registry.register(

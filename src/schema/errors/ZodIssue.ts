@@ -1,5 +1,5 @@
+import { registry } from "@/schema/registry"
 import { ZodIssueCode, z } from "zod"
-import { registry } from ".."
 
 export const zZodIssue = registry.register(
     "ZodIssue",

@@ -20,7 +20,7 @@ jobs:
                   bun install --frozen-lockfile
 
             - name: Types
-              run: bun types
+              run: bun typecheck
     lint:
         runs-on: ubuntu-latest
         steps:

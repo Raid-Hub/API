@@ -1,6 +1,6 @@
+import { registry } from "@/schema/registry"
+import { zInt64, zNaturalNumber } from "@/schema/util"
 import { z } from "zod"
-import { registry } from ".."
-import { zInt64, zNaturalNumber } from "../util"
 import { zPlayerInfo } from "./PlayerInfo"
 
 export type TeamLeaderboardEntry = z.input<typeof zTeamLeaderboardEntry>

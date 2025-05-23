@@ -1,5 +1,5 @@
+import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, test } from "bun:test"
-import { expectErr, expectOk } from "../../util.test"
 import { adminQueryRoute } from "./query"
 
 describe("admin query 200", () => {

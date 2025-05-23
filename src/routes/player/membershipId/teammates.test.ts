@@ -1,6 +1,6 @@
+import { generateJWT } from "@/auth/jwt"
+import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, test } from "bun:test"
-import { expectErr, expectOk } from "../../../util.test"
-import { generateJWT } from "../../../util/auth"
 import { playerTeammatesRoute } from "./teammates"
 
 describe("teammates 200", () => {

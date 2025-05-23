@@ -16,8 +16,24 @@
 
     "noEmit": true,
 
-    "rootDir": "."
+    "rootDir": ".",
+
+    "baseUrl": ".",
+    "paths": {
+      "@/auth/*": ["./src/auth/*"],
+      "@/core/*": ["src/core/*"],
+      "@/integrations/*": ["src/integrations/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/middleware/*": ["src/middleware/*"],
+      "@/routes/*": ["./src/routes/*"],
+      "@/schema/*": ["./src/schema/*"],
+      "@/services/*": ["./src/services/*"]
+    }
   },
-  "include": ["src/**/*.ts", "api-keys.json"],
-  "exclude": ["scripts/*"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.test.ts",
+    "open-api/generate.ts",
+    "api-keys.json"
+  ]
 }

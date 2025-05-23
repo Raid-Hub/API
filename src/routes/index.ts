@@ -1,9 +1,9 @@
-import { RaidHubRouter } from "../RaidHubRouter"
-import { activityRoute } from "./activity"
+import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { adminRouter } from "./admin"
 import { adminAuthorizationRoute } from "./authorize/admin"
 import { userAuthorizationRoute } from "./authorize/user"
 import { clanStatsRoute } from "./clanStats"
+import { instanceRoute } from "./instance"
 import { leaderboardRouter } from "./leaderboard"
 import { manifestRoute } from "./manifest"
 import { metricsRouter } from "./metrics"
@@ -26,8 +26,12 @@ export const router = new RaidHubRouter({
             route: playerRouter
         },
         {
+            path: "/instance/:instanceId",
+            route: instanceRoute
+        },
+        {
             path: "/activity/:instanceId",
-            route: activityRoute
+            route: instanceRoute.deprecatedCopy()
         },
         {
             path: "/leaderboard",

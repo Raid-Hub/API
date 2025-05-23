@@ -1,7 +1,7 @@
+import { generateJWT } from "@/auth/jwt"
+import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { describe, expect, test } from "bun:test"
-import { ErrorCode } from "../../../schema/errors/ErrorCode"
-import { expectErr, expectOk } from "../../../util.test"
-import { generateJWT } from "../../../util/auth"
 import { playerInstancesRoute } from "./instances"
 
 describe("instances 200", () => {
@@ -39,7 +39,9 @@ describe("instances 200", () => {
         })
 
         expectOk(result)
-        expect(result.parsed.length).toBeGreaterThan(0)
+        if (result.type === "ok") {
+            expect(result.parsed.length).toBeGreaterThan(0)
+        }
     }
 
     test("no filters", () => t())

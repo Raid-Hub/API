@@ -1,0 +1,73 @@
+import { postgres } from "@/integrations/postgres"
+import { activityHistoryQueryTimer } from "@/integrations/prometheus/metrics"
+import { withHistogramTimer } from "@/integrations/prometheus/util"
+import { InstanceForPlayer } from "@/schema/components/InstanceForPlayer"
+
+export const getActivities = async (
+    membershipId: bigint | string,
+    {
+        count,
+        cursor,
+        cutoff
+    }: {
+        count: number
+        cutoff?: Date
+        cursor?: Date
+    }
+) => {
+    return await withHistogramTimer(
+        activityHistoryQueryTimer,
+        {
+            count: count,
+            cursor: String(!!cursor),
+            cutoff: String(!!cutoff)
+        },
+        async () => {
+            const params = [membershipId, count, cursor ?? 0, cutoff ?? 0]
+
+            return await postgres.queryRows<InstanceForPlayer>(
+                `SELECT 
+                    instance_id::text AS "instanceId",
+                    hash AS "hash",
+                    activity_id AS "activityId",
+                    version_id AS "versionId",
+                    instance.completed AS "completed",
+                    player_count AS "playerCount",
+                    score AS "score",
+                    fresh AS "fresh",
+                    flawless AS "flawless",
+                    date_started AS "dateStarted",
+                    date_completed AS "dateCompleted",
+                    season_id AS "season",
+                    duration AS "duration",
+                    platform_type AS "platformType",
+                    date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
+                    date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
+                    date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
+                    bi.instance_id IS NOT NULL AS "isBlacklisted",
+                    JSONB_BUILD_OBJECT(
+                        'completed', instance_player.completed,
+                        'sherpas', instance_player.sherpas,
+                        'isFirstClear', instance_player.is_first_clear,
+                        'timePlayedSeconds', instance_player.time_played_seconds
+                    ) as player
+                FROM instance_player
+                INNER JOIN instance USING (instance_id)
+                LEFT JOIN blacklist_instance bi USING (instance_id)
+                INNER JOIN activity_version USING (hash)
+                INNER JOIN activity_definition ON activity_definition.id = activity_version.activity_id
+                WHERE membership_id = $1::bigint
+                ${cursor ? "AND date_completed < $3" : ""}
+                ${cutoff ? "AND date_completed > $4" : ""}
+                ORDER BY date_completed DESC
+                LIMIT $2;`,
+                // Note: the use of strictly less than is important because the cursor is the date of the last activity
+                // that was fetched. If we used less than or equal to, we would fetch the same activity twice.
+                {
+                    params: params,
+                    fetchCount: count
+                }
+            )
+        }
+    )
+}
