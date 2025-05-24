@@ -135,4 +135,8 @@ class RaidHubStatement {
 
         return (rows ?? []) as unknown[]
     }
+
+    async close() {
+        await this.stmnt.close()
+    }
 }
