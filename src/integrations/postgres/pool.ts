@@ -6,6 +6,7 @@ import {
     QueryOptions,
     ScriptExecuteOptions
 } from "postgresql-client"
+import { postgresConnectionsGauge } from "../prometheus/metrics"
 
 interface RaidHubQuerier {
     queryRow<T>(sql: string, options?: Omit<QueryOptions, "objectRows">): Promise<T | null>
@@ -17,9 +18,19 @@ interface RaidHubQuerier {
 }
 
 export class RaidHubPool extends Pool implements RaidHubQuerier {
-    private connector: RaidHubConnector = new RaidHubConnector(this)
-    constructor(config?: PoolConfiguration | string) {
+    readonly metricLabel: string
+    readonly metricsInterval: Timer
+    private readonly connector: RaidHubConnector = new RaidHubConnector(this)
+
+    constructor(metricLabel: string, config?: PoolConfiguration | string) {
         super(config)
+        this.metricLabel = metricLabel
+
+        this.metricsInterval = setInterval(() => {
+            this.updateGauge("total")
+            this.updateGauge("idle")
+            this.updateGauge("acquired")
+        }, 5000)
     }
 
     async queryRow<T>(sql: string, options?: Omit<QueryOptions, "objectRows">): Promise<T | null> {
@@ -34,6 +45,33 @@ export class RaidHubPool extends Pool implements RaidHubQuerier {
     }
     async prepareStatement(sql: string) {
         return await this.connector.prepareStatement(sql)
+    }
+
+    private updateGauge(label: "total" | "idle" | "acquired") {
+        let value: number
+        switch (label) {
+            case "total":
+                value = this.totalConnections
+                break
+            case "idle":
+                value = this.idleConnections
+                break
+            case "acquired":
+                value = this.acquiredConnections
+                break
+        }
+
+        postgresConnectionsGauge.set(
+            {
+                connection_state: label,
+                pool_name: this.metricLabel
+            },
+            value
+        )
+    }
+
+    [Symbol.dispose]() {
+        clearInterval(this.metricsInterval)
     }
 }
 
@@ -134,5 +172,9 @@ class RaidHubStatement {
         }
 
         return (rows ?? []) as unknown[]
+    }
+
+    async close() {
+        await this.stmnt.close()
     }
 }

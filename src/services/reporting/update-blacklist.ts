@@ -35,6 +35,8 @@ export const blacklistInstance = async (data: {
                 })
             )
         )
+
+        void playerStmnt.close()
     })
 }
 

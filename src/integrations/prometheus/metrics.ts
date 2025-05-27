@@ -1,4 +1,4 @@
-import { Histogram } from "prom-client"
+import { Gauge, Histogram } from "prom-client"
 
 export const httpRequestTimer = new Histogram({
     name: "incoming_api_request_duration_ms",
@@ -28,4 +28,10 @@ export const playerSearchQueryTimer = new Histogram({
     help: "Duration of player search queries in ms",
     labelNames: ["prefixLength"],
     buckets: QueryBuckets
+})
+
+export const postgresConnectionsGauge = new Gauge({
+    name: "postgres_connections",
+    labelNames: ["pool_name", "connection_state"],
+    help: "Number of PostgreSQL connections in the pool and their states"
 })
