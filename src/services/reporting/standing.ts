@@ -13,7 +13,7 @@ export const getInstanceFlags = async (instanceId: bigint | string) => {
             fi.flagged_at AS "flaggedAt",
             fi.cheat_probability AS "cheatProbability"
         FROM flag_instance fi
-        WHERE fi.instance_id = $1::bigint AND NOT fi.false_positive
+        WHERE fi.instance_id = $1::bigint
         ORDER BY fi.cheat_probability, fi.flagged_at DESC
         LIMIT 10`,
         {
@@ -70,7 +70,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                         'flaggedAt', fip.flagged_at
                     ) AS "data"
                     FROM flag_instance_player fip
-                    WHERE fip.instance_id = $1::bigint AND NOT fip.false_positive
+                    WHERE fip.instance_id = $1::bigint
                         AND fip.membership_id = p.membership_id
                     ORDER BY date_trunc('week', fip.flagged_at) DESC, fip.cheat_probability DESC
                     LIMIT 12
@@ -92,7 +92,6 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                     JOIN instance i ON i.instance_id = fip.instance_id
                     WHERE fip.membership_id = p.membership_id 
                         AND fip.instance_id <> $1::bigint
-                        AND NOT fip.false_positive
                     ORDER BY date_trunc('week', fip.flagged_at) DESC, fip.cheat_probability DESC
                     LIMIT 10
                 ) AS f
