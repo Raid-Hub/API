@@ -1,6 +1,6 @@
 import { RaidHubPool, RaidHubPoolTransaction } from "./pool"
 
-export const postgres = new RaidHubPool({
+export const postgres = new RaidHubPool("readonly", {
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
     database: "raidhub",
@@ -10,7 +10,7 @@ export const postgres = new RaidHubPool({
     idleTimeoutMillis: 30000
 })
 
-export const postgresWritable = new RaidHubPoolTransaction({
+export const postgresWritable = new RaidHubPoolTransaction("writable", {
     user: process.env.POSTGRES_WRITABLE_USER,
     password: process.env.POSTGRES_WRITABLE_PASSWORD,
     database: "raidhub",
