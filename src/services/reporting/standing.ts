@@ -103,7 +103,8 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                         'instanceId', bip.instance_id,
                         'individualReason', bip.reason,
                         'reason', bi.reason,
-                        'createdAt', bi.created_at
+                        'createdAt', bi.created_at,
+                        'instanceDate', i.date_started
                     ) AS "data"
                     FROM blacklist_instance_player bip
                     JOIN instance i ON i.instance_id = bip.instance_id

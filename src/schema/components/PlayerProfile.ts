@@ -20,7 +20,8 @@ export const zGlobalStat = registry.register(
     "GlobalStat",
     z.object({
         rank: zNaturalNumber(),
-        value: zWholeNumber()
+        value: z.number(),
+        percentile: z.number().nonnegative().max(1)
     })
 )
 
@@ -31,6 +32,8 @@ export const zPlayerProfileGlobalStats = registry.register(
         clears: zGlobalStat.nullable(),
         freshClears: zGlobalStat.nullable(),
         sherpas: zGlobalStat.nullable(),
+        totalTimePlayed: zGlobalStat.nullable(),
+        contest: zGlobalStat.nullable(),
         sumOfBest: zGlobalStat.nullable()
     })
 )

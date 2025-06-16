@@ -78,7 +78,9 @@ This is used to hydrate the RaidHub profile page`,
                     clears: null,
                     freshClears: null,
                     sherpas: null,
-                    sumOfBest: null
+                    sumOfBest: null,
+                    totalTimePlayed: null,
+                    contest: null
                 },
                 activity: Object.fromEntries(activityStats.map(stat => [stat.activityId, stat]))
             },
