@@ -1804,11 +1804,15 @@
             "exclusiveMinimum": true
           },
           "value": {
-            "type": "integer",
-            "minimum": 0
+            "type": "number"
+          },
+          "percentile": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
           }
         },
-        "required": ["rank", "value"]
+        "required": ["rank", "value", "percentile"]
       },
       "PlayerProfileGlobalStats": {
         "type": "object",
@@ -1837,6 +1841,22 @@
             ],
             "nullable": true
           },
+          "totalTimePlayed": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GlobalStat"
+              }
+            ],
+            "nullable": true
+          },
+          "contest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GlobalStat"
+              }
+            ],
+            "nullable": true
+          },
           "sumOfBest": {
             "allOf": [
               {
@@ -1846,7 +1866,14 @@
             "nullable": true
           }
         },
-        "required": ["clears", "freshClears", "sherpas", "sumOfBest"]
+        "required": [
+          "clears",
+          "freshClears",
+          "sherpas",
+          "totalTimePlayed",
+          "contest",
+          "sumOfBest"
+        ]
       },
       "WorldFirstEntry": {
         "type": "object",

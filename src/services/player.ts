@@ -89,21 +89,36 @@ export const getPlayerGlobalStats = async (membershipId: bigint | string) => {
                 `SELECT
                     JSONB_BUILD_OBJECT(
                         'value', clears,
-                        'rank', clears_rank
+                        'rank', clears_rank,
+                        'percentile', clears_percentile
                     ) AS "clears",
                     JSONB_BUILD_OBJECT(
                         'value', fresh_clears,
-                        'rank', fresh_clears_rank
+                        'rank', fresh_clears_rank,
+                        'percentile', fresh_clears_percentile
                     ) AS "freshClears",
                     JSONB_BUILD_OBJECT(
                         'value', sherpas,
-                        'rank', sherpas_rank
+                        'rank', sherpas_rank,
+                        'percentile', sherpas_percentile
                     ) AS "sherpas",
+                    JSONB_BUILD_OBJECT(
+                        'value', total_time_played,
+                        'rank', total_time_played_rank,
+                        'percentile', total_time_played_percentile
+                    ) AS "totalTimePlayed",
+                    CASE WHEN contest IS NOT NULL THEN JSONB_BUILD_OBJECT(
+                        'value', contest.score,
+                        'rank', contest.rank,
+                        'percentile', contest.percentile
+                    ) ELSE NULL END AS "contest",
                     CASE WHEN speed IS NOT NULL THEN JSONB_BUILD_OBJECT(
                         'value', speed,
-                        'rank', speed_rank
+                        'rank', speed_rank,
+                        'percentile', speed_percentile
                     ) ELSE NULL END AS "sumOfBest"
                 FROM individual_global_leaderboard
+                LEFT JOIN world_first_player_rankings contest USING (membership_id)
                 WHERE membership_id = $1::bigint`,
                 {
                     params: [membershipId]
