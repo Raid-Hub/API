@@ -2199,6 +2199,27 @@
               "minItems": 1
             },
             "description": "The set of versionId for each activityId"
+          },
+          "rankingTiers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "minPercentile": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "tierName": {
+                  "type": "string"
+                },
+                "tierColor": {
+                  "type": "string",
+                  "description": "A tailwindcss color class for the tier"
+                }
+              },
+              "required": ["minPercentile", "tierName", "tierColor"]
+            }
           }
         },
         "required": [
@@ -2213,7 +2234,8 @@
           "resprisedRaidIds",
           "resprisedChallengeVersionIds",
           "pantheonIds",
-          "versionsForActivity"
+          "versionsForActivity",
+          "rankingTiers"
         ],
         "additionalProperties": false
       },

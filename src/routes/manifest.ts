@@ -8,6 +8,7 @@ import {
     listHashes,
     listVersionDefinitions
 } from "@/services/manifest/definitions"
+import { TierBreaks } from "@/services/manifest/tiers"
 import { z } from "zod"
 
 export const manifestRoute = new RaidHubRoute({
@@ -84,7 +85,16 @@ export const manifestRoute = new RaidHubRoute({
                         .min(1),
                     versionsForActivity: z.record(z.array(zNaturalNumber()).min(1)).openapi({
                         description: "The set of versionId for each activityId"
-                    })
+                    }),
+                    rankingTiers: z.array(
+                        z.object({
+                            minPercentile: z.number().nonnegative().max(1),
+                            tierName: z.string(),
+                            tierColor: z.string().openapi({
+                                description: "A tailwindcss color class for the tier"
+                            })
+                        })
+                    )
                 })
                 .strict()
         }
@@ -143,7 +153,8 @@ export const manifestRoute = new RaidHubRoute({
                 .map(a => a.associatedActivityId!),
             resprisedChallengeVersionIds: versions.filter(v => v.isChallengeMode).map(v => v.id),
             pantheonIds: [pantheonId],
-            versionsForActivity: versionsForActivity
+            versionsForActivity: versionsForActivity,
+            rankingTiers: TierBreaks
         })
     }
 })
