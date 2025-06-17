@@ -3,7 +3,7 @@
   "info": {
     "title": "RaidHub API",
     "description": "The Semi-public API for RaidHub",
-    "version": "1.3.1",
+    "version": "1.3.2",
     "contact": {
       "name": "RaidHub Admin",
       "email": "admin@raidhub.io"
@@ -1290,6 +1290,17 @@
             },
             "required": ["type", "format", "page", "count", "entries"]
           }
+        ]
+      },
+      "IndividualGlobalLeaderboardCategory": {
+        "type": "string",
+        "enum": [
+          "clears",
+          "full-clears",
+          "sherpas",
+          "speedrun",
+          "world-first-rankings",
+          "in-raid-time"
         ]
       },
       "LeaderboardPagination": {
@@ -5453,14 +5464,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "clears",
-                "freshClears",
-                "sherpas",
-                "speedrun",
-                "powerRankings"
-              ]
+              "$ref": "#/components/schemas/IndividualGlobalLeaderboardCategory"
             },
             "required": true,
             "name": "category",
