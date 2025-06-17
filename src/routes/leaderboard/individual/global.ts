@@ -2,6 +2,7 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zLeaderboardData } from "@/schema/components/LeaderboardData"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zIndividualGlobalLeaderboardCategory } from "@/schema/params/IndividualGlobalLeaderboardCategory"
 import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
 import { zBigIntString } from "@/schema/util"
 import {
@@ -14,20 +15,11 @@ import {
 } from "@/services/leaderboard/individual/power-rankings"
 import { z } from "zod"
 
-const zCategory = z.enum(["clears", "freshClears", "sherpas", "speedrun", "powerRankings"])
-
-const categoryMap = {
-    clears: "clears",
-    freshClears: "fresh_clears",
-    sherpas: "sherpas",
-    speedrun: "speed"
-} as const
-
 export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
     method: "get",
     description: `Individual leaderboards across all raids`,
     params: z.object({
-        category: zCategory
+        category: zIndividualGlobalLeaderboardCategory
     }),
     query: zLeaderboardPagination,
     response: {
@@ -52,7 +44,7 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
         const { page, count, search } = req.query
 
         if (search) {
-            const data = await (category === "powerRankings"
+            const data = await (category === "world-first-rankings"
                 ? searchIndividualWorldFirstPowerRankingsLeaderboard({
                       membershipId: search,
                       take: count
@@ -60,7 +52,7 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
                 : searchIndividualGlobalLeaderboard({
                       membershipId: search,
                       take: count,
-                      column: categoryMap[category]
+                      category
                   }))
 
             if (!data) {
@@ -77,7 +69,7 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
                 entries: data.entries
             })
         } else {
-            const entries = await (category === "powerRankings"
+            const entries = await (category === "world-first-rankings"
                 ? getIndividualWorldFirstPowerRankingsLeaderboard({
                       skip: (page - 1) * count,
                       take: count
@@ -85,12 +77,14 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
                 : getIndividualGlobalLeaderboard({
                       skip: (page - 1) * count,
                       take: count,
-                      column: categoryMap[category]
+                      category
                   }))
 
             return RaidHubRoute.ok({
                 type: "individual" as const,
-                format: category === "speedrun" ? ("duration" as const) : ("numerical" as const),
+                format: ["speedrun", "in-raid-time"].includes(category)
+                    ? ("duration" as const)
+                    : ("numerical" as const),
                 page,
                 count,
                 entries

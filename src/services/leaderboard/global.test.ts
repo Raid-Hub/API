@@ -12,7 +12,7 @@ describe("getIndividualGlobalLeaderboard", () => {
         const data = await getIndividualGlobalLeaderboard({
             skip: 24921,
             take: 27,
-            column: "clears"
+            category: "clears"
         }).catch(console.error)
 
         const parsed = z.array(zIndividualLeaderboardEntry).safeParse(data)
@@ -30,7 +30,7 @@ describe("searchIndividualGlobalLeaderboard", () => {
     it("returns the correct shape", async () => {
         const data = await searchIndividualGlobalLeaderboard({
             take: 4,
-            column: "clears",
+            category: "clears",
             membershipId: "4611686018488107374"
         }).catch(console.error)
 

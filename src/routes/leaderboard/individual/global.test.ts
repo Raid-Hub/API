@@ -25,6 +25,16 @@ describe("global leaderboard 200", () => {
                 page: 1
             }
         ))
+    test("full clears", () =>
+        t(
+            {
+                category: "full-clears"
+            },
+            {
+                count: 10,
+                page: 1
+            }
+        ))
 
     test("sherpas", () =>
         t(
@@ -34,6 +44,17 @@ describe("global leaderboard 200", () => {
             {
                 count: 14,
                 page: 4
+            }
+        ))
+
+    test("in raid time", () =>
+        t(
+            {
+                category: "in-raid-time"
+            },
+            {
+                count: 19,
+                page: 7
             }
         ))
 
@@ -51,7 +72,7 @@ describe("global leaderboard 200", () => {
     test("power rankings", () =>
         t(
             {
-                category: "powerRankings"
+                category: "world-first-rankings"
             },
             {
                 count: 14,
@@ -62,7 +83,7 @@ describe("global leaderboard 200", () => {
     test("search power rankings", () =>
         t(
             {
-                category: "powerRankings"
+                category: "world-first-rankings"
             },
             {
                 count: 11,

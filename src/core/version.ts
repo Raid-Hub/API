@@ -1,1 +1,1 @@
-export const apiVersion = "1.3.1"
+export const apiVersion = "1.3.2"
