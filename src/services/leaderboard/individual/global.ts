@@ -2,27 +2,20 @@ import { postgres } from "@/integrations/postgres"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 import { IndividualGlobalLeaderboardCategory } from "@/schema/params/IndividualGlobalLeaderboardCategory"
 
-export const individualGlobalLeaderboardSortColumns = [
-    "clears",
-    "fresh_clears",
-    "sherpas",
-    "speed",
-    "total_time_played"
-] as const
-
 const categoryMap = {
     clears: "clears",
     "full-clears": "fresh_clears",
     sherpas: "sherpas",
     speedrun: "speed",
-    "in-raid-time": "total_time_played"
+    "in-raid-time": "total_time_played",
+    "world-first-rankings": "wfr_score"
 } as const
 
 const getColumn = (category: string) => {
     const column = categoryMap[category as keyof typeof categoryMap]
-    if (!individualGlobalLeaderboardSortColumns.includes(column)) {
+    if (!column) {
         // Just an extra layer of run-time validation to ensure that the column is one of the valid columns
-        throw new TypeError(`Invalid column: ${column}`)
+        throw new TypeError(`Invalid column: ${category}->${column}`)
     }
     return column
 }
@@ -34,7 +27,7 @@ export const getIndividualGlobalLeaderboard = async ({
 }: {
     skip: number
     take: number
-    category: Exclude<IndividualGlobalLeaderboardCategory, "world-first-rankings">
+    category: IndividualGlobalLeaderboardCategory
 }) => {
     const column = getColumn(category)
 
@@ -72,7 +65,7 @@ export const searchIndividualGlobalLeaderboard = async ({
 }: {
     membershipId: bigint | string
     take: number
-    category: Exclude<IndividualGlobalLeaderboardCategory, "world-first-rankings">
+    category: IndividualGlobalLeaderboardCategory
 }) => {
     const column = getColumn(category)
 

@@ -19,9 +19,9 @@ export const zPlayerProfileActivityStats = registry.register(
 export const zGlobalStat = registry.register(
     "GlobalStat",
     z.object({
-        rank: zNaturalNumber(),
         value: z.number(),
-        percentile: z.number().nonnegative().max(1)
+        rank: zNaturalNumber().nullable(),
+        percentile: z.number().nonnegative().max(1).nullable()
     })
 )
 
@@ -29,12 +29,12 @@ export type PlayerProfileGlobalStats = z.input<typeof zPlayerProfileGlobalStats>
 export const zPlayerProfileGlobalStats = registry.register(
     "PlayerProfileGlobalStats",
     z.object({
-        clears: zGlobalStat.nullable(),
-        freshClears: zGlobalStat.nullable(),
-        sherpas: zGlobalStat.nullable(),
-        totalTimePlayed: zGlobalStat.nullable(),
-        contest: zGlobalStat.nullable(),
-        sumOfBest: zGlobalStat.nullable()
+        clears: zGlobalStat,
+        freshClears: zGlobalStat,
+        sherpas: zGlobalStat,
+        totalTimePlayed: zGlobalStat,
+        contest: zGlobalStat,
+        sumOfBest: zGlobalStat
     })
 )
 

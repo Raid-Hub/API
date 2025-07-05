@@ -9,10 +9,6 @@ import {
     getIndividualGlobalLeaderboard,
     searchIndividualGlobalLeaderboard
 } from "@/services/leaderboard/individual/global"
-import {
-    getIndividualWorldFirstPowerRankingsLeaderboard,
-    searchIndividualWorldFirstPowerRankingsLeaderboard
-} from "@/services/leaderboard/individual/power-rankings"
 import { z } from "zod"
 
 export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
@@ -44,16 +40,11 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
         const { page, count, search } = req.query
 
         if (search) {
-            const data = await (category === "world-first-rankings"
-                ? searchIndividualWorldFirstPowerRankingsLeaderboard({
-                      membershipId: search,
-                      take: count
-                  })
-                : searchIndividualGlobalLeaderboard({
-                      membershipId: search,
-                      take: count,
-                      category
-                  }))
+            const data = await searchIndividualGlobalLeaderboard({
+                membershipId: search,
+                take: count,
+                category
+            })
 
             if (!data) {
                 return RaidHubRoute.fail(ErrorCode.PlayerNotOnLeaderboardError, {
@@ -69,16 +60,11 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
                 entries: data.entries
             })
         } else {
-            const entries = await (category === "world-first-rankings"
-                ? getIndividualWorldFirstPowerRankingsLeaderboard({
-                      skip: (page - 1) * count,
-                      take: count
-                  })
-                : getIndividualGlobalLeaderboard({
-                      skip: (page - 1) * count,
-                      take: count,
-                      category
-                  }))
+            const entries = await getIndividualGlobalLeaderboard({
+                skip: (page - 1) * count,
+                take: count,
+                category
+            })
 
             return RaidHubRoute.ok({
                 type: "individual" as const,

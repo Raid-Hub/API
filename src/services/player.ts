@@ -88,37 +88,37 @@ export const getPlayerGlobalStats = async (membershipId: bigint | string) => {
             postgres.queryRow<PlayerProfileGlobalStats>(
                 `SELECT
                     JSONB_BUILD_OBJECT(
-                        'value', clears,
-                        'rank', clears_rank,
-                        'percentile', clears_percentile
+                        'value', COALESCE(lb.clears, player.clears, 0),
+                        'rank', lb.clears_rank,
+                        'percentile', lb.clears_percentile
                     ) AS "clears",
                     JSONB_BUILD_OBJECT(
-                        'value', fresh_clears,
-                        'rank', fresh_clears_rank,
-                        'percentile', fresh_clears_percentile
+                        'value', COALESCE(lb.fresh_clears, player.fresh_clears, 0),
+                        'rank', lb.fresh_clears_rank,
+                        'percentile', lb.fresh_clears_percentile
                     ) AS "freshClears",
                     JSONB_BUILD_OBJECT(
-                        'value', sherpas,
-                        'rank', sherpas_rank,
-                        'percentile', sherpas_percentile
+                        'value', COALESCE(lb.sherpas, player.sherpas, 0),
+                        'rank', lb.sherpas_rank,
+                        'percentile', lb.sherpas_percentile
                     ) AS "sherpas",
                     JSONB_BUILD_OBJECT(
-                        'value', total_time_played,
-                        'rank', total_time_played_rank,
-                        'percentile', total_time_played_percentile
+                        'value', COALESCE(lb.total_time_played, player.total_time_played_seconds, 0),
+                        'rank', lb.total_time_played_rank,
+                        'percentile', lb.total_time_played_percentile
                     ) AS "totalTimePlayed",
-                    CASE WHEN contest IS NOT NULL THEN JSONB_BUILD_OBJECT(
-                        'value', contest.score,
-                        'rank', contest.rank,
-                        'percentile', contest.percentile
-                    ) ELSE NULL END AS "contest",
-                    CASE WHEN speed IS NOT NULL THEN JSONB_BUILD_OBJECT(
-                        'value', speed,
-                        'rank', speed_rank,
-                        'percentile', speed_percentile
-                    ) ELSE NULL END AS "sumOfBest"
-                FROM individual_global_leaderboard
-                LEFT JOIN world_first_player_rankings contest USING (membership_id)
+                    JSONB_BUILD_OBJECT(
+                        'value', COALESCE(lb.speed, player.sum_of_best, 0),
+                        'rank', lb.speed_rank,
+                        'percentile', lb.speed_percentile
+                    ) AS "sumOfBest",
+                    JSONB_BUILD_OBJECT(
+                        'value', COALESCE(lb.wfr_score, player.wfr_score, 0),
+                        'rank', lb.wfr_score_rank,
+                        'percentile', lb.wfr_score_percentile
+                    ) AS "contest"
+                FROM player
+                LEFT JOIN individual_global_leaderboard lb USING (membership_id)
                 WHERE membership_id = $1::bigint`,
                 {
                     params: [membershipId]

@@ -71,17 +71,14 @@ This is used to hydrate the RaidHub profile page`,
 
         const [activityStats, globalStats, worldFirstEntries] = await statsPromises
 
+        if (!globalStats) {
+            throw new Error(`Unexpected error: global stats for player ${membershipId} not found`)
+        }
+
         return RaidHubRoute.ok({
             playerInfo: player,
             stats: {
-                global: globalStats ?? {
-                    clears: null,
-                    freshClears: null,
-                    sherpas: null,
-                    sumOfBest: null,
-                    totalTimePlayed: null,
-                    contest: null
-                },
+                global: globalStats,
                 activity: Object.fromEntries(activityStats.map(stat => [stat.activityId, stat]))
             },
             worldFirstEntries: Object.fromEntries(
