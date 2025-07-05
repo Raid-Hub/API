@@ -1809,72 +1809,44 @@
       "GlobalStat": {
         "type": "object",
         "properties": {
-          "rank": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
-          },
           "value": {
             "type": "number"
           },
+          "rank": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
           "percentile": {
             "type": "number",
+            "nullable": true,
             "minimum": 0,
             "maximum": 1
           }
         },
-        "required": ["rank", "value", "percentile"]
+        "required": ["value", "rank", "percentile"]
       },
       "PlayerProfileGlobalStats": {
         "type": "object",
         "properties": {
           "clears": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GlobalStat"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/GlobalStat"
           },
           "freshClears": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GlobalStat"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/GlobalStat"
           },
           "sherpas": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GlobalStat"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/GlobalStat"
           },
           "totalTimePlayed": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GlobalStat"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/GlobalStat"
           },
           "contest": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GlobalStat"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/GlobalStat"
           },
           "sumOfBest": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GlobalStat"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/GlobalStat"
           }
         },
         "required": [

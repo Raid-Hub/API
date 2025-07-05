@@ -54,6 +54,17 @@ describe("getPlayerGlobalStats", () => {
             expect(parsed.success).toBe(true)
         }
     })
+
+    it("returns the correct shape for a private profile", async () => {
+        const data = await getPlayerGlobalStats("4611686018467346804").catch(console.error)
+
+        const parsed = zPlayerProfileGlobalStats.safeParse(data)
+        if (!parsed.success) {
+            expect(parsed.error.errors).toEqual([])
+        } else {
+            expect(parsed.success).toBe(true)
+        }
+    })
 })
 
 describe("getWorldFirstEntries", () => {

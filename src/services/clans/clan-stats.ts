@@ -12,10 +12,10 @@ export const getClanStats = async (
         "ranked_scores" AS (
             SELECT 
                 "membership_id",
-                COALESCE(wpr."score", 0) AS "score",
-                ROW_NUMBER() OVER (ORDER BY wpr."score" DESC) AS "intra_clan_ranking"
+                COALESCE(player."wfr_score", 0) AS "score",
+                ROW_NUMBER() OVER (ORDER BY player."wfr_score" DESC) AS "intra_clan_ranking"
             FROM membership_ids
-            LEFT JOIN "world_first_player_rankings" wpr USING (membership_id)
+            LEFT JOIN player USING (membership_id)
         ),
         "member_stats" AS (
             SELECT 
