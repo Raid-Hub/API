@@ -20,6 +20,11 @@ const getColumn = (category: string) => {
     return column
 }
 
+export const getIndividualGlobalLeaderboardValueFormat = (
+    category: IndividualGlobalLeaderboardCategory
+): "numerical" | "duration" =>
+    ["speedrun", "in-raid-time"].includes(category) ? "duration" : "numerical"
+
 export const getIndividualGlobalLeaderboard = async ({
     skip,
     take,

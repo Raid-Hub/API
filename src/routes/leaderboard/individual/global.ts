@@ -7,6 +7,7 @@ import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
 import { zBigIntString } from "@/schema/util"
 import {
     getIndividualGlobalLeaderboard,
+    getIndividualGlobalLeaderboardValueFormat,
     searchIndividualGlobalLeaderboard
 } from "@/services/leaderboard/individual/global"
 import { z } from "zod"
@@ -38,6 +39,7 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
         const { category } = req.params
 
         const { page, count, search } = req.query
+        const format = getIndividualGlobalLeaderboardValueFormat(category)
 
         if (search) {
             const data = await searchIndividualGlobalLeaderboard({
@@ -54,7 +56,7 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
 
             return RaidHubRoute.ok({
                 type: "individual" as const,
-                format: category === "speedrun" ? ("duration" as const) : ("numerical" as const),
+                format,
                 page: data.page,
                 count,
                 entries: data.entries
@@ -68,9 +70,7 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
 
             return RaidHubRoute.ok({
                 type: "individual" as const,
-                format: ["speedrun", "in-raid-time"].includes(category)
-                    ? ("duration" as const)
-                    : ("numerical" as const),
+                format,
                 page,
                 count,
                 entries
