@@ -32,6 +32,8 @@ export const zRaidHubPostGameCarnageReport = registry.register(
                     membershipType: zDestinyMembershipType
                 })
                 .strip(),
+            activityDifficultyTier: z.number().int().optional(),
+            selectedSkullHashes: z.array(zUInt32()).optional(),
             entries: z.array(
                 z
                     .object({
