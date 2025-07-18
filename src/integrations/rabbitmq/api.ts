@@ -12,9 +12,8 @@ const auth = btoa(`${user}:${password}`)
 interface RabbitQueueResponse {
     messages: number
     backing_queue_status?: {
-        avg_ack_ingress_rate: number
+        // other fields ommitted for brevity
         avg_ingress_rate: number
-        avg_ack_egress_rate: number
         avg_egress_rate: number
     }
 }
