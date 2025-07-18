@@ -22,7 +22,7 @@ export const getFloodgatesStatus = async () => {
     return {
         waiting: data.messages,
         ackRateSeconds:
-            Math.round(10_000 * (data.backing_queue_status?.avg_ack_ingress_rate ?? 0)) / 10_000,
+            Math.round(10_000 * (data.backing_queue_status?.avg_egress_rate ?? 0)) / 10_000,
         ingressRateSeconds:
             Math.round(10_000 * (data.backing_queue_status?.avg_ingress_rate ?? 0)) / 10_000
     }

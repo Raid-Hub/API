@@ -113,7 +113,7 @@ describe("getFloodgatesStatus", () => {
             spyFetchQueue.mockResolvedValueOnce({
                 messages: 10,
                 backing_queue_status: {
-                    avg_ack_ingress_rate: 0.5,
+                    avg_egress_rate: 0.5,
                     avg_ingress_rate: 1.0
                 }
             })
