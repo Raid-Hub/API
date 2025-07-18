@@ -14,6 +14,8 @@ interface RabbitQueueResponse {
     backing_queue_status?: {
         avg_ack_ingress_rate: number
         avg_ingress_rate: number
+        avg_ack_egress_rate: number
+        avg_egress_rate: number
     }
 }
 
