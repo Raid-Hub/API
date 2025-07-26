@@ -3,7 +3,7 @@
   "info": {
     "title": "RaidHub API",
     "description": "The Semi-public API for RaidHub",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "contact": {
       "name": "RaidHub Admin",
       "email": "admin@raidhub.io"
