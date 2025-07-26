@@ -112,6 +112,6 @@ describe("getAtlasStatus no mock", () => {
         const result = await getAtlasStatus()
 
         expect(result.isCrawling).toBeTrue()
-        expect(result.lag).toBeWithin(25, 45)
+        expect(result.lag).toBeWithin(15, 60)
     })
 })

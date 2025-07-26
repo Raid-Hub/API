@@ -6,7 +6,8 @@ import { zPlayerInfo } from "./PlayerInfo"
 enum ReportSource {
     Manual = "Manual",
     CheatCheck = "CheatCheck",
-    WebReport = "WebReport"
+    WebReport = "WebReport",
+    BlacklistedPlayerCascade = "BlacklistedPlayerCascade"
 }
 
 enum CheatFlagIndex {
