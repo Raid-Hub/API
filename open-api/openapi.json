@@ -500,7 +500,12 @@
           },
           "reportSource": {
             "type": "string",
-            "enum": ["Manual", "CheatCheck", "WebReport"]
+            "enum": [
+              "Manual",
+              "CheatCheck",
+              "WebReport",
+              "BlacklistedPlayerCascade"
+            ]
           },
           "reportId": {
             "type": "integer",
