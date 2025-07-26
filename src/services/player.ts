@@ -44,8 +44,8 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                         THEN JSONB_BUILD_OBJECT(
                             'instanceId', fastest.instance_id::text,
                             'hash', fastest.hash,
-                            'activityId', fastest_ah.activity_id,
-                            'versionId', fastest_ah.version_id,
+                            'activityId', av.activity_id,
+                            'versionId', av.version_id,
                             'completed', fastest.completed,
                             'playerCount', fastest.player_count,
                             'score', fastest.score,
@@ -56,8 +56,8 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'season', fastest.season_id,
                             'duration', fastest.duration,
                             'platformType', fastest.platform_type,
-                            'isDayOne', date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch'),
-                            'isContest', date_completed < COALESCE(contest_end, TIMESTAMP 'epoch'),
+                            'isDayOne', CASE WHEN av.is_world_first THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END,
+                            'isContest', CASE WHEN av.is_world_first THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END,
                             'isWeekOne', date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch'),
                             'isBlacklisted', bi.instance_id IS NOT NULL
                         ) 
@@ -68,7 +68,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                     AND player_stats.membership_id = $1::bigint 
                 LEFT JOIN instance fastest ON player_stats.fastest_instance_id = fastest.instance_id
                 LEFT JOIN blacklist_instance bi ON player_stats.fastest_instance_id = bi.instance_id
-                LEFT JOIN activity_version fastest_ah ON fastest.hash = fastest_ah.hash
+                LEFT JOIN activity_version av ON fastest.hash = av.hash
                 ORDER BY activity_definition.id`,
                 {
                     params: [membershipId],

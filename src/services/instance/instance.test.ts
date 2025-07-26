@@ -22,6 +22,36 @@ describe("getInstance", () => {
             expect(parsed.success).toBe(true)
         }
     })
+    describe("edge cases", () => {
+        it("is day one for day 1 clears on contest tdp", async () => {
+            const data = await getInstance("16321449037").catch(console.error)
+            const parsed = zInstance.safeParse(data)
+            if (!parsed.success) {
+                console.error(parsed.error.errors)
+                expect(parsed.error.errors).toEqual([])
+            } else {
+                expect(parsed.success).toBe(true)
+                expect(parsed.data.isContest).toBe(true)
+                expect(parsed.data.isDayOne).toBe(true)
+                expect(parsed.data.isWeekOne).toBe(true)
+            }
+        })
+
+        it("is not contest or day one for day 1 clears on non-contest tdp", async () => {
+            const data = await getInstance("16322031067").catch(console.error)
+
+            const parsed = zInstance.safeParse(data)
+            if (!parsed.success) {
+                console.error(parsed.error.errors)
+                expect(parsed.error.errors).toEqual([])
+            } else {
+                expect(parsed.success).toBe(true)
+                expect(parsed.data.isContest).toBe(false)
+                expect(parsed.data.isDayOne).toBe(false)
+                expect(parsed.data.isWeekOne).toBe(true)
+            }
+        })
+    })
 })
 
 describe("getInstanceExtended", () => {

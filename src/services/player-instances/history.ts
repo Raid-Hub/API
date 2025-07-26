@@ -41,8 +41,8 @@ export const getActivities = async (
                     season_id AS "season",
                     duration AS "duration",
                     platform_type AS "platformType",
-                    date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
-                    date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
+                    CASE WHEN av.is_world_first THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
+                    CASE WHEN av.is_world_first THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
                     date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
                     bi.instance_id IS NOT NULL AS "isBlacklisted",
                     JSONB_BUILD_OBJECT(
@@ -54,8 +54,8 @@ export const getActivities = async (
                 FROM instance_player
                 INNER JOIN instance USING (instance_id)
                 LEFT JOIN blacklist_instance bi USING (instance_id)
-                INNER JOIN activity_version USING (hash)
-                INNER JOIN activity_definition ON activity_definition.id = activity_version.activity_id
+                INNER JOIN activity_version av USING (hash)
+                INNER JOIN activity_definition ON activity_definition.id = av.activity_id
                 WHERE membership_id = $1::bigint
                 ${cursor ? "AND date_completed < $3" : ""}
                 ${cutoff ? "AND date_completed > $4" : ""}

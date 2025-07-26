@@ -133,15 +133,15 @@ export async function getInstances({
             season_id AS "season",
             duration AS "duration",
             platform_type AS "platformType",
-            date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
-            date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
+            CASE WHEN av.is_world_first THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
+            CASE WHEN av.is_world_first THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
             date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
             b.instance_id IS NOT NULL AS "isBlacklisted",
             "_lateral".players AS "players"
         FROM _player_instances
         INNER JOIN instance USING (instance_id)
-        INNER JOIN activity_version USING (hash)
-        INNER JOIN activity_definition ON activity_definition.id = activity_version.activity_id
+        INNER JOIN activity_version av USING (hash)
+        INNER JOIN activity_definition ON activity_definition.id = av.activity_id
         LEFT JOIN blacklist_instance b USING (instance_id)
         LEFT JOIN LATERAL (
             SELECT
