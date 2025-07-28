@@ -634,7 +634,8 @@
                   "type": "string"
                 },
                 "individualReason": {
-                  "type": "string"
+                  "type": "string",
+                  "nullable": true
                 },
                 "createdAt": {
                   "type": "string",
