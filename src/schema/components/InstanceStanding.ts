@@ -142,7 +142,7 @@ export const zInstancePlayerStanding = registry.register(
                 instanceId: zInt64(),
                 instanceDate: zISODateString(),
                 reason: z.string(),
-                individualReason: z.string(),
+                individualReason: z.string().nullable(),
                 createdAt: zISODateString()
             })
         ),
