@@ -18,10 +18,6 @@ export const playerRouter = new RaidHubRouter({
                         route: playerHistoryRoute
                     },
                     {
-                        path: "/activities",
-                        route: playerHistoryRoute.deprecatedCopy()
-                    },
-                    {
                         path: "/basic",
                         route: playerBasicRoute
                     },
