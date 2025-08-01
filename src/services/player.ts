@@ -51,6 +51,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'score', fastest.score,
                             'fresh', fastest.fresh,
                             'flawless', fastest.flawless,
+                            'skullHashes', fastest.skull_hashes,
                             'dateStarted', fastest.date_started,
                             'dateCompleted', fastest.date_completed,
                             'season', fastest.season_id,

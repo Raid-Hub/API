@@ -30,10 +30,6 @@ export const router = new RaidHubRouter({
             route: instanceRoute
         },
         {
-            path: "/activity/:instanceId",
-            route: instanceRoute.deprecatedCopy()
-        },
-        {
             path: "/leaderboard",
             route: leaderboardRouter
         },

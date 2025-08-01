@@ -1,5 +1,6 @@
 import { postgres } from "@/integrations/postgres"
 import { ActivityDefinition } from "@/schema/components/ActivityDefinition"
+import { FeatDefinition } from "@/schema/components/FeatDefinition"
 import { VersionDefinition } from "@/schema/components/VersionDefinition"
 
 export const getRaidId = async (raidPath: string) => {
@@ -77,5 +78,20 @@ export const listHashes = async () => {
             activity_id AS "activityId",
             version_id AS "versionId"
         FROM activity_version`
+    )
+}
+
+export const listFeatDefinitions = async () => {
+    return await postgres.queryRows<FeatDefinition>(
+        `SELECT 
+            hash,
+            skull_hash AS "skullHash",
+            name,
+            name_short AS "shortName",
+            description,
+            description_short AS "shortDescription",
+            icon_path AS "iconPath",
+            modifier_power_contribution AS "modifierPowerContribution"
+        FROM activity_feat_definition`
     )
 }

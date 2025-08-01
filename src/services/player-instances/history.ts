@@ -36,6 +36,7 @@ export const getActivities = async (
                     score AS "score",
                     fresh AS "fresh",
                     flawless AS "flawless",
+                    skull_hashes AS "skullHashes",
                     date_started AS "dateStarted",
                     date_completed AS "dateCompleted",
                     season_id AS "season",

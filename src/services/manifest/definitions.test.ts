@@ -1,4 +1,5 @@
 import { zActivityDefinition } from "@/schema/components/ActivityDefinition"
+import { zFeatDefinition } from "@/schema/components/FeatDefinition"
 import { zVersionDefinition } from "@/schema/components/VersionDefinition"
 import { zNaturalNumber, zUInt32 } from "@/schema/util"
 import { describe, expect, it } from "bun:test"
@@ -8,6 +9,7 @@ import {
     getRaidId,
     getVersionId,
     listActivityDefinitions,
+    listFeatDefinitions,
     listHashes,
     listVersionDefinitions
 } from "./definitions"
@@ -97,6 +99,20 @@ describe("listHashes", () => {
                     .strict()
             )
             .safeParse(data)
+        if (!parsed.success) {
+            expect(parsed.error.errors).toEqual([])
+        } else {
+            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.success).toBe(true)
+        }
+    })
+})
+
+describe("listFeatDefinitions", () => {
+    it("returns the correct shape", async () => {
+        const data = await listFeatDefinitions().catch(console.error)
+
+        const parsed = z.array(zFeatDefinition).safeParse(data)
         if (!parsed.success) {
             expect(parsed.error.errors).toEqual([])
         } else {
