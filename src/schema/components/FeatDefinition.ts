@@ -13,7 +13,7 @@ export const zFeatDefinition = registry.register(
             shortName: z.string(),
             description: z.string(),
             shortDescription: z.string(),
-            icon: z.string(),
+            iconPath: z.string(),
             modifierPowerContribution: zWholeNumber()
         })
         .strict()

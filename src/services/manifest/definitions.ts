@@ -90,7 +90,7 @@ export const listFeatDefinitions = async () => {
             name_short AS "shortName",
             description,
             description_short AS "shortDescription",
-            icon,
+            icon_path AS "iconPath",
             modifier_power_contribution AS "modifierPowerContribution"
         FROM activity_feat_definition`
     )

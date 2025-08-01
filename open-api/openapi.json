@@ -1454,7 +1454,7 @@
           "shortDescription": {
             "type": "string"
           },
-          "icon": {
+          "iconPath": {
             "type": "string"
           },
           "modifierPowerContribution": {
@@ -1469,7 +1469,7 @@
           "shortName",
           "description",
           "shortDescription",
-          "icon",
+          "iconPath",
           "modifierPowerContribution"
         ],
         "additionalProperties": false
