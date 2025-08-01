@@ -151,7 +151,7 @@ export class RaidHubPoolTransaction extends RaidHubPool {
             await conn.rollback()
             throw err
         } finally {
-            void this.release(conn)
+            await this.release(conn)
         }
     }
 }
