@@ -3,7 +3,7 @@
   "info": {
     "title": "RaidHub API",
     "description": "The Semi-public API for RaidHub",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "contact": {
       "name": "RaidHub Admin",
       "email": "admin@raidhub.io"
@@ -235,16 +235,6 @@
             "minimum": 0,
             "format": "uint32"
           },
-          "activityId": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
-          },
-          "versionId": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
-          },
           "completed": {
             "type": "boolean"
           },
@@ -260,6 +250,15 @@
             "type": "integer",
             "minimum": 0,
             "exclusiveMinimum": true
+          },
+          "skullHashes": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Mapped to a FeatDefinition by its skullHash",
+              "format": "uint32"
+            }
           },
           "score": {
             "type": "integer",
@@ -294,6 +293,16 @@
               }
             ]
           },
+          "activityId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "versionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
           "isDayOne": {
             "type": "boolean",
             "description": "If the instance was completed before the day one end date"
@@ -314,18 +323,19 @@
         "required": [
           "instanceId",
           "hash",
-          "activityId",
-          "versionId",
           "completed",
           "flawless",
           "fresh",
           "playerCount",
+          "skullHashes",
           "score",
           "dateStarted",
           "dateCompleted",
           "season",
           "duration",
           "platformType",
+          "activityId",
+          "versionId",
           "isDayOne",
           "isContest",
           "isWeekOne",
@@ -348,22 +358,31 @@
           "completed": {
             "type": "boolean"
           },
-          "playerCount": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
-          },
-          "score": {
-            "type": "integer",
-            "minimum": 0
+          "flawless": {
+            "type": "boolean",
+            "nullable": true
           },
           "fresh": {
             "type": "boolean",
             "nullable": true
           },
-          "flawless": {
-            "type": "boolean",
-            "nullable": true
+          "playerCount": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "skullHashes": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Mapped to a FeatDefinition by its skullHash",
+              "format": "uint32"
+            }
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0
           },
           "dateStarted": {
             "type": "string",
@@ -381,15 +400,18 @@
           "duration": {
             "type": "integer",
             "minimum": 0,
-            "exclusiveMinimum": true
+            "exclusiveMinimum": true,
+            "description": "Instance duration in seconds"
           },
           "platformType": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/DestinyMembershipType"
+              },
+              {
+                "description": "If all players are on the same platform, this will be the platform type. Otherwise, it will be `0`."
               }
-            ],
-            "nullable": true
+            ]
           },
           "dateResolved": {
             "type": "string",
@@ -400,10 +422,11 @@
           "instanceId",
           "hash",
           "completed",
-          "playerCount",
-          "score",
-          "fresh",
           "flawless",
+          "fresh",
+          "playerCount",
+          "skullHashes",
+          "score",
           "dateStarted",
           "dateCompleted",
           "season",
@@ -1406,6 +1429,51 @@
           "milestoneHash": 1888320892
         }
       },
+      "FeatDefinition": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "uint32"
+          },
+          "skullHash": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "uint32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shortName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "modifierPowerContribution": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "hash",
+          "skullHash",
+          "name",
+          "shortName",
+          "description",
+          "shortDescription",
+          "icon",
+          "modifierPowerContribution"
+        ],
+        "additionalProperties": false
+      },
       "VersionDefinition": {
         "type": "object",
         "properties": {
@@ -2220,6 +2288,12 @@
               },
               "required": ["minPercentile", "tierName", "tierColor"]
             }
+          },
+          "feats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatDefinition"
+            }
           }
         },
         "required": [
@@ -2235,7 +2309,8 @@
           "resprisedChallengeVersionIds",
           "pantheonIds",
           "versionsForActivity",
-          "rankingTiers"
+          "rankingTiers",
+          "feats"
         ],
         "additionalProperties": false
       },
@@ -2319,28 +2394,6 @@
           }
         },
         "required": ["membershipId"]
-      },
-      "PlayerActivitiesResponse": {
-        "type": "object",
-        "properties": {
-          "membershipId": {
-            "type": "string",
-            "pattern": "^\\d+n?$"
-          },
-          "nextCursor": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "activities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InstanceForPlayer"
-            }
-          }
-        },
-        "required": ["membershipId", "nextCursor", "activities"],
-        "additionalProperties": false
       },
       "PlayerBasicResponse": {
         "type": "object",
@@ -2509,35 +2562,6 @@
           }
         },
         "required": ["instanceId"]
-      },
-      "ActivityResponse": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Instance"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "leaderboardRank": {
-                "type": "integer",
-                "nullable": true,
-                "minimum": 0,
-                "exclusiveMinimum": true
-              },
-              "metadata": {
-                "$ref": "#/components/schemas/InstanceMetadata"
-              },
-              "players": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/InstancePlayerExtended"
-                }
-              }
-            },
-            "required": ["leaderboardRank", "metadata", "players"],
-            "additionalProperties": false
-          }
-        ]
       },
       "LeaderboardIndividualGlobalResponse": {
         "oneOf": [
@@ -4031,240 +4055,6 @@
         }
       }
     },
-    "/player/{membershipId}/activities": {
-      "get": {
-        "summary": "/player/{membershipId}/activities",
-        "deprecated": true,
-        "description": "/activities is deprecated. Use /history now. Get a player's activity history. This endpoint uses date cursors to paginate through a player's activity history. \nThe first request should not include a cursor. Subsequent requests should include the `nextCursor` \nvalue from the previous response. Note that the first request may not return the full number of activities requested\nin order to optimize performance. Subsequent requests will return the full number of activities requested.",
-        "security": [
-          {
-            "Bearer Token": []
-          }
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+n?$"
-            },
-            "required": true,
-            "name": "membershipId",
-            "in": "path"
-          },
-          {
-            "schema": {
-              "type": "integer",
-              "minimum": 10,
-              "maximum": 5000,
-              "default": 2000
-            },
-            "required": false,
-            "name": "count",
-            "in": "query"
-          },
-          {
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "required": false,
-            "name": "cursor",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "response": {
-                      "$ref": "#/components/schemas/PlayerActivitiesResponse"
-                    }
-                  },
-                  "required": ["minted", "success", "response"]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["QueryValidationError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/QueryValidationError"
-                    }
-                  },
-                  "required": ["minted", "success", "code", "error"]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["ApiKeyError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/ApiKeyError"
-                    }
-                  },
-                  "required": ["minted", "success", "code", "error"]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "PlayerPrivateProfileError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["PlayerPrivateProfileError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/PlayerPrivateProfileError"
-                    }
-                  },
-                  "required": ["minted", "success", "code", "error"]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "anyOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "minted": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "success": {
-                          "type": "boolean",
-                          "enum": [false]
-                        },
-                        "code": {
-                          "type": "string",
-                          "enum": ["PlayerNotFoundError"]
-                        },
-                        "error": {
-                          "$ref": "#/components/schemas/PlayerNotFoundError"
-                        }
-                      },
-                      "required": ["minted", "success", "code", "error"]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "minted": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "success": {
-                          "type": "boolean",
-                          "enum": [false]
-                        },
-                        "code": {
-                          "type": "string",
-                          "enum": ["PathValidationError"]
-                        },
-                        "error": {
-                          "$ref": "#/components/schemas/PathValidationError"
-                        }
-                      },
-                      "required": ["minted", "success", "code", "error"]
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["InternalServerError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/InternalServerError"
-                    }
-                  },
-                  "required": ["minted", "success", "code", "error"]
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/player/{membershipId}/basic": {
       "get": {
         "summary": "/player/{membershipId}/basic",
@@ -5185,159 +4975,6 @@
                     },
                     "response": {
                       "$ref": "#/components/schemas/InstanceResponse"
-                    }
-                  },
-                  "required": ["minted", "success", "response"]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["ApiKeyError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/ApiKeyError"
-                    }
-                  },
-                  "required": ["minted", "success", "code", "error"]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "anyOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "minted": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "success": {
-                          "type": "boolean",
-                          "enum": [false]
-                        },
-                        "code": {
-                          "type": "string",
-                          "enum": ["InstanceNotFoundError"]
-                        },
-                        "error": {
-                          "$ref": "#/components/schemas/InstanceNotFoundError"
-                        }
-                      },
-                      "required": ["minted", "success", "code", "error"]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "minted": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "success": {
-                          "type": "boolean",
-                          "enum": [false]
-                        },
-                        "code": {
-                          "type": "string",
-                          "enum": ["PathValidationError"]
-                        },
-                        "error": {
-                          "$ref": "#/components/schemas/PathValidationError"
-                        }
-                      },
-                      "required": ["minted", "success", "code", "error"]
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["InternalServerError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/InternalServerError"
-                    }
-                  },
-                  "required": ["minted", "success", "code", "error"]
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/activity/{instanceId}": {
-      "get": {
-        "summary": "/activity/{instanceId}",
-        "deprecated": true,
-        "description": "/activity is deprecated. Use /instance now. This returns a PGCR object with a shape more aligned with how RaidHub displays PGCRs.",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d+n?$"
-            },
-            "required": true,
-            "name": "instanceId",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [true]
-                    },
-                    "response": {
-                      "$ref": "#/components/schemas/ActivityResponse"
                     }
                   },
                   "required": ["minted", "success", "response"]

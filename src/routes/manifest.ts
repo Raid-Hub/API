@@ -1,10 +1,12 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zActivityDefinition } from "@/schema/components/ActivityDefinition"
+import { zFeatDefinition } from "@/schema/components/FeatDefinition"
 import { zVersionDefinition } from "@/schema/components/VersionDefinition"
 import { zNaturalNumber, zNumericalRecordKey } from "@/schema/util"
 import {
     listActivityDefinitions,
+    listFeatDefinitions,
     listHashes,
     listVersionDefinitions
 } from "@/services/manifest/definitions"
@@ -94,16 +96,18 @@ export const manifestRoute = new RaidHubRoute({
                                 description: "A tailwindcss color class for the tier"
                             })
                         })
-                    )
+                    ),
+                    feats: z.array(zFeatDefinition)
                 })
                 .strict()
         }
     },
     handler: async () => {
-        const [activities, versions, hashes] = await Promise.all([
+        const [activities, versions, hashes, feats] = await Promise.all([
             listActivityDefinitions(),
             listVersionDefinitions(),
-            listHashes()
+            listHashes(),
+            listFeatDefinitions()
         ])
         const raids = activities.filter(a => a.isRaid)
         const pantheonId = 101
@@ -154,7 +158,8 @@ export const manifestRoute = new RaidHubRoute({
             resprisedChallengeVersionIds: versions.filter(v => v.isChallengeMode).map(v => v.id),
             pantheonIds: [pantheonId],
             versionsForActivity: versionsForActivity,
-            rankingTiers: TierBreaks
+            rankingTiers: TierBreaks,
+            feats: feats
         })
     }
 })

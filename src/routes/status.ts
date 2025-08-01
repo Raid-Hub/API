@@ -10,7 +10,7 @@ import {
 import { getAtlasStatus } from "@/services/atlas"
 import { getFloodgatesRecentId, getFloodgatesStatus } from "@/services/floodgates"
 import { getInstanceBasic } from "@/services/instance/instance"
-import { getLatestInstanceByDate } from "@/services/instance/recent"
+import { getLatestInstanceByDate } from "@/services/instance/latest"
 import { z } from "zod"
 
 // This state tracks the status of the Destiny API and debounces it with a grace period of 60 seconds.
