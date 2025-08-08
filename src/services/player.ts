@@ -57,8 +57,8 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'season', fastest.season_id,
                             'duration', fastest.duration,
                             'platformType', fastest.platform_type,
-                            'isDayOne', CASE WHEN av.is_world_first THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END,
-                            'isContest', CASE WHEN av.is_world_first THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END,
+                            'isDayOne', CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END,
+                            'isContest', CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END,
                             'isWeekOne', date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch'),
                             'isBlacklisted', bi.instance_id IS NOT NULL
                         ) 

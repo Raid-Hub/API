@@ -23,8 +23,8 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
             season_id AS "season",
             duration AS "duration",
             platform_type AS "platformType",
-            CASE WHEN av.is_world_first THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
-            CASE WHEN av.is_world_first THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
+            CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
+            CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
             date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
             b.instance_id IS NOT NULL AS "isBlacklisted"
         FROM instance

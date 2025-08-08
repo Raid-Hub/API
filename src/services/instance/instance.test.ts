@@ -51,6 +51,36 @@ describe("getInstance", () => {
                 expect(parsed.data.isWeekOne).toBe(true)
             }
         })
+
+        it("is contest for day 1 non-challenge king's fall", async () => {
+            const data = await getInstance("11395499732").catch(console.error)
+
+            const parsed = zInstance.safeParse(data)
+            if (!parsed.success) {
+                console.error(parsed.error.errors)
+                expect(parsed.error.errors).toEqual([])
+            } else {
+                expect(parsed.success).toBe(true)
+                expect(parsed.data.isContest).toBe(true)
+                expect(parsed.data.isDayOne).toBe(true)
+                expect(parsed.data.isWeekOne).toBe(true)
+            }
+        })
+
+        it("is not contest for day 1 levi", async () => {
+            const data = await getInstance("258758374").catch(console.error)
+
+            const parsed = zInstance.safeParse(data)
+            if (!parsed.success) {
+                console.error(parsed.error.errors)
+                expect(parsed.error.errors).toEqual([])
+            } else {
+                expect(parsed.success).toBe(true)
+                expect(parsed.data.isContest).toBe(false)
+                expect(parsed.data.isDayOne).toBe(true)
+                expect(parsed.data.isWeekOne).toBe(true)
+            }
+        })
     })
 })
 
