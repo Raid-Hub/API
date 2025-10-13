@@ -1481,7 +1481,7 @@
       },
       "ImageSize": {
         "type": "string",
-        "enum": ["tiny", "small", "medium", "large", "xlarge"],
+        "enum": ["tiny", "small", "medium", "large", "xlarge", "full"],
         "description": "The size of a RaidHub CDN hosted image.",
         "example": "medium"
       },

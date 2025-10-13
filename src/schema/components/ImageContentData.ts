@@ -4,7 +4,7 @@ import { z } from "zod"
 export type ImageSize = z.input<typeof zImageSize>
 export const zImageSize = registry.register(
     "ImageSize",
-    z.enum(["tiny", "small", "medium", "large", "xlarge"]).openapi({
+    z.enum(["tiny", "small", "medium", "large", "xlarge", "full"]).openapi({
         description: "The size of a RaidHub CDN hosted image.",
         example: "medium"
     })

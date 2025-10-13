@@ -1,4 +1,5 @@
-import { BungieApiError, bungiePlatformHttp } from "@/integrations/bungie"
+import * as bungie from "@/integrations/bungie"
+import { BungieApiError } from "@/integrations/bungie"
 import { clanQueue, playersQueue } from "@/integrations/rabbitmq/queues"
 import { expectErr, expectOk } from "@/lib/test-utils"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
@@ -56,15 +57,15 @@ describe("clan 404", () => {
     })
 })
 
-test("clan 503", async () => {
-    const spyBungieFetch = spyOn(bungiePlatformHttp({ ttl: 30_000 }), "fetch")
+describe("clan 503", async () => {
+    const spyGetClan = spyOn(bungie, "getClan")
 
     afterAll(() => {
-        spyBungieFetch.mockRestore()
+        spyGetClan.mockRestore()
     })
 
     test("system disabled", async () => {
-        spyBungieFetch.mockRejectedValueOnce(
+        spyGetClan.mockRejectedValue(
             new BungieApiError({
                 cause: {
                     ErrorCode: PlatformErrorCodes.SystemDisabled,
