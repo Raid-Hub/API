@@ -16,7 +16,8 @@ export const zActivityDefinition = registry.register(
             dayOneEnd: zISODateString({ nullable: true }),
             contestEnd: zISODateString({ nullable: true }),
             weekOneEnd: zISODateString({ nullable: true }),
-            milestoneHash: zUInt32().nullable()
+            milestoneHash: zUInt32().nullable(),
+            splashSlug: z.string()
         })
         .strict()
         .openapi({
@@ -31,7 +32,8 @@ export const zActivityDefinition = registry.register(
                 dayOneEnd: new Date("2021-05-23T00:00:00Z"),
                 contestEnd: new Date("2021-05-23T00:00:00Z"),
                 weekOneEnd: new Date("2021-05-25T00:00:00Z"),
-                milestoneHash: 1888320892
+                milestoneHash: 1888320892,
+                splashSlug: "vog"
             }
         })
 )

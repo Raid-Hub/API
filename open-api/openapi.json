@@ -1400,6 +1400,9 @@
             "nullable": true,
             "minimum": 0,
             "format": "uint32"
+          },
+          "splashSlug": {
+            "type": "string"
           }
         },
         "required": [
@@ -1412,7 +1415,8 @@
           "dayOneEnd",
           "contestEnd",
           "weekOneEnd",
-          "milestoneHash"
+          "milestoneHash",
+          "splashSlug"
         ],
         "additionalProperties": false,
         "description": "The definition of an activity in the RaidHub database.",
@@ -1426,7 +1430,8 @@
           "dayOneEnd": "2021-05-23T00:00:00.000Z",
           "contestEnd": "2021-05-23T00:00:00.000Z",
           "weekOneEnd": "2021-05-25T00:00:00.000Z",
-          "milestoneHash": 1888320892
+          "milestoneHash": 1888320892,
+          "splashSlug": "vog"
         }
       },
       "FeatDefinition": {
@@ -1473,6 +1478,46 @@
           "modifierPowerContribution"
         ],
         "additionalProperties": false
+      },
+      "ImageSize": {
+        "type": "string",
+        "enum": ["tiny", "small", "medium", "large", "xlarge"],
+        "description": "The size of a RaidHub CDN hosted image.",
+        "example": "medium"
+      },
+      "ImageContentData": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "size": {
+            "$ref": "#/components/schemas/ImageSize"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "fileFormat": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": ["slug", "size", "fileName", "fileFormat", "path", "url"],
+        "additionalProperties": false,
+        "description": "A URL to a piece of content hosted on the RaidHub CDN.",
+        "example": {
+          "slug": "vog",
+          "size": "medium",
+          "fileName": "medium.jpg",
+          "fileFormat": "jpg",
+          "path": "content/splash/vog/medium.jpg",
+          "url": "https://cdn.raidhub.io/content/splash/vog/medium.jpg"
+        }
       },
       "VersionDefinition": {
         "type": "object",
@@ -2294,6 +2339,16 @@
             "items": {
               "$ref": "#/components/schemas/FeatDefinition"
             }
+          },
+          "splashUrls": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ImageContentData"
+              }
+            },
+            "description": "The mapping of each RaidHub activityId to its splash image URLs"
           }
         },
         "required": [
@@ -2310,7 +2365,8 @@
           "pantheonIds",
           "versionsForActivity",
           "rankingTiers",
-          "feats"
+          "feats",
+          "splashUrls"
         ],
         "additionalProperties": false
       },
