@@ -50,7 +50,8 @@ export const listActivityDefinitions = async () => {
             day_one_end AS "dayOneEnd",
             week_one_end AS "weekOneEnd",
             contest_end AS "contestEnd",
-            milestone_hash AS "milestoneHash"
+            milestone_hash AS "milestoneHash",
+            splash_path AS "splashSlug"
         FROM activity_definition`
     )
 }

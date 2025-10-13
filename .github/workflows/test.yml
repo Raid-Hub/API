@@ -58,6 +58,11 @@ jobs:
                   BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
                   RABBIT_API_USER: ${{ secrets.RABBIT_API_USER }}
                   RABBIT_API_PASSWORD: ${{ secrets.RABBIT_API_PASSWORD }}
+                  R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+                  R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+                  R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+                  R2_BUCKET: ${{ secrets.R2_BUCKET }}
+
               run: bun test --coverage --bail=5 --timeout=20000
 
             #  Compares two code coverage files and generates report as a comment

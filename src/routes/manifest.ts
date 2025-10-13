@@ -2,6 +2,7 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zActivityDefinition } from "@/schema/components/ActivityDefinition"
 import { zFeatDefinition } from "@/schema/components/FeatDefinition"
+import { zImageContentData } from "@/schema/components/ImageContentData"
 import { zVersionDefinition } from "@/schema/components/VersionDefinition"
 import { zNaturalNumber, zNumericalRecordKey } from "@/schema/util"
 import {
@@ -11,6 +12,7 @@ import {
     listVersionDefinitions
 } from "@/services/manifest/definitions"
 import { TierBreaks } from "@/services/manifest/tiers"
+import { generateSplashUrls } from "@/services/manifest/urls"
 import { z } from "zod"
 
 export const manifestRoute = new RaidHubRoute({
@@ -97,17 +99,25 @@ export const manifestRoute = new RaidHubRoute({
                             })
                         })
                     ),
-                    feats: z.array(zFeatDefinition)
+                    feats: z.array(zFeatDefinition),
+                    splashUrls: z
+                        .record(zNumericalRecordKey(), z.array(zImageContentData))
+                        .openapi({
+                            description:
+                                "The mapping of each RaidHub activityId to its splash image URLs"
+                        })
                 })
                 .strict()
         }
     },
     handler: async () => {
-        const [activities, versions, hashes, feats] = await Promise.all([
-            listActivityDefinitions(),
+        const activitiesPromise = listActivityDefinitions()
+        const [activities, versions, hashes, feats, splashUrls] = await Promise.all([
+            activitiesPromise,
             listVersionDefinitions(),
             listHashes(),
-            listFeatDefinitions()
+            listFeatDefinitions(),
+            activitiesPromise.then(generateSplashUrls)
         ])
         const raids = activities.filter(a => a.isRaid)
         const pantheonId = 101
@@ -159,7 +169,8 @@ export const manifestRoute = new RaidHubRoute({
             pantheonIds: [pantheonId],
             versionsForActivity: versionsForActivity,
             rankingTiers: TierBreaks,
-            feats: feats
+            feats: feats,
+            splashUrls: splashUrls
         })
     }
 })
