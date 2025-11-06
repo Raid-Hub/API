@@ -1,8 +1,11 @@
+import { Logger } from "@/lib/utils/logging"
 import { ApiKeyError } from "@/schema/errors/ApiKeyError"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { file } from "bun"
 import { RequestHandler } from "express"
 import { z } from "zod"
+
+const logger = new Logger("API_KEYS_SERVICE")
 
 const KeySchema = z.object({
     origin: z.string().default("*"),
@@ -50,24 +53,27 @@ const apiKeys = file(process.env.API_KEYS_PATH!, { type: "application/json" })
                     })
             )
     )
-    .catch(
-        (
-            err
-        ): Record<
-            string,
-            {
-                origin: string
-                regex: RegExp
-            }
-        > => {
-            console.error("Failed to load API keys", err)
-            if (process.env.PROD) {
-                process.exit(1)
-            } else {
-                return {}
-            }
+    .catch((err): Record<string, { origin: string; regex: RegExp }> => {
+        if (process.env.PROD) {
+            return logger.fatal(
+                "API_KEYS_LOAD_FAILED",
+                err instanceof Error ? err : new Error(String(err)),
+                {
+                    operation: "load_api_keys"
+                }
+            )
+        } else {
+            logger.warn(
+                "API_KEYS_LOAD_FAILED",
+                err instanceof Error ? err : new Error(String(err)),
+                {
+                    operation: "load_api_keys",
+                    action: "using_empty_keys"
+                }
+            )
+            return {}
         }
-    )
+    })
 
 const isValidAPIKey = async (
     apiKey: string | undefined,

@@ -1,5 +1,8 @@
+import { Logger } from "@/lib/utils/logging"
 import amqp from "amqplib"
 import { RabbitConnection } from "./connection"
+
+const logger = new Logger("RABBITMQ")
 
 export class RabbitQueue<T> {
     readonly queueName: string
@@ -33,12 +36,14 @@ export class RabbitQueue<T> {
 
             return channel.sendToQueue(this.queueName, Buffer.from(JSON.stringify(message)))
         } catch (err) {
-            process.env.NODE_ENV !== "test" &&
-                console.error(
-                    new Error("Failed to send message via RabbitMQ", {
-                        cause: err
-                    })
-                )
+            logger.error(
+                "RABBITMQ_SEND_FAILED",
+                err instanceof Error ? err : new Error(String(err)),
+                {
+                    queue: this.queueName,
+                    operation: "send_message"
+                }
+            )
         }
     }
 }

@@ -1,5 +1,8 @@
+import { Logger } from "@/lib/utils/logging"
 import jwt from "jsonwebtoken"
 import { zJWTAuthFormat } from "./jwt"
+
+const logger = new Logger("API_AUTH_SERVICE")
 
 export const canAccessProtectedResource = async (
     destinyMembershipId: string | bigint,
@@ -25,7 +28,14 @@ export const canAccessProtectedResource = async (
             })
         )
     } catch (err) {
-        process.env.NODE_ENV !== "test" && console.error(err)
+        logger.warn(
+            "JWT_VERIFICATION_FAILED",
+            err instanceof Error ? err : new Error(String(err)),
+            {
+                operation: "verify_token",
+                membership_id: String(destinyMembershipId)
+            }
+        )
         return false
     }
 }

@@ -1,62 +1,60 @@
+import { Logger, LogFields } from "@/lib/utils/logging"
 import {
     ClickHouseLogLevel,
     ErrorLogParams,
     LogParams,
-    Logger,
     WarnLogParams,
-    createClient
+    createClient,
+    type Logger as ClickhouseLoggingInterface
 } from "@clickhouse/client"
 
-class ClickhouseLogger implements Logger {
-    private formatMessage({
-        level,
-        module,
-        message
-    }: {
-        level: string
-        module: string
-        message: string
-    }) {
-        return `[${level}][@clickhouse/client][${module}] ${message}`
-    }
+class ClickhouseLogger implements ClickhouseLoggingInterface {
+    private logger = new Logger("CLICKHOUSE")
+
     trace({ module, message, args }: LogParams) {
-        const params: unknown[] = [this.formatMessage({ module, message, level: "TRACE" })]
-        if (args) {
-            params.push("\nArguments:", args)
-        }
-        console.debug(...params)
+        this.logger.debug("CLICKHOUSE_TRACE", {
+            module,
+            message,
+            ...(args ? { args: args as LogFields } : {})
+        })
     }
     debug({ module, message, args }: LogParams) {
-        const params: unknown[] = [this.formatMessage({ module, message, level: "DEBUG" })]
-        if (args) {
-            params.push("\nArguments:", args)
-        }
-        console.debug(...params)
+        this.logger.debug("CLICKHOUSE_DEBUG", {
+            module,
+            message,
+            ...(args ? { args: args as LogFields } : {})
+        })
     }
     info({ module, message, args }: LogParams) {
-        const params: unknown[] = [this.formatMessage({ module, message, level: "INFO" })]
-        if (args) {
-            params.push("\nArguments:", args)
-        }
-        console.info(...params)
+        this.logger.info("CLICKHOUSE_INFO", {
+            module,
+            message,
+            ...(args ? { args: args as LogFields } : {})
+        })
     }
     warn({ module, message, args, err }: WarnLogParams) {
-        const params: unknown[] = [this.formatMessage({ module, message, level: "WARN" })]
-        if (args) {
-            params.push("\nArguments:", args)
-        }
-        if (err) {
-            params.push("\nCaused by:", err)
-        }
-        console.warn(...params)
+        this.logger.warn("CLICKHOUSE_WARN", err ?? null, {
+            module,
+            message,
+            ...(args ? { args: args as LogFields } : {})
+        })
     }
     error({ module, message, args, err }: ErrorLogParams) {
-        const params: unknown[] = [this.formatMessage({ module, message, level: "ERROR" })]
-        if (args) {
-            params.push("\nArguments:", args)
+        if (!err) {
+            // ClickHouse error without Error object - create one
+            const error = new Error(message || "ClickHouse error")
+            this.logger.error("CLICKHOUSE_ERROR", error, {
+                module,
+                message,
+                ...(args ? { args: args as LogFields } : {})
+            })
+        } else {
+            this.logger.error("CLICKHOUSE_ERROR", err, {
+                module,
+                message,
+                ...(args ? { args: args as LogFields } : {})
+            })
         }
-        params.push("\nCaused by:", err)
-        console.error(...params)
     }
 }
 
@@ -64,7 +62,7 @@ export const clickhouse = createClient({
     username: process.env.CLICKHOUSE_USER,
     password: process.env.CLICKHOUSE_PASSWORD,
     application: process.env.PROD ? "RaidHub-API-Prod" : "RaidHub-API-Dev",
-    database: "default",
+    database: process.env.CLICKHOUSE_DATABASE ?? "default",
     request_timeout: 5000,
     log: {
         LoggerClass: ClickhouseLogger,
