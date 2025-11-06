@@ -1,3 +1,4 @@
+import { Logger } from "@/lib/utils/logging"
 import {
     Connection,
     Pool,
@@ -7,6 +8,8 @@ import {
     ScriptExecuteOptions
 } from "postgresql-client"
 import { postgresConnectionsGauge } from "../prometheus/metrics"
+
+const logger = new Logger("POSTGRES")
 
 interface RaidHubQuerier {
     queryRow<T>(sql: string, options?: Omit<QueryOptions, "objectRows">): Promise<T | null>
@@ -94,9 +97,11 @@ export class RaidHubConnector implements RaidHubQuerier {
             ...options,
             ...QueryOptions
         })
-        if (!process.env.PROD && process.env.NODE_ENV !== "test") {
-            console.log(executeTime, sql)
-        }
+        logger.debug("QUERY_EXECUTED", {
+            duration: `${executeTime}ms`,
+            operation: "query_row",
+            sql: sql.substring(0, 100) // Truncate long queries in logs
+        })
 
         if (!rows?.[0]) return null
 
@@ -111,9 +116,11 @@ export class RaidHubConnector implements RaidHubQuerier {
             ...options,
             ...QueryOptions
         })
-        if (!process.env.PROD && process.env.NODE_ENV !== "test") {
-            console.log(executeTime, sql)
-        }
+        logger.debug("QUERY_EXECUTED", {
+            duration: `${executeTime}ms`,
+            operation: "query_row",
+            sql: sql
+        })
 
         return rows as T[]
     }
@@ -128,12 +135,12 @@ export class RaidHubConnector implements RaidHubQuerier {
             ...options,
             ...QueryOptions
         })
-        if (!process.env.PROD && process.env.NODE_ENV !== "test") {
-            results.forEach(({ executeTime }) => {
-                console.log(executeTime, executeTime)
-            })
-            console.log(totalTime, sql)
-        }
+        logger.debug("SCRIPT_EXECUTED", {
+            duration: `${totalTime}ms`,
+            operation: "execute_script",
+            result_count: results.length,
+            sql: sql
+        })
 
         return results.map(r => (r.rows ?? []) as unknown[])
     }
@@ -167,9 +174,11 @@ class RaidHubStatement {
             ...options,
             ...QueryOptions
         })
-        if (!process.env.PROD && process.env.NODE_ENV !== "test") {
-            console.log(executeTime, this.stmnt.sql)
-        }
+        logger.debug("STATEMENT_EXECUTED", {
+            duration: `${executeTime}ms`,
+            operation: "execute_statement",
+            sql: this.stmnt.sql.substring(0, 100) // Truncate long queries in logs
+        })
 
         return (rows ?? []) as unknown[]
     }

@@ -1,11 +1,16 @@
 import "@/lib/extensions"
+import "@/lib/instrument"
+
 import compression from "compression"
 import express, { Router, static as expressStatic, json } from "express"
 import path from "path"
 import { verifyApiKey } from "./auth/api-keys"
 import { servePrometheus } from "./integrations/prometheus/server"
+import { Logger } from "./lib/utils/logging"
 import { errorHandler } from "./middleware/error-handler"
 import { router } from "./routes"
+
+const logger = new Logger("API_INITIALIZER")
 
 const port = Number(process.env.PORT || 8000)
 
@@ -43,6 +48,9 @@ app.use(verifyApiKey, json(), compression(), router.express, errorHandler)
 
 // Start the server
 app.listen(port, () => {
-    console.log("Express server started on port: " + port)
+    logger.info("SERVER_STARTED", {
+        port: port,
+        status: "ready"
+    })
     servePrometheus()
 })

@@ -1,5 +1,8 @@
+import { Logger } from "@/lib/utils/logging"
 import { serve } from "bun"
 import { prometheusRegistry } from "./registry"
+
+const logger = new Logger("PROMETHEUS")
 
 const port = process.env.METRICS_PORT || 8082
 export const servePrometheus = () => {
@@ -28,5 +31,8 @@ export const servePrometheus = () => {
         }
     })
 
-    console.log(`Metrics server started on port: ${port}`)
+    logger.info("METRICS_SERVER_STARTED", {
+        port: port,
+        status: "ready"
+    })
 }

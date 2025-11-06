@@ -12,5 +12,9 @@ declare module "bun" {
         CLICKHOUSE_USER: string
         CLICKHOUSE_PASSWORD: string
         PROMETHEUS_HTTP_PORT?: number
+        SENTRY_DSN?: string
+        SENTRY_ENVIRONMENT?: string
+        LOG_LEVEL?: "debug" | "info" | "warn" | "error"
+        METRICS_PORT?: number
     }
 }

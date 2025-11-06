@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any */
 import { httpRequestTimer } from "@/integrations/prometheus/metrics"
+import { Logger } from "@/lib/utils/logging"
 import { zApiKeyError } from "@/schema/errors/ApiKeyError"
 import { BodyValidationError, zBodyValidationError } from "@/schema/errors/BodyValidationError"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
@@ -18,6 +19,8 @@ import {
     RaidHubHandler,
     RaidHubHandlerReturn
 } from "./RaidHubRouterTypes"
+
+const logger = new Logger("API_ROUTING_SERVICE")
 
 // This class is used to define type-safe a route in the RaidHub API
 export class RaidHubRoute<
@@ -216,7 +219,15 @@ export class RaidHubRoute<
                             try {
                                 await callback()
                             } catch (err) {
-                                process.env.NODE_ENV !== "test" && console.error(err)
+                                logger.error(
+                                    "ROUTE_AFTER_CALLBACK_ERROR",
+                                    err instanceof Error ? err : new Error(String(err)),
+                                    {
+                                        path: req.path,
+                                        method: req.method,
+                                        url: req.url
+                                    }
+                                )
                             }
                         })
                     })
@@ -260,16 +271,20 @@ export class RaidHubRoute<
         any,
         z.output<Body>,
         z.output<Query>
-    > = (_, res, next) => {
+    > = (req, res, next) => {
         const start = Date.now()
         res.on("finish", () => {
             const responseTimeInMs = Date.now() - start
             const path = this.getFullPath()
             const code = res.statusCode.toString()
-            if (!process.env.PROD && process.env.NODE_ENV !== "test") {
-                console.log(`Request to ${path} took ${responseTimeInMs}ms`)
-            }
             httpRequestTimer.labels(path, code).observe(responseTimeInMs)
+
+            logger.debug("REQUEST_COMPLETED", {
+                path: req.path,
+                method: req.method,
+                statusCode: res.statusCode,
+                duration: `${responseTimeInMs}ms`
+            })
         })
         next()
     }
