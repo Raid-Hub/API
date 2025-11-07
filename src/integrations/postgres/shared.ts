@@ -1,12 +1,22 @@
 import { Logger } from "@/lib/utils/logging"
 import { Pool, PoolClient, types } from "pg"
+import { TypeId, arrayParser } from "pg-types"
 import { postgresConnectionsGauge } from "../prometheus/metrics"
 
 const logger = new Logger("POSTGRES")
 
+// PostgreSQL OID for int8[] (bigint array)
+const INT8_ARRAY_OID = 1016 as TypeId
+
 // Configure bigint (int8) to be parsed as JavaScript BigInt
 types.setTypeParser(types.builtins.INT8, (val: string) => {
     return BigInt(val)
+})
+
+// Configure bigint array (int8[]) - OID 1016
+types.setTypeParser(INT8_ARRAY_OID, (val: string) => {
+    const int8Parser = types.getTypeParser(types.builtins.INT8)
+    return arrayParser(val, (entry: string) => int8Parser(entry))
 })
 
 export const TABLE_SCHEMAS = [

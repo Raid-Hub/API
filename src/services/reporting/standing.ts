@@ -11,7 +11,7 @@ export const getInstanceFlags = async (instanceId: bigint | string) => {
             fi.cheat_check_version AS "cheatCheckVersion",
             fi.cheat_check_bitmask::text AS "cheatCheckBitmask",
             fi.flagged_at AS "flaggedAt",
-            fi.cheat_probability AS "cheatProbability"
+            fi.cheat_probability::double precision AS "cheatProbability"
         FROM flag_instance fi
         WHERE fi.instance_id = $1::bigint
         ORDER BY fi.cheat_probability, fi.flagged_at DESC
@@ -61,7 +61,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                         'membershipId', fip.membership_id::text,
                         'cheatCheckVersion', fip.cheat_check_version,
                         'cheatCheckBitmask', fip.cheat_check_bitmask::text,
-                        'cheatProbability', fip.cheat_probability,
+                        'cheatProbability', fip.cheat_probability::double precision,
                         'flaggedAt', fip.flagged_at
                     ) AS "data"
                     FROM flag_instance_player fip
@@ -80,7 +80,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                         'instanceDate', i.date_started,
                         'cheatCheckVersion', fip.cheat_check_version,
                         'cheatCheckBitmask', fip.cheat_check_bitmask::text,
-                        'cheatProbability', fip.cheat_probability,
+                        'cheatProbability', fip.cheat_probability::double precision,
                         'flaggedAt', fip.flagged_at
                     ) AS "data"
                     FROM flag_instance_player fip
