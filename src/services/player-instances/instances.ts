@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { InstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
 
 export async function getInstances({
@@ -116,7 +116,7 @@ export async function getInstances({
 
     params.push(count)
 
-    return await postgres.queryRows<InstanceWithPlayers>(
+    return await pgReader.queryRows<InstanceWithPlayers>(
         `WITH _player_instances AS (${playerStmnts.join(" INTERSECT ")}) 
         SELECT
             instance_id::text AS "instanceId",
@@ -169,9 +169,6 @@ export async function getInstances({
         ORDER BY date_completed DESC
         LIMIT $${params.length}
         `,
-        {
-            params,
-            fetchCount: count
-        }
+        params
     )
 }

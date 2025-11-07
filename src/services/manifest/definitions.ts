@@ -1,14 +1,12 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { ActivityDefinition } from "@/schema/components/ActivityDefinition"
 import { FeatDefinition } from "@/schema/components/FeatDefinition"
 import { VersionDefinition } from "@/schema/components/VersionDefinition"
 
 export const getRaidId = async (raidPath: string) => {
-    return await postgres.queryRow<{ id: number }>(
+    return await pgReader.queryRow<{ id: number }>(
         `SELECT id FROM activity_definition WHERE path = $1 AND is_raid`,
-        {
-            params: [raidPath]
-        }
+        [raidPath]
     )
 }
 
@@ -16,30 +14,26 @@ export const getVersionId = async (
     versionPath: string,
     associatedActivityId: number | null = null
 ) => {
-    return await postgres.queryRow<{ id: number }>(
+    return await pgReader.queryRow<{ id: number }>(
         `SELECT id FROM version_definition WHERE path = $1 ${associatedActivityId ? "AND associated_activity_id = $2" : ""}`,
-        {
-            params: associatedActivityId ? [versionPath, associatedActivityId] : [versionPath]
-        }
+        associatedActivityId ? [versionPath, associatedActivityId] : [versionPath]
     )
 }
 
 export const getActivityVersion = async (activityPath: string, versionPath: string) => {
-    return await postgres.queryRow<{ activityId: number; versionId: number }>(
+    return await pgReader.queryRow<{ activityId: number; versionId: number }>(
         `SELECT activity_id AS "activityId", version_id AS "versionId"
         FROM activity_version 
         JOIN activity_definition ON activity_version.activity_id = activity_definition.id
         JOIN version_definition ON activity_version.version_id = version_definition.id
         WHERE activity_definition.path = $1 AND version_definition.path = $2
         LIMIT 1`,
-        {
-            params: [activityPath, versionPath]
-        }
+        [activityPath, versionPath]
     )
 }
 
 export const listActivityDefinitions = async () => {
-    return await postgres.queryRows<ActivityDefinition>(
+    return await pgReader.queryRows<ActivityDefinition>(
         `SELECT 
             id,
             name,
@@ -57,7 +51,7 @@ export const listActivityDefinitions = async () => {
 }
 
 export const listVersionDefinitions = async () => {
-    return await postgres.queryRows<VersionDefinition>(
+    return await pgReader.queryRows<VersionDefinition>(
         `SELECT 
             id,
             name,
@@ -69,7 +63,7 @@ export const listVersionDefinitions = async () => {
 }
 
 export const listHashes = async () => {
-    return await postgres.queryRows<{
+    return await pgReader.queryRows<{
         hash: number
         activityId: number
         versionId: number
@@ -83,7 +77,7 @@ export const listHashes = async () => {
 }
 
 export const listFeatDefinitions = async () => {
-    return await postgres.queryRows<FeatDefinition>(
+    return await pgReader.queryRows<FeatDefinition>(
         `SELECT 
             hash,
             skull_hash AS "skullHash",

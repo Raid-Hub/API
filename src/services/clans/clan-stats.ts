@@ -1,11 +1,11 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { ClanStats } from "@/schema/components/Clan"
 
 export const getClanStats = async (
     groupId: string | bigint,
     membershipIds: bigint[] | string[]
 ) => {
-    const clanStats = await postgres.queryRow<ClanStats>(
+    const clanStats = await pgReader.queryRow<ClanStats>(
         `WITH "membership_ids" AS (
             SELECT unnest($1)::bigint AS membership_id
         ),
@@ -95,9 +95,7 @@ export const getClanStats = async (
         FROM (SELECT JSONB_AGG(member_stats."_member") AS "members" FROM "member_stats") AS "_member_stats"
         CROSS JOIN "live_aggregates"
         LEFT JOIN clan_ranks ON clan_ranks."group_id" = $2::bigint`,
-        {
-            params: [membershipIds, groupId]
-        }
+        [membershipIds, groupId]
     )
 
     if (!clanStats) {

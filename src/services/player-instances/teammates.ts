@@ -1,8 +1,8 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { Teammate } from "@/schema/components/Teammate"
 
 export const getTeammates = async (membershipId: bigint | string, { count }: { count: number }) => {
-    return await postgres.queryRows<Teammate>(
+    return await pgReader.queryRows<Teammate>(
         `WITH self AS (
             SELECT 
                 instance_id, time_played_seconds, completed
@@ -38,9 +38,6 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
             ) AS "playerInfo"
         FROM agg_data
         JOIN player USING (membership_id);`,
-        {
-            params: [membershipId, count],
-            fetchCount: count
-        }
+        [membershipId, count]
     )
 }

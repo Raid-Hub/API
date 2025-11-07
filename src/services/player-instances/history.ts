@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { activityHistoryQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { InstanceForPlayer } from "@/schema/components/InstanceForPlayer"
@@ -25,7 +25,7 @@ export const getActivities = async (
         async () => {
             const params = [membershipId, count, cursor ?? 0, cutoff ?? 0]
 
-            return await postgres.queryRows<InstanceForPlayer>(
+            return await pgReader.queryRows<InstanceForPlayer>(
                 `SELECT 
                     instance_id::text AS "instanceId",
                     hash AS "hash",
@@ -64,10 +64,7 @@ export const getActivities = async (
                 LIMIT $2;`,
                 // Note: the use of strictly less than is important because the cursor is the date of the last activity
                 // that was fetched. If we used less than or equal to, we would fetch the same activity twice.
-                {
-                    params: params,
-                    fetchCount: count
-                }
+                params
             )
         }
     )

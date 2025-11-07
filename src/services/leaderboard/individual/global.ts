@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 import { IndividualGlobalLeaderboardCategory } from "@/schema/params/IndividualGlobalLeaderboardCategory"
 
@@ -36,7 +36,7 @@ export const getIndividualGlobalLeaderboard = async ({
 }) => {
     const column = getColumn(category)
 
-    return await postgres.queryRows<IndividualLeaderboardEntry>(
+    return await pgReader.queryRows<IndividualLeaderboardEntry>(
         `SELECT
             individual_global_leaderboard.${column}_position AS "position",
             individual_global_leaderboard.${column}_rank AS "rank",
@@ -56,10 +56,7 @@ export const getIndividualGlobalLeaderboard = async ({
         JOIN player USING (membership_id)
         WHERE ${column}_position > $1 AND ${column}_position <= ($1 + $2)
         ORDER BY ${column}_position ASC`,
-        {
-            params: [skip, take],
-            fetchCount: take
-        }
+        [skip, take]
     )
 }
 
@@ -74,15 +71,13 @@ export const searchIndividualGlobalLeaderboard = async ({
 }) => {
     const column = getColumn(category)
 
-    const result = await postgres.queryRow<{ position: number }>(
+    const result = await pgReader.queryRow<{ position: number }>(
         `SELECT individual_global_leaderboard.${column}_position AS "position" 
         FROM individual_global_leaderboard 
         WHERE membership_id = $1::bigint
         ORDER BY position ASC
         LIMIT 1`,
-        {
-            params: [membershipId]
-        }
+        [membershipId]
     )
     if (!result) return null
 

@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { TeamLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const getFirstTeamActivityVersionLeaderboard = async ({
@@ -12,7 +12,7 @@ export const getFirstTeamActivityVersionLeaderboard = async ({
     skip: number
     take: number
 }) => {
-    return await postgres.queryRows<TeamLeaderboardEntry>(
+    return await pgReader.queryRows<TeamLeaderboardEntry>(
         `SELECT
             position,
             rank,
@@ -43,10 +43,7 @@ export const getFirstTeamActivityVersionLeaderboard = async ({
         WHERE position > $1 AND position <= ($1 + $2)
             AND activity_id = $3 AND version_id = $4
         ORDER BY position ASC`,
-        {
-            params: [skip, take, activityId, versionId],
-            fetchCount: take
-        }
+        [skip, take, activityId, versionId]
     )
 }
 
@@ -61,16 +58,14 @@ export const searchFirstTeamActivityVersionLeaderboard = async ({
     membershipId: bigint | string
     take: number
 }) => {
-    const result = await postgres.queryRow<{ position: number }>(
+    const result = await pgReader.queryRow<{ position: number }>(
         `SELECT position 
         FROM team_activity_version_leaderboard 
         WHERE membership_ids @> $1::jsonb
             AND activity_id = $2 AND version_id = $3
         ORDER BY position ASC
         LIMIT 1`,
-        {
-            params: [`${[membershipId]}`, activityId, versionId]
-        }
+        [`${[membershipId]}`, activityId, versionId]
     )
     if (!result) return null
 

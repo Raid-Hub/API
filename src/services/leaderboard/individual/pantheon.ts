@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const individualPantheonLeaderboardSortColumns = ["clears", "fresh_clears", "score"] as const
@@ -23,7 +23,7 @@ export const getIndividualPantheonLeaderboard = async ({
 }) => {
     validateColumn(column)
 
-    return await postgres.queryRows<IndividualLeaderboardEntry>(
+    return await pgReader.queryRows<IndividualLeaderboardEntry>(
         `SELECT
             individual_pantheon_version_leaderboard.${column}_position AS "position",
             individual_pantheon_version_leaderboard.${column}_rank AS "rank",
@@ -44,10 +44,7 @@ export const getIndividualPantheonLeaderboard = async ({
         WHERE ${column}_position > $1 AND ${column}_position <= ($1 + $2)
             AND version_id = $3
         ORDER BY ${column}_position ASC`,
-        {
-            params: [skip, take, versionId],
-            fetchCount: take
-        }
+        [skip, take, versionId]
     )
 }
 
@@ -64,15 +61,13 @@ export const searchIndividualPantheonLeaderboard = async ({
 }) => {
     validateColumn(column)
 
-    const result = await postgres.queryRow<{ position: number }>(
+    const result = await pgReader.queryRow<{ position: number }>(
         `SELECT individual_pantheon_version_leaderboard.${column}_position AS "position" 
         FROM individual_pantheon_version_leaderboard 
         WHERE membership_id = $1::bigint AND version_id = $2
         ORDER BY position ASC
         LIMIT 1`,
-        {
-            params: [membershipId, versionId]
-        }
+        [membershipId, versionId]
     )
     if (!result) return null
 

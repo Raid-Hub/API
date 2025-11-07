@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { playerProfileQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
@@ -9,7 +9,7 @@ import {
 } from "@/schema/components/PlayerProfile"
 
 export const getPlayer = async (membershipId: bigint | string) => {
-    return await postgres.queryRow<PlayerInfo>(
+    return await pgReader.queryRow<PlayerInfo>(
         `SELECT  
             membership_id::text AS "membershipId",
             membership_type AS "membershipType",
@@ -22,9 +22,7 @@ export const getPlayer = async (membershipId: bigint | string) => {
             cheat_level AS "cheatLevel"
         FROM player 
         WHERE membership_id = $1::bigint`,
-        {
-            params: [membershipId]
-        }
+        [membershipId]
     )
 }
 export const getPlayerActivityStats = async (membershipId: bigint | string) => {
@@ -34,7 +32,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
             method: "getPlayerActivityStats"
         },
         () =>
-            postgres.queryRows<PlayerProfileActivityStats>(
+            pgReader.queryRows<PlayerProfileActivityStats>(
                 `SELECT 
                     activity_definition.id AS "activityId",
                     COALESCE(player_stats.fresh_clears, 0) AS "freshClears",
@@ -71,10 +69,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                 LEFT JOIN blacklist_instance bi ON player_stats.fastest_instance_id = bi.instance_id
                 LEFT JOIN activity_version av ON fastest.hash = av.hash
                 ORDER BY activity_definition.id`,
-                {
-                    params: [membershipId],
-                    fetchCount: 100
-                }
+                [membershipId]
             )
     )
 }
@@ -86,7 +81,7 @@ export const getPlayerGlobalStats = async (membershipId: bigint | string) => {
             method: "getPlayerGlobalStats"
         },
         () =>
-            postgres.queryRow<PlayerProfileGlobalStats>(
+            pgReader.queryRow<PlayerProfileGlobalStats>(
                 `SELECT
                     JSONB_BUILD_OBJECT(
                         'value', COALESCE(lb.clears, player.clears, 0),
@@ -121,9 +116,7 @@ export const getPlayerGlobalStats = async (membershipId: bigint | string) => {
                 FROM player
                 LEFT JOIN individual_global_leaderboard lb USING (membership_id)
                 WHERE membership_id = $1::bigint`,
-                {
-                    params: [membershipId]
-                }
+                [membershipId]
             )
     )
 }
@@ -135,7 +128,7 @@ export const getWorldFirstEntries = async (membershipId: bigint | string) => {
             method: "getWorldFirstEntries"
         },
         () =>
-            postgres.queryRows<
+            pgReader.queryRows<
                 | WorldFirstEntry
                 | {
                       activityId: bigint
@@ -170,10 +163,7 @@ export const getWorldFirstEntries = async (membershipId: bigint | string) => {
                 ) AS "__inner__" ON true
                 WHERE is_raid = true
                 ORDER BY activity_definition.id ASC;`,
-                {
-                    params: [`${[membershipId]}`],
-                    fetchCount: 100
-                }
+                [`${[membershipId]}`]
             )
     )
 }

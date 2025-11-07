@@ -1,7 +1,7 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 
 export const getLatestInstanceByDate = async () => {
-    const latestActivity = await postgres.queryRow<{
+    const latestActivity = await pgReader.queryRow<{
         instanceId: string
         dateCompleted: Date
         dateResolved: Date

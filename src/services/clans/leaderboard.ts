@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { ClanLeaderboardEntry } from "@/schema/components/Clan"
 
 export const clanLeaderboardSortColumns = [
@@ -32,7 +32,7 @@ export const getClanLeaderboard = async ({
 }) => {
     validateColumn(column)
 
-    return await postgres.queryRows<ClanLeaderboardEntry>(
+    return await pgReader.queryRows<ClanLeaderboardEntry>(
         `SELECT
             JSONB_BUILD_OBJECT(
                 'groupId', clan."group_id"::text,
@@ -58,9 +58,6 @@ export const getClanLeaderboard = async ({
         ORDER BY ${column} DESC
         OFFSET $1
         LIMIT $2`,
-        {
-            params: [skip, take],
-            fetchCount: take
-        }
+        [skip, take]
     )
 }

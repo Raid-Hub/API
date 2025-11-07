@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { TeamLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const getContestTeamLeaderboard = async ({
@@ -10,7 +10,7 @@ export const getContestTeamLeaderboard = async ({
     skip: number
     take: number
 }) => {
-    return await postgres.queryRows<TeamLeaderboardEntry>(
+    return await pgReader.queryRows<TeamLeaderboardEntry>(
         `SELECT
             position,
             rank,
@@ -41,10 +41,7 @@ export const getContestTeamLeaderboard = async ({
         WHERE position > $1 AND position <= ($1 + $2)
             AND activity_id = $3
         ORDER BY position ASC`,
-        {
-            params: [skip, take, raidId],
-            fetchCount: take
-        }
+        [skip, take, raidId]
     )
 }
 
@@ -57,16 +54,14 @@ export const searchContestTeamLeaderboard = async ({
     membershipId: bigint | string
     take: number
 }) => {
-    const result = await postgres.queryRow<{ position: number }>(
+    const result = await pgReader.queryRow<{ position: number }>(
         `SELECT position 
         FROM world_first_contest_leaderboard 
         WHERE membership_ids @> $1::jsonb
             AND activity_id = $2
         ORDER BY position ASC
         LIMIT 1`,
-        {
-            params: [`${[membershipId]}`, raidId]
-        }
+        [`${[membershipId]}`, raidId]
     )
     if (!result) return null
 

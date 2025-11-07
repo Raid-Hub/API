@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import {
     InstanceBlacklist,
     InstanceFlag,
@@ -6,7 +6,7 @@ import {
 } from "@/schema/components/InstanceStanding"
 
 export const getInstanceFlags = async (instanceId: bigint | string) => {
-    return await postgres.queryRows<InstanceFlag>(
+    return await pgReader.queryRows<InstanceFlag>(
         `SELECT 
             fi.cheat_check_version AS "cheatCheckVersion",
             fi.cheat_check_bitmask::text AS "cheatCheckBitmask",
@@ -16,15 +16,12 @@ export const getInstanceFlags = async (instanceId: bigint | string) => {
         WHERE fi.instance_id = $1::bigint
         ORDER BY fi.cheat_probability, fi.flagged_at DESC
         LIMIT 10`,
-        {
-            params: [instanceId],
-            fetchCount: 10
-        }
+        [instanceId]
     )
 }
 
 export const getInstanceBlacklist = async (instanceId: bigint | string) => {
-    return await postgres.queryRow<InstanceBlacklist>(
+    return await pgReader.queryRow<InstanceBlacklist>(
         `SELECT 
             bi.instance_id::text AS "instanceId",
             bi.report_source::text AS "reportSource",
@@ -35,14 +32,12 @@ export const getInstanceBlacklist = async (instanceId: bigint | string) => {
         FROM blacklist_instance bi
         WHERE bi.instance_id = $1::bigint
         LIMIT 1`,
-        {
-            params: [instanceId]
-        }
+        [instanceId]
     )
 }
 
 export const getInstancePlayersStanding = async (instanceId: bigint | string) => {
-    return await postgres.queryRows<InstancePlayerStanding>(
+    return await pgReader.queryRows<InstancePlayerStanding>(
         `SELECT 
             json_build_object(
                 'membershipId', p.membership_id::text,
@@ -122,9 +117,6 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
         WHERE ip.instance_id = $1::bigint
         ORDER BY ip.completed DESC, ip.time_played_seconds DESC
         LIMIT 12`,
-        {
-            params: [instanceId],
-            fetchCount: 12
-        }
+        [instanceId]
     )
 }
