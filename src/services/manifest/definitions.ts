@@ -5,7 +5,7 @@ import { VersionDefinition } from "@/schema/components/VersionDefinition"
 
 export const getRaidId = async (raidPath: string) => {
     return await pgReader.queryRow<{ id: number }>(
-        `SELECT id FROM activity_definition WHERE path = $1 AND is_raid`,
+        `SELECT id::int FROM activity_definition WHERE path = $1 AND is_raid`,
         [raidPath]
     )
 }
@@ -15,14 +15,14 @@ export const getVersionId = async (
     associatedActivityId: number | null = null
 ) => {
     return await pgReader.queryRow<{ id: number }>(
-        `SELECT id FROM version_definition WHERE path = $1 ${associatedActivityId ? "AND associated_activity_id = $2" : ""}`,
+        `SELECT id::int FROM version_definition WHERE path = $1 ${associatedActivityId ? "AND associated_activity_id = $2" : ""}`,
         associatedActivityId ? [versionPath, associatedActivityId] : [versionPath]
     )
 }
 
 export const getActivityVersion = async (activityPath: string, versionPath: string) => {
     return await pgReader.queryRow<{ activityId: number; versionId: number }>(
-        `SELECT activity_id AS "activityId", version_id AS "versionId"
+        `SELECT activity_id::int AS "activityId", version_id::int AS "versionId"
         FROM activity_version 
         JOIN activity_definition ON activity_version.activity_id = activity_definition.id
         JOIN version_definition ON activity_version.version_id = version_definition.id
@@ -35,7 +35,7 @@ export const getActivityVersion = async (activityPath: string, versionPath: stri
 export const listActivityDefinitions = async () => {
     return await pgReader.queryRows<ActivityDefinition>(
         `SELECT 
-            id,
+            id::int,
             name,
             path,
             is_sunset AS "isSunset",
@@ -53,10 +53,10 @@ export const listActivityDefinitions = async () => {
 export const listVersionDefinitions = async () => {
     return await pgReader.queryRows<VersionDefinition>(
         `SELECT 
-            id,
+            id::int,
             name,
             path,
-            associated_activity_id AS "associatedActivityId",
+            associated_activity_id::int AS "associatedActivityId",
             is_challenge_mode AS "isChallengeMode"
         FROM version_definition`
     )
@@ -70,8 +70,8 @@ export const listHashes = async () => {
     }>(
         `SELECT 
             hash,
-            activity_id AS "activityId",
-            version_id AS "versionId"
+            activity_id::int AS "activityId",
+            version_id::int AS "versionId"
         FROM activity_version`
     )
 }
@@ -79,7 +79,7 @@ export const listHashes = async () => {
 export const listFeatDefinitions = async () => {
     return await pgReader.queryRows<FeatDefinition>(
         `SELECT 
-            hash,
+            hash AS "hash",
             skull_hash AS "skullHash",
             name,
             name_short AS "shortName",

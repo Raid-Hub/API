@@ -29,8 +29,8 @@ export const getActivities = async (
                 `SELECT 
                     instance_id::text AS "instanceId",
                     hash AS "hash",
-                    activity_id AS "activityId",
-                    version_id AS "versionId",
+                    activity_id::int AS "activityId",
+                    version_id::int AS "versionId",
                     instance.completed AS "completed",
                     player_count AS "playerCount",
                     score AS "score",

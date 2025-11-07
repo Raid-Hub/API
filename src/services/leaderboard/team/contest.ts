@@ -12,8 +12,8 @@ export const getContestTeamLeaderboard = async ({
 }) => {
     return await pgReader.queryRows<TeamLeaderboardEntry>(
         `SELECT
-            position,
-            rank,
+            position::int,
+            rank::int,
             time_after_launch AS "value",
             instance_id::text as "instanceId",
             "lateral".players
@@ -55,7 +55,7 @@ export const searchContestTeamLeaderboard = async ({
     take: number
 }) => {
     const result = await pgReader.queryRow<{ position: number }>(
-        `SELECT position 
+        `SELECT position::int 
         FROM world_first_contest_leaderboard 
         WHERE membership_ids @> $1::jsonb
             AND activity_id = $2

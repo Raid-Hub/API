@@ -121,8 +121,8 @@ export async function getInstances({
         SELECT
             instance_id::text AS "instanceId",
             hash AS "hash",
-            activity_id AS "activityId",
-            version_id AS "versionId",
+            activity_id::int AS "activityId",
+            version_id::int AS "versionId",
             completed AS "completed",
             player_count AS "playerCount",
             score AS "score",

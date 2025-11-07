@@ -1,18 +1,7 @@
+import { Pool } from "pg"
 import { createPool, executeQuery, QueryParams } from "./shared"
 
-export function createReader(config: {
-    user?: string
-    password?: string
-    database?: string
-    host?: string
-    port?: number
-    min?: number
-    max?: number
-    idleTimeoutMillis?: number
-    connectionTimeoutMillis?: number
-}) {
-    const pool = createPool({ name: "reader", ...config })
-
+export const readerMethods = (pool: Pool) => {
     return {
         async queryRow<T>(sql: string, params?: QueryParams): Promise<T | null> {
             const rows = await executeQuery<T>(pool, sql, params, "query_row")
@@ -35,4 +24,20 @@ export function createReader(config: {
             }
         }
     }
+}
+
+export function createReader(config: {
+    user?: string
+    password?: string
+    database?: string
+    host?: string
+    port?: number
+    min?: number
+    max?: number
+    idleTimeoutMillis?: number
+    connectionTimeoutMillis?: number
+}) {
+    const pool = createPool({ name: "reader", ...config })
+
+    return readerMethods(pool)
 }

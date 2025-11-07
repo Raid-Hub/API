@@ -10,8 +10,8 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
         `SELECT 
             instance_id::text AS "instanceId",
             hash AS "hash",
-            activity_id AS "activityId",
-            version_id AS "versionId",
+            activity_id::int AS "activityId",
+            version_id::int AS "versionId",
             completed AS "completed",
             player_count AS "playerCount",
             score AS "score",
@@ -129,7 +129,9 @@ export async function getInstanceExtended(
     })
 }
 
-export async function getInstanceMetadataByHash(hash: number | string): Promise<InstanceMetadata> {
+export async function getInstanceMetadataByHash(
+    hash: number | string | bigint
+): Promise<InstanceMetadata> {
     const metaData = await pgReader.queryRow<InstanceMetadata>(
         `SELECT 
             ad.name AS "activityName",
@@ -140,7 +142,7 @@ export async function getInstanceMetadataByHash(hash: number | string): Promise<
         INNER JOIN version_definition vd ON vd.id = ah.version_id
         WHERE hash = $1::bigint
         LIMIT 1;`,
-        [String(hash)]
+        [hash.toString()]
     )
     if (!metaData) {
         throw new Error("Metadata not found")
@@ -152,7 +154,7 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
     return await pgReader.queryRow<{
         rank: number
     }>(
-        `SELECT rank
+        `SELECT rank::int
         FROM team_activity_version_leaderboard
         WHERE instance_id = $1::bigint
         ORDER BY rank ASC

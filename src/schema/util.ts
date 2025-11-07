@@ -55,11 +55,15 @@ export const zInt64 = () =>
         format: "int64"
     })
 
+const maxUInt32 = 2n ** 32n - 1n
 // Intended to be used as an output param for a UInt32
 export const zUInt32 = () =>
-    z.number().int().nonnegative().openapi({
-        format: "uint32"
-    })
+    z
+        .union([z.number().int().nonnegative(), z.bigint().refine(n => n >= 0n && n <= maxUInt32)])
+        .openapi({
+            type: "integer",
+            format: "uint32"
+        })
 
 // Intended to be used as an output param for a record key
 export const zNumericalRecordKey = (format: "integer" | "uint32" | "uint64" = "integer") =>

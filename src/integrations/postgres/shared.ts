@@ -1,8 +1,13 @@
 import { Logger } from "@/lib/utils/logging"
-import { Pool, PoolClient } from "pg"
+import { Pool, PoolClient, types } from "pg"
 import { postgresConnectionsGauge } from "../prometheus/metrics"
 
 const logger = new Logger("POSTGRES")
+
+// Configure bigint (int8) to be parsed as JavaScript BigInt
+types.setTypeParser(types.builtins.INT8, (val: string) => {
+    return BigInt(val)
+})
 
 export const TABLE_SCHEMAS = [
     "core",

@@ -34,7 +34,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
         () =>
             pgReader.queryRows<PlayerProfileActivityStats>(
                 `SELECT 
-                    activity_definition.id AS "activityId",
+                    activity_definition.id::int AS "activityId",
                     COALESCE(player_stats.fresh_clears, 0) AS "freshClears",
                     COALESCE(player_stats.clears, 0) AS "clears",
                     COALESCE(player_stats.sherpas, 0) AS "sherpas",
@@ -42,8 +42,8 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                         THEN JSONB_BUILD_OBJECT(
                             'instanceId', fastest.instance_id::text,
                             'hash', fastest.hash,
-                            'activityId', av.activity_id,
-                            'versionId', av.version_id,
+                            'activityId', av.activity_id::int,
+                            'versionId', av.version_id::int,
                             'completed', fastest.completed,
                             'playerCount', fastest.player_count,
                             'score', fastest.score,
@@ -143,10 +143,10 @@ export const getWorldFirstEntries = async (membershipId: bigint | string) => {
             >(
                 `
                 SELECT
-                    activity_definition.id AS "activityId",
-                    rank,
+                    activity_definition.id::int AS "activityId",
+                    rank::int,
                     instance_id::text AS "instanceId",
-                    time_after_launch AS "timeAfterLaunch",
+                    time_after_launch::int AS "timeAfterLaunch",
                     (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END) AS "isDayOne",
                     (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END) AS "isContest",
                     (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') ELSE false END) AS "isWeekOne",

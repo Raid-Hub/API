@@ -7,7 +7,7 @@ export const getClanStats = async (
 ) => {
     const clanStats = await pgReader.queryRow<ClanStats>(
         `WITH "membership_ids" AS (
-            SELECT unnest($1)::bigint AS membership_id
+            SELECT unnest($1::bigint[]) AS membership_id
         ),
         "ranked_scores" AS (
             SELECT 

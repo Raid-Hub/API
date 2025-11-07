@@ -38,8 +38,8 @@ export const getIndividualGlobalLeaderboard = async ({
 
     return await pgReader.queryRows<IndividualLeaderboardEntry>(
         `SELECT
-            individual_global_leaderboard.${column}_position AS "position",
-            individual_global_leaderboard.${column}_rank AS "rank",
+            individual_global_leaderboard.${column}_position::int AS "position",
+            individual_global_leaderboard.${column}_rank::int AS "rank",
             individual_global_leaderboard.${column} AS "value",
             JSONB_BUILD_OBJECT(
                 'membershipId', membership_id::text,
@@ -72,7 +72,7 @@ export const searchIndividualGlobalLeaderboard = async ({
     const column = getColumn(category)
 
     const result = await pgReader.queryRow<{ position: number }>(
-        `SELECT individual_global_leaderboard.${column}_position AS "position" 
+        `SELECT individual_global_leaderboard.${column}_position::int AS "position" 
         FROM individual_global_leaderboard 
         WHERE membership_id = $1::bigint
         ORDER BY position ASC

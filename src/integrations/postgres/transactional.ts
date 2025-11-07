@@ -1,3 +1,4 @@
+import { readerMethods } from "./reader"
 import { createPool, executeQuery, QueryParams } from "./shared"
 
 export function createTransactional(config: {
@@ -13,32 +14,10 @@ export function createTransactional(config: {
 }) {
     const pool = createPool({ name: "transactional", ...config })
 
-    const queryMethods = {
-        async queryRow<T>(sql: string, params?: QueryParams): Promise<T | null> {
-            const rows = await executeQuery<T>(pool, sql, params, "query_row")
-            return (rows[0] as T) || null
-        },
-
-        async queryRows<T>(sql: string, params?: QueryParams): Promise<T[]> {
-            return executeQuery<T>(pool, sql, params, "query_rows")
-        },
-
-        async prepare(sql: string) {
-            const client = await pool.connect()
-            return {
-                async execute<T>(params?: QueryParams): Promise<T[]> {
-                    return executeQuery<T>(client, sql, params, "prepared_statement")
-                },
-                async close() {
-                    client.release()
-                }
-            }
-        }
-    }
+    const queryMethods = readerMethods(pool)
 
     return {
         ...queryMethods,
-
         async transaction<T>(
             callback: (tx: {
                 queryRow<T>(sql: string, params?: QueryParams): Promise<T | null>

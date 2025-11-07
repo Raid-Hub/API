@@ -14,8 +14,8 @@ export const getFirstTeamActivityVersionLeaderboard = async ({
 }) => {
     return await pgReader.queryRows<TeamLeaderboardEntry>(
         `SELECT
-            position,
-            rank,
+            position::int,
+            rank::int,
             value,
             instance_id::text as "instanceId",
             "lateral".players
@@ -59,7 +59,7 @@ export const searchFirstTeamActivityVersionLeaderboard = async ({
     take: number
 }) => {
     const result = await pgReader.queryRow<{ position: number }>(
-        `SELECT position 
+        `SELECT position::int 
         FROM team_activity_version_leaderboard 
         WHERE membership_ids @> $1::jsonb
             AND activity_id = $2 AND version_id = $3

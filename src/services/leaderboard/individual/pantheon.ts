@@ -25,8 +25,8 @@ export const getIndividualPantheonLeaderboard = async ({
 
     return await pgReader.queryRows<IndividualLeaderboardEntry>(
         `SELECT
-            individual_pantheon_version_leaderboard.${column}_position AS "position",
-            individual_pantheon_version_leaderboard.${column}_rank AS "rank",
+            individual_pantheon_version_leaderboard.${column}_position::int AS "position",
+            individual_pantheon_version_leaderboard.${column}_rank::int AS "rank",
             individual_pantheon_version_leaderboard.${column} AS "value",
             JSONB_BUILD_OBJECT(
                 'membershipId', membership_id::text,
@@ -62,7 +62,7 @@ export const searchIndividualPantheonLeaderboard = async ({
     validateColumn(column)
 
     const result = await pgReader.queryRow<{ position: number }>(
-        `SELECT individual_pantheon_version_leaderboard.${column}_position AS "position" 
+        `SELECT individual_pantheon_version_leaderboard.${column}_position::int AS "position" 
         FROM individual_pantheon_version_leaderboard 
         WHERE membership_id = $1::bigint AND version_id = $2
         ORDER BY position ASC
