@@ -22,9 +22,9 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
             LIMIT $2
         )
         SELECT  
-            agg_data.time_played as "estimatedTimePlayedSeconds",
-            agg_data.clears,
-            agg_data.count as "instanceCount",
+            agg_data.time_played::int as "estimatedTimePlayedSeconds",
+            agg_data.clears::int,
+            agg_data.count::int as "instanceCount",
             JSONB_BUILD_OBJECT(
                 'membershipId', "membership_id"::text, 
                 'membershipType', "membership_type", 

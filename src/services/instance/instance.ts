@@ -13,15 +13,15 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
             activity_id::int AS "activityId",
             version_id::int AS "versionId",
             completed AS "completed",
-            player_count AS "playerCount",
-            score AS "score",
+            player_count::int AS "playerCount",
+            score::int AS "score",
             fresh AS "fresh",
             flawless AS "flawless",
             skull_hashes AS "skullHashes",
             date_started AS "dateStarted",
             date_completed AS "dateCompleted",
-            season_id AS "season",
-            duration AS "duration",
+            season_id::int AS "season",
+            duration::int AS "duration",
             platform_type AS "platformType",
             CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
             CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
@@ -47,8 +47,8 @@ export async function getInstanceExtended(
         SELECT 
             completed as "completed",
             is_first_clear as "isFirstClear",
-            ap.sherpas as "sherpas",
-            time_played_seconds as "timePlayedSeconds",
+            ap.sherpas::int as "sherpas",
+            time_played_seconds::int as "timePlayedSeconds",
             JSONB_BUILD_OBJECT(
                 'membershipId', "membership_id"::text, 
                 'membershipType', "membership_type", 
@@ -70,16 +70,16 @@ export async function getInstanceExtended(
                     'classHash', "class_hash", 
                     'emblemHash', "emblem_hash", 
                     'completed', "completed", 
-                    'timePlayedSeconds', "time_played_seconds", 
-                    'startSeconds', "start_seconds", 
-                    'score', "score", 
-                    'kills', "kills", 
-                    'assists', "assists", 
-                    'deaths', "deaths", 
-                    'precisionKills', "precision_kills", 
-                    'superKills', "super_kills", 
-                    'grenadeKills', "grenade_kills", 
-                    'meleeKills', "melee_kills", 
+                    'timePlayedSeconds', "time_played_seconds"::int, 
+                    'startSeconds', "start_seconds"::int, 
+                    'score', "score"::int, 
+                    'kills', "kills"::int, 
+                    'assists', "assists"::int, 
+                    'deaths', "deaths"::int, 
+                    'precisionKills', "precision_kills"::int, 
+                    'superKills', "super_kills"::int, 
+                    'grenadeKills', "grenade_kills"::int, 
+                    'meleeKills', "melee_kills"::int, 
                     'weapons', "weapons_json"
                 )
             ) AS "characters_json"
@@ -90,8 +90,8 @@ export async function getInstanceExtended(
                         JSONB_AGG(
                             JSONB_BUILD_OBJECT(
                                 'weaponHash', w."weapon_hash", 
-                                'kills', w."kills", 
-                                'precisionKills', w."precision_kills"
+                                'kills', w."kills"::int, 
+                                'precisionKills', w."precision_kills"::int
                             )
                         ), '[]'::jsonb
                     ) AS "weapons_json"
@@ -169,15 +169,15 @@ export async function getInstanceBasic(instanceId: bigint | string) {
             instance_id::text AS "instanceId",
             hash AS "hash",
             completed AS "completed",
-            player_count AS "playerCount",
-            score AS "score",
+            player_count::int AS "playerCount",
+            score::int AS "score",
             fresh AS "fresh",
             flawless AS "flawless",
             skull_hashes AS "skullHashes",
             date_started AT TIME ZONE 'UTC' AS "dateStarted",
             date_completed AT TIME ZONE 'UTC' AS "dateCompleted",
-            season_id AS "season",
-            duration AS "duration",
+            season_id::int AS "season",
+            duration::int AS "duration",
             platform_type AS "platformType",
             pgcr.date_crawled AS "dateResolved"
         FROM instance

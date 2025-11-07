@@ -35,9 +35,9 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
             pgReader.queryRows<PlayerProfileActivityStats>(
                 `SELECT 
                     activity_definition.id::int AS "activityId",
-                    COALESCE(player_stats.fresh_clears, 0) AS "freshClears",
-                    COALESCE(player_stats.clears, 0) AS "clears",
-                    COALESCE(player_stats.sherpas, 0) AS "sherpas",
+                    COALESCE(player_stats.fresh_clears, 0)::int AS "freshClears",
+                    COALESCE(player_stats.clears, 0)::int AS "clears",
+                    COALESCE(player_stats.sherpas, 0)::int AS "sherpas",
                     CASE WHEN fastest_instance_id IS NOT NULL 
                         THEN JSONB_BUILD_OBJECT(
                             'instanceId', fastest.instance_id::text,
@@ -45,15 +45,15 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'activityId', av.activity_id::int,
                             'versionId', av.version_id::int,
                             'completed', fastest.completed,
-                            'playerCount', fastest.player_count,
-                            'score', fastest.score,
+                            'playerCount', fastest.player_count::int,
+                            'score', fastest.score::int,
                             'fresh', fastest.fresh,
                             'flawless', fastest.flawless,
                             'skullHashes', fastest.skull_hashes,
                             'dateStarted', fastest.date_started,
                             'dateCompleted', fastest.date_completed,
-                            'season', fastest.season_id,
-                            'duration', fastest.duration,
+                            'season', fastest.season_id::int,
+                            'duration', fastest.duration::int,
                             'platformType', fastest.platform_type,
                             'isDayOne', CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END,
                             'isContest', CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END,
@@ -84,33 +84,33 @@ export const getPlayerGlobalStats = async (membershipId: bigint | string) => {
             pgReader.queryRow<PlayerProfileGlobalStats>(
                 `SELECT
                     JSONB_BUILD_OBJECT(
-                        'value', COALESCE(lb.clears, player.clears, 0),
-                        'rank', lb.clears_rank,
+                        'value', COALESCE(lb.clears, player.clears, 0)::int,
+                        'rank', lb.clears_rank::int,
                         'percentile', lb.clears_percentile
                     ) AS "clears",
                     JSONB_BUILD_OBJECT(
-                        'value', COALESCE(lb.fresh_clears, player.fresh_clears, 0),
-                        'rank', lb.fresh_clears_rank,
+                        'value', COALESCE(lb.fresh_clears, player.fresh_clears, 0)::int,
+                        'rank', lb.fresh_clears_rank::int,
                         'percentile', lb.fresh_clears_percentile
                     ) AS "freshClears",
                     JSONB_BUILD_OBJECT(
-                        'value', COALESCE(lb.sherpas, player.sherpas, 0),
-                        'rank', lb.sherpas_rank,
+                        'value', COALESCE(lb.sherpas, player.sherpas, 0)::int,
+                        'rank', lb.sherpas_rank::int,
                         'percentile', lb.sherpas_percentile
                     ) AS "sherpas",
                     JSONB_BUILD_OBJECT(
-                        'value', COALESCE(lb.total_time_played, player.total_time_played_seconds, 0),
-                        'rank', lb.total_time_played_rank,
+                        'value', COALESCE(lb.total_time_played, player.total_time_played_seconds, 0)::int,
+                        'rank', lb.total_time_played_rank::int,
                         'percentile', lb.total_time_played_percentile
                     ) AS "totalTimePlayed",
                     JSONB_BUILD_OBJECT(
-                        'value', COALESCE(lb.speed, player.sum_of_best, 0),
-                        'rank', lb.speed_rank,
+                        'value', COALESCE(lb.speed, player.sum_of_best, 0)::int,
+                        'rank', lb.speed_rank::int,
                         'percentile', lb.speed_percentile
                     ) AS "sumOfBest",
                     JSONB_BUILD_OBJECT(
-                        'value', COALESCE(lb.wfr_score, player.wfr_score, 0),
-                        'rank', lb.wfr_score_rank,
+                        'value', COALESCE(lb.wfr_score, player.wfr_score, 0)::int,
+                        'rank', lb.wfr_score_rank::int,
                         'percentile', lb.wfr_score_percentile
                     ) AS "contest"
                 FROM player

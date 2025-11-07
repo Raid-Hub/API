@@ -5,19 +5,14 @@ import { postgresConnectionsGauge } from "../prometheus/metrics"
 
 const logger = new Logger("POSTGRES")
 
-// PostgreSQL OID for int8[] (bigint array)
-const INT8_ARRAY_OID = 1016 as TypeId
-
 // Configure bigint (int8) to be parsed as JavaScript BigInt
 types.setTypeParser(types.builtins.INT8, (val: string) => {
     return BigInt(val)
 })
 
 // Configure bigint array (int8[]) - OID 1016
-types.setTypeParser(INT8_ARRAY_OID, (val: string) => {
-    const int8Parser = types.getTypeParser(types.builtins.INT8)
-    return arrayParser(val, (entry: string) => int8Parser(entry))
-})
+const int8Parser = types.getTypeParser(types.builtins.INT8)
+types.setTypeParser(1016 as TypeId, (val: string) => arrayParser(val, int8Parser))
 
 export const TABLE_SCHEMAS = [
     "core",
@@ -49,7 +44,35 @@ export async function executeQuery<T>(
             sql: sql.substring(0, 200)
         })
 
-        return result.rows as T[]
+        // Convert BigInt values to numbers for fields that expect numbers
+        // This handles both scalar BigInt values and arrays
+        const rows = result.rows.map(row => {
+            const converted: Record<string, unknown> = { ...row }
+            for (const [key, value] of Object.entries(converted)) {
+                if (typeof value === "bigint") {
+                    const num = Number(value)
+                    // Convert to number if within safe integer range
+                    if (num <= Number.MAX_SAFE_INTEGER) {
+                        converted[key] = num
+                    }
+                } else if (Array.isArray(value)) {
+                    // Arrays are already handled by the type parser, but ensure elements are numbers if needed
+                    converted[key] = value.map(item => {
+                        if (typeof item === "bigint") {
+                            const num = Number(item)
+                            if (num <= Number.MAX_SAFE_INTEGER) {
+                                return num
+                            }
+                            return item
+                        }
+                        return item
+                    })
+                }
+            }
+            return converted as T
+        })
+
+        return rows
     } catch (error) {
         const executeTime = Date.now() - startTime
         const err = error instanceof Error ? error : new Error(String(error))

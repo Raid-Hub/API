@@ -50,9 +50,9 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                 'isPrivate', p.is_private,
                 'cheatLevel', p.cheat_level
             ) AS "playerInfo",
-            p.clears,
+            p.clears::int,
             ip.completed,
-            ip.time_played_seconds AS "timePlayedSeconds",
+            ip.time_played_seconds::int AS "timePlayedSeconds",
             (
                 SELECT COALESCE(jsonb_agg(f.data), '[]'::jsonb)
                 FROM (

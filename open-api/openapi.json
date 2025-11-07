@@ -255,8 +255,8 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "minimum": 0,
               "description": "Mapped to a FeatDefinition by its skullHash",
+              "minimum": 0,
               "format": "uint32"
             }
           },
@@ -375,8 +375,8 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "minimum": 0,
               "description": "Mapped to a FeatDefinition by its skullHash",
+              "minimum": 0,
               "format": "uint32"
             }
           },
@@ -1049,15 +1049,15 @@
           },
           "classHash": {
             "type": "integer",
-            "nullable": true,
             "minimum": 0,
-            "format": "uint32"
+            "format": "uint32",
+            "nullable": true
           },
           "emblemHash": {
             "type": "integer",
-            "nullable": true,
             "minimum": 0,
-            "format": "uint32"
+            "format": "uint32",
+            "nullable": true
           },
           "completed": {
             "type": "boolean"
@@ -1397,9 +1397,9 @@
           },
           "milestoneHash": {
             "type": "integer",
-            "nullable": true,
             "minimum": 0,
-            "format": "uint32"
+            "format": "uint32",
+            "nullable": true
           },
           "splashSlug": {
             "type": "string"

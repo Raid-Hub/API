@@ -1,4 +1,4 @@
-import { ZodBooleanDef, ZodDateDef, ZodNullable, ZodStringDef, ZodType, z } from "zod"
+import { ZodBooleanDef, ZodDateDef, ZodNullable, ZodNumberDef, ZodStringDef, ZodType, z } from "zod"
 
 export const zNaturalNumber = () => z.number().int().positive()
 
@@ -57,13 +57,25 @@ export const zInt64 = () =>
 
 const maxUInt32 = 2n ** 32n - 1n
 // Intended to be used as an output param for a UInt32
-export const zUInt32 = () =>
-    z
+export const zUInt32 = <N extends boolean = false>({
+    nullable
+}: {
+    nullable?: N
+} = {}): N extends true
+    ? ZodNullable<ZodType<number, ZodNumberDef, string | number | bigint>>
+    : ZodType<number, ZodNumberDef, string | number | bigint> => {
+    const base = z
         .union([z.number().int().nonnegative(), z.bigint().refine(n => n >= 0n && n <= maxUInt32)])
+        // @ts-expect-error generic hell
         .openapi({
             type: "integer",
-            format: "uint32"
+            minimum: 0,
+            format: "uint32",
+            nullable: nullable
         })
+    // @ts-expect-error generic hell
+    return nullable ? base.nullable() : base
+}
 
 // Intended to be used as an output param for a record key
 export const zNumericalRecordKey = (format: "integer" | "uint32" | "uint64" = "integer") =>
