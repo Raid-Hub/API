@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt } from "@/integrations/postgres/parsers"
 import { playerProfileQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
@@ -10,8 +11,8 @@ import {
 
 export const getPlayer = async (membershipId: bigint | string) => {
     return await pgReader.queryRow<PlayerInfo>(
-        `SELECT  
-            membership_id::text AS "membershipId",
+        `SELECT
+            membership_id AS "membershipId",
             membership_type AS "membershipType",
             icon_path AS "iconPath",
             display_name AS "displayName",
@@ -20,9 +21,9 @@ export const getPlayer = async (membershipId: bigint | string) => {
             last_seen AS "lastSeen",
             is_private AS "isPrivate",
             cheat_level AS "cheatLevel"
-        FROM player 
+        FROM player
         WHERE membership_id = $1::bigint`,
-        [membershipId]
+        { params: [membershipId] }
     )
 }
 export const getPlayerActivityStats = async (membershipId: bigint | string) => {
@@ -33,16 +34,16 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
         },
         () =>
             pgReader.queryRows<PlayerProfileActivityStats>(
-                `SELECT 
+                `SELECT
                     activity_definition.id::int AS "activityId",
                     COALESCE(player_stats.fresh_clears, 0)::int AS "freshClears",
                     COALESCE(player_stats.clears, 0)::int AS "clears",
                     COALESCE(player_stats.sherpas, 0)::int AS "sherpas",
-                    CASE WHEN fastest_instance_id IS NOT NULL 
+                    CASE WHEN fastest_instance_id IS NOT NULL
                         THEN JSONB_BUILD_OBJECT(
                             'instanceId', fastest.instance_id::text,
                             'hash', fastest.hash,
-                            'activityId', av.activity_id::int,
+                            'activityId', av.activity_id,
                             'versionId', av.version_id::int,
                             'completed', fastest.completed,
                             'playerCount', fastest.player_count::int,
@@ -59,17 +60,22 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'isContest', CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END,
                             'isWeekOne', date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch'),
                             'isBlacklisted', bi.instance_id IS NOT NULL
-                        ) 
-                        ELSE NULL 
+                        )
+                        ELSE NULL
                     END as "fastestInstance"
-                FROM activity_definition 
+                FROM activity_definition
                 LEFT JOIN player_stats ON activity_definition.id = player_stats.activity_id
-                    AND player_stats.membership_id = $1::bigint 
+                    AND player_stats.membership_id = $1::bigint
                 LEFT JOIN instance fastest ON player_stats.fastest_instance_id = fastest.instance_id
                 LEFT JOIN blacklist_instance bi ON player_stats.fastest_instance_id = bi.instance_id
                 LEFT JOIN activity_version av ON fastest.hash = av.hash
                 ORDER BY activity_definition.id`,
-                [membershipId]
+                {
+                    params: [membershipId],
+                    transformers: {
+                        fastestInstance: { instanceId: convertStringToBigInt }
+                    }
+                }
             )
     )
 }
@@ -116,7 +122,7 @@ export const getPlayerGlobalStats = async (membershipId: bigint | string) => {
                 FROM player
                 LEFT JOIN individual_global_leaderboard lb USING (membership_id)
                 WHERE membership_id = $1::bigint`,
-                [membershipId]
+                { params: [membershipId] }
             )
     )
 }
@@ -128,42 +134,24 @@ export const getWorldFirstEntries = async (membershipId: bigint | string) => {
             method: "getWorldFirstEntries"
         },
         () =>
-            pgReader.queryRows<
-                | WorldFirstEntry
-                | {
-                      activityId: bigint
-                      rank: null
-                      instanceId: null
-                      timeAfterLaunch: null
-                      isDayOne: boolean
-                      isContest: boolean
-                      isWeekOne: boolean
-                      isChallengeMode: boolean
-                  }
-            >(
+            pgReader.queryRows<WorldFirstEntry>(
                 `
-                SELECT
+                SELECT DISTINCT ON (activity_definition.id)
                     activity_definition.id::int AS "activityId",
                     rank::int,
-                    instance_id::text AS "instanceId",
+                    instance_id AS "instanceId",
                     time_after_launch::int AS "timeAfterLaunch",
                     (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END) AS "isDayOne",
                     (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END) AS "isContest",
                     (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') ELSE false END) AS "isWeekOne",
                     COALESCE(is_challenge_mode, false) AS "isChallengeMode"
-                FROM activity_definition
-                LEFT JOIN LATERAL (
-                    SELECT instance_id, time_after_launch, date_completed, rank, is_challenge_mode
-                    FROM world_first_contest_leaderboard
-                    WHERE activity_id = activity_definition.id
-                        AND membership_ids @> $1::jsonb
-                        AND rank <= 500
-                    ORDER BY rank ASC
-                    LIMIT 1
-                ) AS "__inner__" ON true
-                WHERE is_raid = true
-                ORDER BY activity_definition.id ASC;`,
-                [`${[membershipId]}`]
+                FROM world_first_contest_leaderboard
+                JOIN activity_definition ON world_first_contest_leaderboard.activity_id = activity_definition.id
+                WHERE membership_ids @> $1::jsonb
+                    AND rank <= 500
+                    AND activity_definition.is_raid = true
+                ORDER BY activity_definition.id ASC, rank ASC;`,
+                { params: [`${[membershipId]}`] }
             )
     )
 }

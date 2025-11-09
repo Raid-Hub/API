@@ -47,6 +47,14 @@ Useful if you need to access PGCRs when Bungie's API is down.`,
 
         const decompressed = gunzipSync(result.data)
         const pgcr = JSON.parse(decoder.decode(decompressed)) as RaidHubPostGameCarnageReport
+        pgcr.activityDetails.instanceId = BigInt(pgcr.activityDetails.instanceId)
+        pgcr.entries.forEach(entry => {
+            entry.characterId = BigInt(entry.characterId)
+            entry.player.destinyUserInfo.membershipId = BigInt(
+                entry.player.destinyUserInfo.membershipId
+            )
+        })
+
         return RaidHubRoute.ok(pgcr)
     }
 })

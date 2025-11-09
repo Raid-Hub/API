@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt } from "@/integrations/postgres/parsers"
 import { ClanStats } from "@/schema/components/Clan"
 
 export const getClanStats = async (
@@ -95,7 +96,12 @@ export const getClanStats = async (
         FROM (SELECT JSONB_AGG(member_stats."_member") AS "members" FROM "member_stats") AS "_member_stats"
         CROSS JOIN "live_aggregates"
         LEFT JOIN clan_ranks ON clan_ranks."group_id" = $2::bigint`,
-        [membershipIds, groupId]
+        {
+            params: [membershipIds, groupId],
+            transformers: {
+                members: { playerInfo: { membershipId: convertStringToBigInt } }
+            }
+        }
     )
 
     if (!clanStats) {

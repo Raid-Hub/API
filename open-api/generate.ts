@@ -1,3 +1,5 @@
+import "@/lib/extensions"
+
 import { apiVersion } from "@/core/version"
 import { router } from "@/routes/index"
 import { registry } from "@/schema/registry"

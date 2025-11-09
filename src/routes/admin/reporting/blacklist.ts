@@ -61,7 +61,7 @@ export const blacklistInstanceRoute = new RaidHubRoute({
         }
 
         const playersNotInInstance = req.body.players?.filter(
-            player => !players.find(p => p.membershipId === String(player.membershipId))
+            player => !players.find(p => p.membershipId === player.membershipId)
         )
 
         if (playersNotInInstance?.length) {

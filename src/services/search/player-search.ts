@@ -26,7 +26,7 @@ export async function searchForPlayer(
         () =>
             pgReader.queryRows<PlayerInfo>(
                 `SELECT 
-                    membership_id::text AS "membershipId",
+                    membership_id AS "membershipId",
                     membership_type AS "membershipType",
                     icon_path AS "iconPath",
                     display_name AS "displayName",
@@ -39,11 +39,13 @@ export async function searchForPlayer(
                 WHERE lower(${opts.global ? "bungie_name" : "display_name"}) LIKE $1 
                     ${opts.membershipType ? "AND membership_type = $3" : ""}
                     AND last_seen > TIMESTAMP 'epoch'
-                ORDER BY _search_score DESC 
+                ORDER BY _search_score DESC
                 LIMIT $2;`,
-                opts.membershipType
-                    ? [searchTerm + "%", opts.count, opts.membershipType]
-                    : [searchTerm + "%", opts.count]
+                {
+                    params: opts.membershipType
+                        ? [searchTerm + "%", opts.count, opts.membershipType]
+                        : [searchTerm + "%", opts.count]
+                }
             )
     )
 

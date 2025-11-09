@@ -37,8 +37,8 @@ describe("activity 200", () => {
         expect(spyPlayersQueueSend).toHaveBeenCalledTimes(6)
         expect(spyCharQueueSend).toHaveBeenCalledWith({
             instanceId: 258758374n,
-            membershipId: "4611686018465791772",
-            characterId: "2305843009271027922"
+            membershipId: 4611686018465791772n,
+            characterId: 2305843009271027922n
         })
     })
 })

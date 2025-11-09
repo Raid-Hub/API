@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertUInt32Value } from "@/integrations/postgres/parsers"
 import { activityHistoryQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { InstanceForPlayer } from "@/schema/components/InstanceForPlayer"
@@ -23,11 +24,20 @@ export const getActivities = async (
             cutoff: String(!!cutoff)
         },
         async () => {
-            const params = [membershipId, count, cursor ?? 0, cutoff ?? 0]
+            // Build parameters conditionally to avoid unused parameters
+            const params: unknown[] = [membershipId, count]
+            let paramIndex = 2
+
+            if (cursor) {
+                params.push(cursor)
+            }
+            if (cutoff) {
+                params.push(cutoff)
+            }
 
             return await pgReader.queryRows<InstanceForPlayer>(
-                `SELECT 
-                    instance_id::text AS "instanceId",
+                `SELECT
+                    instance_id AS "instanceId",
                     hash AS "hash",
                     activity_id::int AS "activityId",
                     version_id::int AS "versionId",
@@ -58,13 +68,19 @@ export const getActivities = async (
                 INNER JOIN activity_version av USING (hash)
                 INNER JOIN activity_definition ON activity_definition.id = av.activity_id
                 WHERE membership_id = $1::bigint
-                ${cursor ? "AND date_completed < $3" : ""}
-                ${cutoff ? "AND date_completed > $4" : ""}
+                ${cursor ? `AND date_completed < $${++paramIndex}` : ""}
+                ${cutoff ? `AND date_completed > $${++paramIndex}` : ""}
                 ORDER BY date_completed DESC
                 LIMIT $2;`,
                 // Note: the use of strictly less than is important because the cursor is the date of the last activity
                 // that was fetched. If we used less than or equal to, we would fetch the same activity twice.
-                params
+                {
+                    params,
+                    transformers: {
+                        hash: convertUInt32Value,
+                        skullHashes: convertUInt32Value
+                    }
+                }
             )
         }
     )

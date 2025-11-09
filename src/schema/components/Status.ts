@@ -19,7 +19,7 @@ export const zAtlasStatus = registry.register(
         status: z.enum(["Crawling", "Idle", "Offline"]),
         medianSecondsBehindNow: z.number().nonnegative().nullable(),
         estimatedCatchUpTimestamp: zISODateString({ nullable: true }),
-        latestResolvedInstance: zLatestResolvedInstance
+        latestResolvedInstance: zLatestResolvedInstance.nullable()
     })
 )
 

@@ -9,8 +9,8 @@ export const zInstanceCharacter = registry.register(
     z
         .object({
             characterId: zInt64(),
-            classHash: zUInt32({ nullable: true }),
-            emblemHash: zUInt32({ nullable: true }),
+            classHash: zUInt32().nullable(),
+            emblemHash: zUInt32().nullable(),
             completed: z.boolean(),
             timePlayedSeconds: zWholeNumber(),
             startSeconds: zWholeNumber(),

@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt } from "@/integrations/postgres/parsers"
 import { Teammate } from "@/schema/components/Teammate"
 
 export const getTeammates = async (membershipId: bigint | string, { count }: { count: number }) => {
@@ -38,6 +39,11 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
             ) AS "playerInfo"
         FROM agg_data
         JOIN player USING (membership_id);`,
-        [membershipId, count]
+        {
+            params: [membershipId, count],
+            transformers: {
+                playerInfo: { membershipId: convertStringToBigInt }
+            }
+        }
     )
 }

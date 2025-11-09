@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt } from "@/integrations/postgres/parsers"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const individualRaidLeaderboardSortColumns = ["clears", "fresh_clears", "sherpas"] as const
@@ -27,7 +28,7 @@ export const getIndividualRaidLeaderboard = async ({
         `SELECT
             individual_raid_leaderboard.${column}_position::int AS "position",
             individual_raid_leaderboard.${column}_rank::int AS "rank",
-            individual_raid_leaderboard.${column} AS "value",
+            individual_raid_leaderboard.${column}::int AS "value",
             JSONB_BUILD_OBJECT(
                 'membershipId', membership_id::text,
                 'membershipType', membership_type,
@@ -44,7 +45,12 @@ export const getIndividualRaidLeaderboard = async ({
         WHERE ${column}_position > $1 AND ${column}_position <= ($1 + $2)
             AND activity_id = $3
         ORDER BY ${column}_position ASC`,
-        [skip, take, raidId]
+        {
+            params: [skip, take, raidId],
+            transformers: {
+                playerInfo: { membershipId: convertStringToBigInt }
+            }
+        }
     )
 }
 
@@ -62,12 +68,12 @@ export const searchIndividualRaidLeaderboard = async ({
     validateColumn(column)
 
     const result = await pgReader.queryRow<{ position: number }>(
-        `SELECT individual_raid_leaderboard.${column}_position::int AS "position" 
-        FROM individual_raid_leaderboard 
+        `SELECT individual_raid_leaderboard.${column}_position::int AS "position"
+        FROM individual_raid_leaderboard
         WHERE membership_id = $1::bigint AND activity_id = $2
         ORDER BY position ASC
         LIMIT 1`,
-        [membershipId, raidId]
+        { params: [membershipId, raidId] }
     )
     if (!result) return null
 

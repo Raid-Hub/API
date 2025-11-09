@@ -50,7 +50,7 @@ export const zRaidHubPostGameCarnageReport = registry.register(
                                         membershipType: zDestinyMembershipType
                                             .nullable()
                                             .optional(),
-                                        membershipId: z.string(),
+                                        membershipId: zInt64(),
                                         displayName: z.string().nullable().optional(),
                                         bungieGlobalDisplayName: z.string().nullable().optional(),
                                         bungieGlobalDisplayNameCode: z
@@ -68,7 +68,7 @@ export const zRaidHubPostGameCarnageReport = registry.register(
                                 emblemHash: zUInt32()
                             })
                             .strip(),
-                        characterId: z.string(),
+                        characterId: zInt64(),
                         values: z.record(zDestinyHistoricalStatsValuePair),
                         extended: z
                             .object({

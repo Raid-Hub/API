@@ -1,5 +1,8 @@
+import { configurePostgresParsers } from "./parsers"
 import { createReader } from "./reader"
 import { createTransactional } from "./transactional"
+
+configurePostgresParsers()
 
 export const pgReader = createReader({
     user: process.env.POSTGRES_USER,

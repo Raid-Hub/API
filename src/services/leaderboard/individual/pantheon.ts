@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt } from "@/integrations/postgres/parsers"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const individualPantheonLeaderboardSortColumns = ["clears", "fresh_clears", "score"] as const
@@ -27,7 +28,7 @@ export const getIndividualPantheonLeaderboard = async ({
         `SELECT
             individual_pantheon_version_leaderboard.${column}_position::int AS "position",
             individual_pantheon_version_leaderboard.${column}_rank::int AS "rank",
-            individual_pantheon_version_leaderboard.${column} AS "value",
+            individual_pantheon_version_leaderboard.${column}::int AS "value",
             JSONB_BUILD_OBJECT(
                 'membershipId', membership_id::text,
                 'membershipType', membership_type,
@@ -44,7 +45,12 @@ export const getIndividualPantheonLeaderboard = async ({
         WHERE ${column}_position > $1 AND ${column}_position <= ($1 + $2)
             AND version_id = $3
         ORDER BY ${column}_position ASC`,
-        [skip, take, versionId]
+        {
+            params: [skip, take, versionId],
+            transformers: {
+                playerInfo: { membershipId: convertStringToBigInt }
+            }
+        }
     )
 }
 
@@ -62,12 +68,12 @@ export const searchIndividualPantheonLeaderboard = async ({
     validateColumn(column)
 
     const result = await pgReader.queryRow<{ position: number }>(
-        `SELECT individual_pantheon_version_leaderboard.${column}_position::int AS "position" 
-        FROM individual_pantheon_version_leaderboard 
+        `SELECT individual_pantheon_version_leaderboard.${column}_position::int AS "position"
+        FROM individual_pantheon_version_leaderboard
         WHERE membership_id = $1::bigint AND version_id = $2
         ORDER BY position ASC
         LIMIT 1`,
-        [membershipId, versionId]
+        { params: [membershipId, versionId] }
     )
     if (!result) return null
 

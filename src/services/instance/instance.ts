@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertUInt32Value } from "@/integrations/postgres/parsers"
 import { Instance, InstanceBasic } from "@/schema/components/Instance"
 import { InstanceExtended } from "@/schema/components/InstanceExtended"
 import { InstanceMetadata } from "@/schema/components/InstanceMetadata"
@@ -7,8 +8,8 @@ import { PlayerInfo } from "@/schema/components/PlayerInfo"
 
 export async function getInstance(instanceId: bigint | string): Promise<Instance | null> {
     return await pgReader.queryRow<Instance>(
-        `SELECT 
-            instance_id::text AS "instanceId",
+        `SELECT
+            instance_id AS "instanceId",
             hash AS "hash",
             activity_id::int AS "activityId",
             version_id::int AS "versionId",
@@ -33,7 +34,13 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
         LEFT JOIN blacklist_instance b USING (instance_id)
         WHERE instance_id = $1::bigint
         LIMIT 1;`,
-        [instanceId]
+        {
+            params: [instanceId],
+            transformers: {
+                hash: convertUInt32Value,
+                skullHashes: convertUInt32Value
+            }
+        }
     )
 }
 
@@ -108,10 +115,16 @@ export async function getInstanceExtended(
                     AND "ap"."instance_id" = "ac"."instance_id"
                 ORDER BY "completed" DESC, "time_played_seconds" DESC
             ) AS "c"
-        ) AS "t1" ON true 
+                ) AS "t1" ON true
         WHERE instance_id = $1::bigint
         ORDER BY completed DESC, time_played_seconds DESC;`,
-        [instanceId]
+        {
+            params: [instanceId],
+            transformers: {
+                playerInfo: { membershipId: convertStringToBigInt },
+                characters: { characterId: convertStringToBigInt }
+            }
+        }
     )
 
     return await instanceQuery.then(async instance => {
@@ -133,7 +146,7 @@ export async function getInstanceMetadataByHash(
     hash: number | string | bigint
 ): Promise<InstanceMetadata> {
     const metaData = await pgReader.queryRow<InstanceMetadata>(
-        `SELECT 
+        `SELECT
             ad.name AS "activityName",
             vd.name AS "versionName",
             ad.is_raid AS "isRaid"
@@ -142,7 +155,7 @@ export async function getInstanceMetadataByHash(
         INNER JOIN version_definition vd ON vd.id = ah.version_id
         WHERE hash = $1::bigint
         LIMIT 1;`,
-        [hash.toString()]
+        { params: [hash.toString()] }
     )
     if (!metaData) {
         throw new Error("Metadata not found")
@@ -159,14 +172,14 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
         WHERE instance_id = $1::bigint
         ORDER BY rank ASC
         LIMIT 1;`,
-        [instanceId]
+        { params: [instanceId] }
     )
 }
 
 export async function getInstanceBasic(instanceId: bigint | string) {
     const instance = await pgReader.queryRow<InstanceBasic>(
-        `SELECT 
-            instance_id::text AS "instanceId",
+        `SELECT
+            instance_id AS "instanceId",
             hash AS "hash",
             completed AS "completed",
             player_count::int AS "playerCount",
@@ -184,7 +197,13 @@ export async function getInstanceBasic(instanceId: bigint | string) {
         JOIN pgcr USING (instance_id)
         WHERE instance_id = $1::bigint
         LIMIT 1;`,
-        [instanceId]
+        {
+            params: [instanceId],
+            transformers: {
+                hash: convertUInt32Value,
+                skullHashes: convertUInt32Value
+            }
+        }
     )
 
     return instance
@@ -193,7 +212,7 @@ export async function getInstanceBasic(instanceId: bigint | string) {
 export async function getInstancePlayerInfo(instanceId: bigint | string) {
     return await pgReader.queryRows<PlayerInfo>(
         `SELECT 
-            player.membership_id::text AS "membershipId",
+            player.membership_id AS "membershipId",
             player.membership_type AS "membershipType",
             player.icon_path AS "iconPath",
             player.display_name AS "displayName",
@@ -206,6 +225,6 @@ export async function getInstancePlayerInfo(instanceId: bigint | string) {
         INNER JOIN "player" USING (membership_id)
         WHERE instance_id = $1::bigint
         ORDER BY completed DESC, time_played_seconds DESC;`,
-        [instanceId]
+        { params: [instanceId] }
     )
 }

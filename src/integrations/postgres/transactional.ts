@@ -1,5 +1,5 @@
 import { readerMethods } from "./reader"
-import { createPool, executeQuery, QueryParams } from "./shared"
+import { createPool, executeQuery, QueryOptions } from "./shared"
 
 export function createTransactional(config: {
     user?: string
@@ -20,27 +20,27 @@ export function createTransactional(config: {
         ...queryMethods,
         async transaction<T>(
             callback: (tx: {
-                queryRow<T>(sql: string, params?: QueryParams): Promise<T | null>
-                queryRows<T>(sql: string, params?: QueryParams): Promise<T[]>
+                queryRow<T>(sql: string, options?: QueryOptions): Promise<T | null>
+                queryRows<T>(sql: string, options?: QueryOptions): Promise<T[]>
                 prepare(sql: string): Promise<{
-                    execute<T>(params?: QueryParams): Promise<T[]>
+                    execute<T>(options?: QueryOptions): Promise<T[]>
                     close(): Promise<void>
                 }>
             }) => Promise<T>
         ): Promise<T> {
             const client = await pool.connect()
             const tx = {
-                async queryRow<T>(sql: string, params?: QueryParams): Promise<T | null> {
-                    const rows = await executeQuery<T>(client, sql, params, "query_row")
+                async queryRow<T>(sql: string, options: QueryOptions = {}): Promise<T | null> {
+                    const rows = await executeQuery<T>(client, sql, "query_row", options)
                     return (rows[0] as T) || null
                 },
-                async queryRows<T>(sql: string, params?: QueryParams): Promise<T[]> {
-                    return executeQuery<T>(client, sql, params, "query_rows")
+                async queryRows<T>(sql: string, options: QueryOptions = {}): Promise<T[]> {
+                    return executeQuery<T>(client, sql, "query_rows", options)
                 },
                 async prepare(sql: string) {
                     return {
-                        async execute<T>(params?: QueryParams): Promise<T[]> {
-                            return executeQuery<T>(client, sql, params, "prepared_statement")
+                        async execute<T>(options: QueryOptions = {}): Promise<T[]> {
+                            return executeQuery<T>(client, sql, "prepared_statement", options)
                         },
                         async close() {
                             // No-op in transaction, client released at end

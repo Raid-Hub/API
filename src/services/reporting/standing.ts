@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt } from "@/integrations/postgres/parsers"
 import {
     InstanceBlacklist,
     InstanceFlag,
@@ -16,14 +17,19 @@ export const getInstanceFlags = async (instanceId: bigint | string) => {
         WHERE fi.instance_id = $1::bigint
         ORDER BY fi.cheat_probability, fi.flagged_at DESC
         LIMIT 10`,
-        [instanceId]
+        {
+            params: [instanceId],
+            transformers: {
+                cheatCheckBitmask: convertStringToBigInt
+            }
+        }
     )
 }
 
 export const getInstanceBlacklist = async (instanceId: bigint | string) => {
     return await pgReader.queryRow<InstanceBlacklist>(
         `SELECT 
-            bi.instance_id::text AS "instanceId",
+            bi.instance_id AS "instanceId",
             bi.report_source::text AS "reportSource",
             bi.report_id AS "reportId",
             bi.cheat_check_version AS "cheatCheckVersion",
@@ -32,7 +38,7 @@ export const getInstanceBlacklist = async (instanceId: bigint | string) => {
         FROM blacklist_instance bi
         WHERE bi.instance_id = $1::bigint
         LIMIT 1`,
-        [instanceId]
+        { params: [instanceId] }
     )
 }
 
@@ -117,6 +123,22 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
         WHERE ip.instance_id = $1::bigint
         ORDER BY ip.completed DESC, ip.time_played_seconds DESC
         LIMIT 12`,
-        [instanceId]
+        {
+            params: [instanceId],
+            transformers: {
+                playerInfo: { membershipId: convertStringToBigInt },
+                flags: {
+                    membershipId: convertStringToBigInt,
+                    instanceId: convertStringToBigInt,
+                    cheatCheckBitmask: convertStringToBigInt
+                },
+                blacklistedInstances: { instanceId: convertStringToBigInt },
+                otherRecentFlags: {
+                    instanceId: convertStringToBigInt,
+                    membershipId: convertStringToBigInt,
+                    cheatCheckBitmask: convertStringToBigInt
+                }
+            }
+        }
     )
 }

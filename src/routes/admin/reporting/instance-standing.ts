@@ -54,7 +54,7 @@ export const reportingStandingInstanceRoute = new RaidHubRoute({
 
         if (!instanceDetails) {
             return RaidHubRoute.fail(ErrorCode.InstanceNotFoundError, {
-                instanceId: String(instanceId)
+                instanceId
             })
         }
 

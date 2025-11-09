@@ -1,18 +1,9 @@
+import { postgresConnectionsGauge } from "@/integrations/prometheus/metrics"
 import { Logger } from "@/lib/utils/logging"
-import { Pool, PoolClient, types } from "pg"
-import { TypeId, arrayParser } from "pg-types"
-import { postgresConnectionsGauge } from "../prometheus/metrics"
+import { Pool, PoolClient } from "pg"
+import { TransformerTree, parseRowsWithTransformers } from "./transformer"
 
 const logger = new Logger("POSTGRES")
-
-// Configure bigint (int8) to be parsed as JavaScript BigInt
-types.setTypeParser(types.builtins.INT8, (val: string) => {
-    return BigInt(val)
-})
-
-// Configure bigint array (int8[]) - OID 1016
-const int8Parser = types.getTypeParser(types.builtins.INT8)
-types.setTypeParser(1016 as TypeId, (val: string) => arrayParser(val, int8Parser))
 
 export const TABLE_SCHEMAS = [
     "core",
@@ -27,15 +18,22 @@ export const TABLE_SCHEMAS = [
 
 export type QueryParams = unknown[]
 
+export type QueryOptions = {
+    params?: QueryParams
+    transformers?: TransformerTree
+}
+
 export async function executeQuery<T>(
     client: Pool | PoolClient,
     sql: string,
-    params?: QueryParams,
-    operation: string = "query"
+    operation: string = "query",
+    options: QueryOptions = {}
 ): Promise<T[]> {
     const startTime = Date.now()
     try {
-        const result = params ? await client.query(sql, params) : await client.query(sql)
+        const result = options.params
+            ? await client.query(sql, options.params)
+            : await client.query(sql)
         const executeTime = Date.now() - startTime
 
         logger.debug("QUERY_EXECUTED", {
@@ -44,35 +42,7 @@ export async function executeQuery<T>(
             sql: sql.substring(0, 200)
         })
 
-        // Convert BigInt values to numbers for fields that expect numbers
-        // This handles both scalar BigInt values and arrays
-        const rows = result.rows.map(row => {
-            const converted: Record<string, unknown> = { ...row }
-            for (const [key, value] of Object.entries(converted)) {
-                if (typeof value === "bigint") {
-                    const num = Number(value)
-                    // Convert to number if within safe integer range
-                    if (num <= Number.MAX_SAFE_INTEGER) {
-                        converted[key] = num
-                    }
-                } else if (Array.isArray(value)) {
-                    // Arrays are already handled by the type parser, but ensure elements are numbers if needed
-                    converted[key] = value.map(item => {
-                        if (typeof item === "bigint") {
-                            const num = Number(item)
-                            if (num <= Number.MAX_SAFE_INTEGER) {
-                                return num
-                            }
-                            return item
-                        }
-                        return item
-                    })
-                }
-            }
-            return converted as T
-        })
-
-        return rows
+        return parseRowsWithTransformers(result.rows, options.transformers) as T[]
     } catch (error) {
         const executeTime = Date.now() - startTime
         const err = error instanceof Error ? error : new Error(String(error))

@@ -255,8 +255,8 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "description": "Mapped to a FeatDefinition by its skullHash",
               "minimum": 0,
+              "description": "Mapped to a FeatDefinition by its skullHash",
               "format": "uint32"
             }
           },
@@ -375,8 +375,8 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "description": "Mapped to a FeatDefinition by its skullHash",
               "minimum": 0,
+              "description": "Mapped to a FeatDefinition by its skullHash",
               "format": "uint32"
             }
           },
@@ -1049,15 +1049,15 @@
           },
           "classHash": {
             "type": "integer",
+            "nullable": true,
             "minimum": 0,
-            "format": "uint32",
-            "nullable": true
+            "format": "uint32"
           },
           "emblemHash": {
             "type": "integer",
+            "nullable": true,
             "minimum": 0,
-            "format": "uint32",
-            "nullable": true
+            "format": "uint32"
           },
           "completed": {
             "type": "boolean"
@@ -1397,9 +1397,9 @@
           },
           "milestoneHash": {
             "type": "integer",
+            "nullable": true,
             "minimum": 0,
-            "format": "uint32",
-            "nullable": true
+            "format": "uint32"
           },
           "splashSlug": {
             "type": "string"
@@ -1707,7 +1707,8 @@
                           "nullable": true
                         },
                         "membershipId": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "int64"
                         },
                         "displayName": {
                           "type": "string",
@@ -1766,7 +1767,8 @@
                   ]
                 },
                 "characterId": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "int64"
                 },
                 "values": {
                   "type": "object",
@@ -2132,7 +2134,12 @@
             "nullable": true
           },
           "latestResolvedInstance": {
-            "$ref": "#/components/schemas/LatestResolvedInstance"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatestResolvedInstance"
+              }
+            ],
+            "nullable": true
           }
         },
         "required": [
@@ -2614,7 +2621,7 @@
         "properties": {
           "instanceId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["instanceId"]
@@ -3092,7 +3099,8 @@
                           "nullable": true
                         },
                         "membershipId": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "int64"
                         },
                         "displayName": {
                           "type": "string",
@@ -3151,7 +3159,8 @@
                   ]
                 },
                 "characterId": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "int64"
                 },
                 "values": {
                   "type": "object",
@@ -4356,7 +4365,19 @@
                       "enum": ["PlayerPrivateProfileError"]
                     },
                     "error": {
-                      "$ref": "#/components/schemas/PlayerPrivateProfileError"
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/PlayerPrivateProfileError"
+                        },
+                        {
+                          "properties": {
+                            "membershipId": {
+                              "type": "string",
+                              "format": "int64"
+                            }
+                          }
+                        }
+                      ]
                     }
                   },
                   "required": ["minted", "success", "code", "error"]
@@ -4386,7 +4407,19 @@
                           "enum": ["PlayerNotFoundError"]
                         },
                         "error": {
-                          "$ref": "#/components/schemas/PlayerNotFoundError"
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PlayerNotFoundError"
+                            },
+                            {
+                              "properties": {
+                                "membershipId": {
+                                  "type": "string",
+                                  "format": "int64"
+                                }
+                              }
+                            }
+                          ]
                         }
                       },
                       "required": ["minted", "success", "code", "error"]
@@ -7328,19 +7361,7 @@
                           "enum": ["InstanceNotFoundError"]
                         },
                         "error": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/InstanceNotFoundError"
-                            },
-                            {
-                              "properties": {
-                                "instanceId": {
-                                  "type": "string",
-                                  "format": "int64"
-                                }
-                              }
-                            }
-                          ]
+                          "$ref": "#/components/schemas/InstanceNotFoundError"
                         }
                       },
                       "required": ["minted", "success", "code", "error"]
@@ -7588,7 +7609,19 @@
                           "enum": ["InstanceNotFoundError"]
                         },
                         "error": {
-                          "$ref": "#/components/schemas/InstanceNotFoundError"
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/InstanceNotFoundError"
+                            },
+                            {
+                              "properties": {
+                                "instanceId": {
+                                  "type": "string",
+                                  "pattern": "^\\d+n?$"
+                                }
+                              }
+                            }
+                          ]
                         }
                       },
                       "required": ["minted", "success", "code", "error"]

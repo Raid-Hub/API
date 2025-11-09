@@ -35,7 +35,7 @@ export const zPlayerInfo = registry.register(
             example: {
                 bungieGlobalDisplayName: "Newo",
                 bungieGlobalDisplayNameCode: "9010",
-                membershipId: "4611686018488107374",
+                membershipId: 4611686018488107374n,
                 displayName: "xx_newo_xx",
                 iconPath: "/common/destiny2_content/icons/93844c8b76ea80683a880479e3506980.jpg",
                 membershipType: 3,

@@ -16,7 +16,7 @@ export const zActivityDefinition = registry.register(
             dayOneEnd: zISODateString({ nullable: true }),
             contestEnd: zISODateString({ nullable: true }),
             weekOneEnd: zISODateString({ nullable: true }),
-            milestoneHash: zUInt32({ nullable: true }),
+            milestoneHash: zUInt32().nullable(),
             splashSlug: z.string()
         })
         .strict()

@@ -37,7 +37,7 @@ export const updatePlayerRoute = new RaidHubRoute({
 
         if (!player) {
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, {
-                membershipId: String(membershipId)
+                membershipId
             })
         }
 

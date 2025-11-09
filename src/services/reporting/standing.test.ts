@@ -42,7 +42,7 @@ describe("getInstancePlayersStanding", () => {
     it("returns the correct shape", async () => {
         const standing = await getInstancePlayersStanding("16164452822")
         expect(standing.length).toBe(1)
-        expect(standing[0].playerInfo.membershipId).toBe("4611686018538460817")
+        expect(standing[0].playerInfo.membershipId).toBe(4611686018538460817n)
         expect(standing[0].flags.length).toBeGreaterThan(0)
 
         const parsed = z.array(zInstancePlayerStanding).safeParse(standing)
@@ -57,7 +57,7 @@ describe("getInstancePlayersStanding", () => {
     it("returns the correct shape #2", async () => {
         const standing = await getInstancePlayersStanding("16327328028")
         expect(standing.length).toBe(6)
-        expect(standing[1].playerInfo.membershipId).toBe("4611686018470558748")
+        expect(standing[1].playerInfo.membershipId).toBe(4611686018470558748n)
         expect(standing[1].blacklistedInstances.length).toBeGreaterThan(0)
 
         const parsed = z.array(zInstancePlayerStanding).safeParse(standing)

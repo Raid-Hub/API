@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt } from "@/integrations/postgres/parsers"
 import { TeamLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const getFirstTeamActivityVersionLeaderboard = async ({
@@ -17,7 +18,7 @@ export const getFirstTeamActivityVersionLeaderboard = async ({
             position::int,
             rank::int,
             value,
-            instance_id::text as "instanceId",
+            instance_id as "instanceId",
             "lateral".players
         FROM team_activity_version_leaderboard
         LEFT JOIN LATERAL (
@@ -43,7 +44,12 @@ export const getFirstTeamActivityVersionLeaderboard = async ({
         WHERE position > $1 AND position <= ($1 + $2)
             AND activity_id = $3 AND version_id = $4
         ORDER BY position ASC`,
-        [skip, take, activityId, versionId]
+        {
+            params: [skip, take, activityId, versionId],
+            transformers: {
+                players: { membershipId: convertStringToBigInt }
+            }
+        }
     )
 }
 
@@ -65,7 +71,7 @@ export const searchFirstTeamActivityVersionLeaderboard = async ({
             AND activity_id = $2 AND version_id = $3
         ORDER BY position ASC
         LIMIT 1`,
-        [`${[membershipId]}`, activityId, versionId]
+        { params: [`${[membershipId]}`, activityId, versionId] }
     )
     if (!result) return null
 

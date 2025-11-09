@@ -3,7 +3,7 @@ import { instanceCharacterQueue, playersQueue } from "@/integrations/rabbitmq/qu
 import { cacheControl } from "@/middleware/cache-control"
 import { zInstanceExtended } from "@/schema/components/InstanceExtended"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString } from "@/schema/util"
+import { zBigIntString, zInt64 } from "@/schema/util"
 import { getInstanceExtended } from "@/services/instance/instance"
 import { z } from "zod"
 
@@ -25,7 +25,7 @@ export const instanceRoute = new RaidHubRoute({
                 statusCode: 404,
                 code: ErrorCode.InstanceNotFoundError,
                 schema: z.object({
-                    instanceId: zBigIntString()
+                    instanceId: zInt64()
                 })
             }
         ]

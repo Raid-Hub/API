@@ -4,7 +4,6 @@ import {
     zPlayerProfileGlobalStats,
     zWorldFirstEntry
 } from "@/schema/components/PlayerProfile"
-import { zBigIntString } from "@/schema/util"
 import { describe, expect, it } from "bun:test"
 import { z } from "zod"
 import {
@@ -71,18 +70,7 @@ describe("getWorldFirstEntries", () => {
     it("returns the correct shape", async () => {
         const data = await getWorldFirstEntries("4611686018488107374").catch(console.error)
 
-        const parsed = z
-            .array(
-                zWorldFirstEntry.or(
-                    z.object({
-                        activityId: zBigIntString(),
-                        rank: z.null(),
-                        instanceId: z.null(),
-                        timeAfterLaunch: z.null()
-                    })
-                )
-            )
-            .safeParse(data)
+        const parsed = z.array(zWorldFirstEntry).safeParse(data)
         if (!parsed.success) {
             expect(parsed.error.errors).toEqual([])
         } else {

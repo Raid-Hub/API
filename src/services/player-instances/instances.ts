@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertUInt32Value } from "@/integrations/postgres/parsers"
 import { InstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
 
 export async function getInstances({
@@ -119,7 +120,7 @@ export async function getInstances({
     return await pgReader.queryRows<InstanceWithPlayers>(
         `WITH _player_instances AS (${playerStmnts.join(" INTERSECT ")}) 
         SELECT
-            instance_id::text AS "instanceId",
+            instance_id AS "instanceId",
             hash AS "hash",
             activity_id::int AS "activityId",
             version_id::int AS "versionId",
@@ -169,6 +170,13 @@ export async function getInstances({
         ORDER BY date_completed DESC
         LIMIT $${params.length}
         `,
-        params
+        {
+            params,
+            transformers: {
+                hash: convertUInt32Value,
+                skullHashes: convertUInt32Value,
+                players: { membershipId: convertStringToBigInt }
+            }
+        }
     )
 }

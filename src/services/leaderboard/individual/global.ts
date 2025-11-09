@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt } from "@/integrations/postgres/parsers"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 import { IndividualGlobalLeaderboardCategory } from "@/schema/params/IndividualGlobalLeaderboardCategory"
 
@@ -40,7 +41,7 @@ export const getIndividualGlobalLeaderboard = async ({
         `SELECT
             individual_global_leaderboard.${column}_position::int AS "position",
             individual_global_leaderboard.${column}_rank::int AS "rank",
-            individual_global_leaderboard.${column} AS "value",
+            individual_global_leaderboard.${column}::${column === "wfr_score" ? "double precision" : "int"} AS "value",
             JSONB_BUILD_OBJECT(
                 'membershipId', membership_id::text,
                 'membershipType', membership_type,
@@ -56,7 +57,12 @@ export const getIndividualGlobalLeaderboard = async ({
         JOIN player USING (membership_id)
         WHERE ${column}_position > $1 AND ${column}_position <= ($1 + $2)
         ORDER BY ${column}_position ASC`,
-        [skip, take]
+        {
+            params: [skip, take],
+            transformers: {
+                playerInfo: { membershipId: convertStringToBigInt }
+            }
+        }
     )
 }
 
@@ -72,12 +78,12 @@ export const searchIndividualGlobalLeaderboard = async ({
     const column = getColumn(category)
 
     const result = await pgReader.queryRow<{ position: number }>(
-        `SELECT individual_global_leaderboard.${column}_position::int AS "position" 
-        FROM individual_global_leaderboard 
+        `SELECT individual_global_leaderboard.${column}_position::int AS "position"
+        FROM individual_global_leaderboard
         WHERE membership_id = $1::bigint
         ORDER BY position ASC
         LIMIT 1`,
-        [membershipId]
+        { params: [membershipId] }
     )
     if (!result) return null
 

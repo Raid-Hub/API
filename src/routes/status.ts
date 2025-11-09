@@ -107,7 +107,10 @@ async function getAtlasPGCR(): Promise<AtlasStatus> {
             medianSecondsBehindNow:
                 atlasStatus.lag !== null ? Math.round(1000 * atlasStatus.lag) / 1000 : null,
             estimatedCatchUpTimestamp: null,
-            latestResolvedInstance
+            latestResolvedInstance: latestResolvedInstance ? {
+                ...latestResolvedInstance,
+                instanceId: latestResolvedInstance.instanceId.toString()
+            } : null
         }
     }
 
@@ -116,7 +119,10 @@ async function getAtlasPGCR(): Promise<AtlasStatus> {
             status: "Offline" as const,
             medianSecondsBehindNow: null,
             estimatedCatchUpTimestamp: null,
-            latestResolvedInstance
+            latestResolvedInstance: latestResolvedInstance ? {
+                ...latestResolvedInstance,
+                instanceId: latestResolvedInstance.instanceId.toString()
+            } : null
         }
     }
 
@@ -128,7 +134,10 @@ async function getAtlasPGCR(): Promise<AtlasStatus> {
             atlasStatus.estimatedCatchUpTime < 0.5 * atlasStatus.lag
                 ? new Date(Date.now() + atlasStatus.estimatedCatchUpTime * 1000)
                 : null,
-        latestResolvedInstance
+        latestResolvedInstance: latestResolvedInstance ? {
+            ...latestResolvedInstance,
+            instanceId: latestResolvedInstance.instanceId.toString()
+        } : null
     }
 }
 
@@ -146,7 +155,7 @@ async function getFloodgatesPGCR(): Promise<FloodgatesStatus> {
         }
 
         return {
-            instanceId: instance.instanceId,
+            instanceId: instance.instanceId.toString(),
             dateCompleted: instance.dateCompleted,
             dateResolved: instance.dateResolved
         }
