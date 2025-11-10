@@ -3,7 +3,7 @@ import { playersQueue } from "@/integrations/rabbitmq/queues"
 import { cacheControl } from "@/middleware/cache-control"
 import { zPlayerInfo } from "@/schema/components/PlayerInfo"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString } from "@/schema/util"
+import { zBigIntString } from "@/schema/input"
 import { getPlayer } from "@/services/player"
 import { z } from "zod"
 

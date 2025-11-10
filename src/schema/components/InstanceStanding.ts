@@ -1,5 +1,5 @@
+import { zISO8601DateString, zInt64, zNaturalNumber, zWholeNumber } from "@/schema/output"
 import { registry } from "@/schema/registry"
-import { zISODateString, zInt64, zNaturalNumber, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
 import { zPlayerInfo } from "./PlayerInfo"
 
@@ -100,7 +100,7 @@ export const zInstanceBlacklist = registry.register(
         reportId: zNaturalNumber().nullable(),
         cheatCheckVersion: z.string().nullable(),
         reason: z.string(),
-        createdAt: zISODateString()
+        createdAt: zISO8601DateString()
     })
 )
 
@@ -108,7 +108,7 @@ export type InstanceFlag = z.infer<typeof zInstanceFlag>
 export const zInstanceFlag = registry.register(
     "InstanceFlag",
     z.object({
-        flaggedAt: zISODateString(),
+        flaggedAt: zISO8601DateString(),
         cheatCheckVersion: z.string(),
         cheatProbability: z.number().nonnegative(),
         cheatCheckBitmask: zCheatCheckBitmask
@@ -119,7 +119,7 @@ export type InstancePlayerFlag = z.infer<typeof zInstancePlayerFlag>
 export const zInstancePlayerFlag = registry.register(
     "InstancePlayerFlag",
     z.object({
-        flaggedAt: zISODateString(),
+        flaggedAt: zISO8601DateString(),
         cheatCheckVersion: z.string(),
         cheatProbability: z.number().nonnegative(),
         cheatCheckBitmask: zCheatCheckBitmask,
@@ -140,10 +140,10 @@ export const zInstancePlayerStanding = registry.register(
         blacklistedInstances: z.array(
             z.object({
                 instanceId: zInt64(),
-                instanceDate: zISODateString(),
+                instanceDate: zISO8601DateString(),
                 reason: z.string(),
                 individualReason: z.string().nullable(),
-                createdAt: zISODateString()
+                createdAt: zISO8601DateString()
             })
         ),
         otherRecentFlags: z.array(zInstancePlayerFlag)

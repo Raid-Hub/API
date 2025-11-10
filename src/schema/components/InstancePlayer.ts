@@ -1,5 +1,5 @@
 import { registry } from "@/schema/registry"
-import { zWholeNumber } from "@/schema/util"
+import { zWholeNumber } from "@/schema/output"
 import { z } from "zod"
 
 export type InstancePlayer = z.input<typeof zInstancePlayer>

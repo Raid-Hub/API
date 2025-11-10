@@ -5,7 +5,7 @@ import {
     zRaidHubPostGameCarnageReport
 } from "@/schema/components/RaidHubPostGameCarnageReport"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString } from "@/schema/util"
+import { zBigIntString } from "@/schema/input"
 import { getRawCompressedPGCR } from "@/services/pgcr"
 import { gunzipSync } from "bun"
 import { z } from "zod"
@@ -54,6 +54,7 @@ Useful if you need to access PGCRs when Bungie's API is down.`,
                 entry.player.destinyUserInfo.membershipId
             )
         })
+        pgcr.period = new Date(pgcr.period)
 
         return RaidHubRoute.ok(pgcr)
     }

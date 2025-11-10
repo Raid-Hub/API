@@ -27,5 +27,10 @@ export const getDailyPlayerPopulation = async () => {
             hour: string
             population: PopulationByRaidMetric
         }>()
-        .then(response => response.data)
+        .then(response =>
+            response.data.map(item => ({
+                hour: new Date(item.hour),
+                population: item.population
+            }))
+        )
 }

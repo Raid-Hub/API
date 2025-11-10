@@ -1,5 +1,5 @@
 import { zIndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
-import { zNaturalNumber } from "@/schema/util"
+import { zNaturalNumber } from "@/schema/output"
 import {
     getIndividualRaidLeaderboard,
     searchIndividualRaidLeaderboard

@@ -1,13 +1,13 @@
+import { zISO8601DateString, zWholeNumber } from "@/schema/output"
 import { registry } from "@/schema/registry"
-import { zISODateString, zWholeNumber } from "@/schema/util"
 import { z } from "zod"
 
 export type LatestResolvedInstance = z.input<typeof zLatestResolvedInstance>
 export const zLatestResolvedInstance = registry.register(
     "LatestResolvedInstance",
     z.object({
-        dateCompleted: zISODateString(),
-        dateResolved: zISODateString(),
+        dateCompleted: zISO8601DateString(),
+        dateResolved: zISO8601DateString(),
         instanceId: z.string()
     })
 )
@@ -18,7 +18,7 @@ export const zAtlasStatus = registry.register(
     z.object({
         status: z.enum(["Crawling", "Idle", "Offline"]),
         medianSecondsBehindNow: z.number().nonnegative().nullable(),
-        estimatedCatchUpTimestamp: zISODateString({ nullable: true }),
+        estimatedCatchUpTimestamp: zISO8601DateString().nullable(),
         latestResolvedInstance: zLatestResolvedInstance.nullable()
     })
 )
@@ -32,6 +32,6 @@ export const zFloodgatesStatus = registry.register(
         resolveRate: z.number().nonnegative(),
         backlog: zWholeNumber(),
         latestResolvedInstance: zLatestResolvedInstance.nullable(),
-        estimatedBacklogEmptied: zISODateString({ nullable: true })
+        estimatedBacklogEmptied: zISO8601DateString().nullable()
     })
 )

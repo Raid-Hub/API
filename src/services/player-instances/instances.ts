@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt, convertUInt32Value } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate, convertUInt32Value } from "@/integrations/postgres/parsers"
 import { InstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
 
 export async function getInstances({
@@ -175,7 +175,10 @@ export async function getInstances({
             transformers: {
                 hash: convertUInt32Value,
                 skullHashes: convertUInt32Value,
-                players: { membershipId: convertStringToBigInt }
+                players: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                }
             }
         }
     )

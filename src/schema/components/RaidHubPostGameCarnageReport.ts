@@ -1,6 +1,6 @@
 import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
 import { registry } from "@/schema/registry"
-import { zInt64, zISODateString, zUInt32 } from "@/schema/util"
+import { zInt64, zISO8601DateString, zUInt32 } from "@/schema/output"
 import { DestinyActivityModeType } from "bungie-net-core/enums"
 import { z } from "zod"
 
@@ -20,7 +20,7 @@ export const zRaidHubPostGameCarnageReport = registry.register(
     "RaidHubPostGameCarnageReport",
     z
         .object({
-            period: zISODateString(),
+            period: zISO8601DateString(),
             startingPhaseIndex: z.number().optional(),
             activityWasStartedFromBeginning: z.boolean().optional(),
             activityDetails: z

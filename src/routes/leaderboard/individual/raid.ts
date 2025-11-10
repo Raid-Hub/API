@@ -3,7 +3,7 @@ import { cacheControl } from "@/middleware/cache-control"
 import { zLeaderboardData } from "@/schema/components/LeaderboardData"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
-import { zBigIntString } from "@/schema/util"
+import { zBigIntString } from "@/schema/input"
 import {
     getIndividualRaidLeaderboard,
     individualRaidLeaderboardSortColumns,

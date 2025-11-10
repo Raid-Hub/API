@@ -1,7 +1,7 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zPopulationByRaidMetric } from "@/schema/components/Metrics"
-import { zISODateString } from "@/schema/util"
+import { zISO8601DateString } from "@/schema/output"
 import { getDailyPlayerPopulation } from "@/services/metrics/daily-player-population"
 import { z } from "zod"
 
@@ -13,7 +13,7 @@ export const dailyPlayerPopulationRoute = new RaidHubRoute({
             statusCode: 200,
             schema: z.array(
                 z.object({
-                    hour: zISODateString(),
+                    hour: zISO8601DateString(),
                     population: zPopulationByRaidMetric
                 })
             )

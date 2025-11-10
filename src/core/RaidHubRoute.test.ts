@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, mock, test } from "bun:test"
 
 import { errorHandler } from "@/middleware/error-handler"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString, zDigitString } from "@/schema/util"
+import { zBigIntString, zDigitString } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 
 import express from "express"
 import request from "supertest"
@@ -48,7 +49,7 @@ const testGetRoute = new RaidHubRoute({
                 code: ErrorCode.PlayerNotFoundError,
                 statusCode: 404,
                 schema: z.object({
-                    playerId: zBigIntString()
+                    playerId: zInt64()
                 })
             },
             {

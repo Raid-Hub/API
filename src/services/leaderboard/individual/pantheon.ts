@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/parsers"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const individualPantheonLeaderboardSortColumns = ["clears", "fresh_clears", "score"] as const
@@ -48,7 +48,10 @@ export const getIndividualPantheonLeaderboard = async ({
         {
             params: [skip, take, versionId],
             transformers: {
-                playerInfo: { membershipId: convertStringToBigInt }
+                playerInfo: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                }
             }
         }
     )

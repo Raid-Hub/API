@@ -4,7 +4,7 @@ import { zLeaderboardData } from "@/schema/components/LeaderboardData"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zIndividualGlobalLeaderboardCategory } from "@/schema/params/IndividualGlobalLeaderboardCategory"
 import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
-import { zBigIntString } from "@/schema/util"
+import { zBigIntString } from "@/schema/input"
 import {
     getIndividualGlobalLeaderboard,
     getIndividualGlobalLeaderboardValueFormat,

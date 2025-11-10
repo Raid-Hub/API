@@ -2,7 +2,7 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zPlayerInfo } from "@/schema/components/PlayerInfo"
 import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
-import { zNaturalNumber } from "@/schema/util"
+import { zNaturalNumber } from "@/schema/output"
 import { searchForPlayer } from "@/services/search/player-search"
 import { z } from "zod"
 

@@ -1,4 +1,12 @@
-type RowValue = bigint | string | number | boolean | null | RowValue[] | { [key: string]: RowValue }
+type RowValue =
+    | bigint
+    | string
+    | number
+    | boolean
+    | Date
+    | null
+    | RowValue[]
+    | { [key: string]: RowValue }
 type Row = { [key: string]: RowValue }
 
 export type TransformerTree = {

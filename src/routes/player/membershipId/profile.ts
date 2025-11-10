@@ -4,7 +4,8 @@ import { playersQueue } from "@/integrations/rabbitmq/queues"
 import { cacheControl } from "@/middleware/cache-control"
 import { WorldFirstEntry, zPlayerProfile } from "@/schema/components/PlayerProfile"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString, zInt64 } from "@/schema/util"
+import { zBigIntString } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import {
     getPlayer,
     getPlayerActivityStats,

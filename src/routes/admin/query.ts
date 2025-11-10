@@ -2,7 +2,7 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { pgReader } from "@/integrations/postgres"
 import { cacheControl } from "@/middleware/cache-control"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zNaturalNumber } from "@/schema/util"
+import { zNaturalNumber } from "@/schema/output"
 import { DatabaseError } from "pg"
 import { z } from "zod"
 

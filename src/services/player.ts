@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/parsers"
 import { playerProfileQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
@@ -73,7 +73,11 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                 {
                     params: [membershipId],
                     transformers: {
-                        fastestInstance: { instanceId: convertStringToBigInt }
+                        fastestInstance: {
+                            instanceId: convertStringToBigInt,
+                            dateStarted: convertStringToDate,
+                            dateCompleted: convertStringToDate
+                        }
                     }
                 }
             )

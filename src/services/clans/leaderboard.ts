@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/parsers"
 import { ClanLeaderboardEntry } from "@/schema/components/Clan"
 
 export const clanLeaderboardSortColumns = [
@@ -62,7 +62,10 @@ export const getClanLeaderboard = async ({
         {
             params: [skip, take],
             transformers: {
-                clan: { groupId: convertStringToBigInt }
+                clan: {
+                    groupId: convertStringToBigInt,
+                    lastUpdated: convertStringToDate
+                }
             }
         }
     )

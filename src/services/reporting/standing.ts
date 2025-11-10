@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/parsers"
 import {
     InstanceBlacklist,
     InstanceFlag,
@@ -126,17 +126,23 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
         {
             params: [instanceId],
             transformers: {
-                playerInfo: { membershipId: convertStringToBigInt },
+                playerInfo: { membershipId: convertStringToBigInt, lastSeen: convertStringToDate },
                 flags: {
                     membershipId: convertStringToBigInt,
                     instanceId: convertStringToBigInt,
-                    cheatCheckBitmask: convertStringToBigInt
+                    cheatCheckBitmask: convertStringToBigInt,
+                    flaggedAt: convertStringToDate
                 },
-                blacklistedInstances: { instanceId: convertStringToBigInt },
+                blacklistedInstances: {
+                    instanceId: convertStringToBigInt,
+                    createdAt: convertStringToDate,
+                    instanceDate: convertStringToDate
+                },
                 otherRecentFlags: {
                     instanceId: convertStringToBigInt,
                     membershipId: convertStringToBigInt,
-                    cheatCheckBitmask: convertStringToBigInt
+                    cheatCheckBitmask: convertStringToBigInt,
+                    flaggedAt: convertStringToDate
                 }
             }
         }

@@ -15,6 +15,7 @@ const parseInt8ArrayValue = (value: string) => {
 export const configurePostgresParsers = () => {
     types.setTypeParser(types.builtins.INT8, (val: string) => parseInt8Value(val))
     types.setTypeParser(1016 as TypeId, (val: string) => parseInt8ArrayValue(val))
+    types.setTypeParser(types.builtins.JSONB, (val: string) => JSON.parse(val))
 }
 
 const MAX_UINT32 = 2n ** 32n - 1n
@@ -40,4 +41,18 @@ export function convertStringToBigInt(value: unknown, key: string): bigint | nul
         throw new Error(`Key ${key}: Expected a stringified bigint, got ${typeof value}`)
     }
     return BigInt(value)
+}
+
+export function convertStringToDate(value: unknown, key: string): Date | null {
+    if (value === null) {
+        return null
+    }
+    if (typeof value !== "string") {
+        throw new Error(`Key ${key}: Expected a stringified date, got ${typeof value}`)
+    }
+    const date = new Date(value)
+    if (isNaN(date.getTime())) {
+        throw new Error(`Key ${key}: Invalid date string '${value}'`)
+    }
+    return date
 }

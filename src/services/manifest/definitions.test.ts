@@ -1,7 +1,7 @@
 import { zActivityDefinition } from "@/schema/components/ActivityDefinition"
 import { zFeatDefinition } from "@/schema/components/FeatDefinition"
 import { zVersionDefinition } from "@/schema/components/VersionDefinition"
-import { zNaturalNumber, zUInt32 } from "@/schema/util"
+import { zNaturalNumber, zUInt32 } from "@/schema/output"
 import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 import {

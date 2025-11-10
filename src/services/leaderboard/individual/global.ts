@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/parsers"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 import { IndividualGlobalLeaderboardCategory } from "@/schema/params/IndividualGlobalLeaderboardCategory"
 
@@ -60,7 +60,10 @@ export const getIndividualGlobalLeaderboard = async ({
         {
             params: [skip, take],
             transformers: {
-                playerInfo: { membershipId: convertStringToBigInt }
+                playerInfo: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                }
             }
         }
     )

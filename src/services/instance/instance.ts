@@ -1,5 +1,9 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt, convertUInt32Value } from "@/integrations/postgres/parsers"
+import {
+    convertStringToBigInt,
+    convertStringToDate,
+    convertUInt32Value
+} from "@/integrations/postgres/parsers"
 import { Instance, InstanceBasic } from "@/schema/components/Instance"
 import { InstanceExtended } from "@/schema/components/InstanceExtended"
 import { InstanceMetadata } from "@/schema/components/InstanceMetadata"
@@ -121,7 +125,10 @@ export async function getInstanceExtended(
         {
             params: [instanceId],
             transformers: {
-                playerInfo: { membershipId: convertStringToBigInt },
+                playerInfo: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                },
                 characters: { characterId: convertStringToBigInt }
             }
         }

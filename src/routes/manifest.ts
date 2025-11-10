@@ -4,7 +4,7 @@ import { zActivityDefinition } from "@/schema/components/ActivityDefinition"
 import { zFeatDefinition } from "@/schema/components/FeatDefinition"
 import { zImageContentData } from "@/schema/components/ImageContentData"
 import { zVersionDefinition } from "@/schema/components/VersionDefinition"
-import { zNaturalNumber, zNumericalRecordKey } from "@/schema/util"
+import { zNaturalNumber, zNumericalRecordKey } from "@/schema/output"
 import {
     listActivityDefinitions,
     listFeatDefinitions,

@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/parsers"
 import { Teammate } from "@/schema/components/Teammate"
 
 export const getTeammates = async (membershipId: bigint | string, { count }: { count: number }) => {
@@ -33,7 +33,7 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
                 'displayName', "display_name", 
                 'bungieGlobalDisplayName', "bungie_global_display_name", 
                 'bungieGlobalDisplayNameCode', "bungie_global_display_name_code", 
-                'lastSeen', "last_seen",
+                'lastSeen', "last_seen"::text,
                 'isPrivate', "is_private",
                 'cheatLevel', cheat_level
             ) AS "playerInfo"
@@ -42,7 +42,7 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
         {
             params: [membershipId, count],
             transformers: {
-                playerInfo: { membershipId: convertStringToBigInt }
+                playerInfo: { membershipId: convertStringToBigInt, lastSeen: convertStringToDate }
             }
         }
     )

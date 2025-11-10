@@ -1,6 +1,7 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString, zNaturalNumber } from "@/schema/util"
+import { zBigIntString } from "@/schema/input"
+import { zNaturalNumber } from "@/schema/output"
 import { getInstancePlayerInfo } from "@/services/instance/instance"
 import { blacklistInstance, removeInstanceBlacklist } from "@/services/reporting/update-blacklist"
 import { z } from "zod"

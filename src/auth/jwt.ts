@@ -1,11 +1,10 @@
-import { zDigitString } from "@/schema/util"
 import jwt from "jsonwebtoken"
 import { z } from "zod"
 
 export const zJWTAuthFormat = z.object({
     isAdmin: z.boolean(),
-    bungieMembershipId: zDigitString(),
-    destinyMembershipIds: z.array(zDigitString())
+    bungieMembershipId: z.string(),
+    destinyMembershipIds: z.array(z.string())
 })
 
 export const generateJWT = (data: z.infer<typeof zJWTAuthFormat>, expiresIn: number) => {

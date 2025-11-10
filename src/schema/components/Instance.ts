@@ -1,6 +1,6 @@
 import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
 import { registry } from "@/schema/registry"
-import { zInt64, zISODateString, zNaturalNumber, zUInt32, zWholeNumber } from "@/schema/util"
+import { zInt64, zISO8601DateString, zNaturalNumber, zUInt32, zWholeNumber } from "@/schema/output"
 import { z } from "zod"
 
 const zInstancePrimitive = z.object({
@@ -16,8 +16,8 @@ const zInstancePrimitive = z.object({
         })
     ),
     score: zWholeNumber(),
-    dateStarted: zISODateString(),
-    dateCompleted: zISODateString(),
+    dateStarted: zISO8601DateString(),
+    dateCompleted: zISO8601DateString(),
     season: zNaturalNumber(),
     duration: zNaturalNumber().openapi({
         description: "Instance duration in seconds"
@@ -54,6 +54,6 @@ export type InstanceBasic = z.input<typeof zInstanceBasic>
 export const zInstanceBasic = registry.register(
     "InstanceBasic",
     zInstancePrimitive.extend({
-        dateResolved: zISODateString()
+        dateResolved: zISO8601DateString()
     })
 )
