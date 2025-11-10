@@ -448,13 +448,9 @@
             "format": "int64"
           },
           "membershipType": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DestinyMembershipType"
-              }
-            ],
             "nullable": true,
-            "description": "The platform on which the player created their account."
+            "description": "The platform on which the player created their account.",
+            "$ref": "#/components/schemas/DestinyMembershipType"
           },
           "iconPath": {
             "type": "string",
@@ -988,12 +984,8 @@
               "type": "object",
               "properties": {
                 "playerInfo": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PlayerInfo"
-                    }
-                  ],
-                  "nullable": true
+                  "nullable": true,
+                  "$ref": "#/components/schemas/PlayerInfo"
                 },
                 "stats": {
                   "$ref": "#/components/schemas/ClanMemberStats"
@@ -1699,12 +1691,8 @@
                           }
                         },
                         "membershipType": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/DestinyMembershipType"
-                            }
-                          ],
-                          "nullable": true
+                          "nullable": true,
+                          "$ref": "#/components/schemas/DestinyMembershipType"
                         },
                         "membershipId": {
                           "type": "string",
@@ -1922,12 +1910,8 @@
             "minimum": 0
           },
           "fastestInstance": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Instance"
-              }
-            ],
-            "nullable": true
+            "nullable": true,
+            "$ref": "#/components/schemas/Instance"
           }
         },
         "required": [
@@ -2059,12 +2043,8 @@
           "worldFirstEntries": {
             "type": "object",
             "additionalProperties": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/WorldFirstEntry"
-                }
-              ],
-              "nullable": true
+              "nullable": true,
+              "$ref": "#/components/schemas/WorldFirstEntry"
             }
           }
         },
@@ -2134,12 +2114,8 @@
             "nullable": true
           },
           "latestResolvedInstance": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LatestResolvedInstance"
-              }
-            ],
-            "nullable": true
+            "nullable": true,
+            "$ref": "#/components/schemas/LatestResolvedInstance"
           }
         },
         "required": [
@@ -2169,12 +2145,8 @@
             "minimum": 0
           },
           "latestResolvedInstance": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LatestResolvedInstance"
-              }
-            ],
-            "nullable": true
+            "nullable": true,
+            "$ref": "#/components/schemas/LatestResolvedInstance"
           },
           "estimatedBacklogEmptied": {
             "type": "string",
@@ -2466,13 +2438,9 @@
             "format": "int64"
           },
           "membershipType": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DestinyMembershipType"
-              }
-            ],
             "nullable": true,
-            "description": "The platform on which the player created their account."
+            "description": "The platform on which the player created their account.",
+            "$ref": "#/components/schemas/DestinyMembershipType"
           },
           "iconPath": {
             "type": "string",
@@ -2551,12 +2519,8 @@
           "worldFirstEntries": {
             "type": "object",
             "additionalProperties": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/WorldFirstEntry"
-                }
-              ],
-              "nullable": true
+              "nullable": true,
+              "$ref": "#/components/schemas/WorldFirstEntry"
             }
           }
         },
@@ -3091,12 +3055,8 @@
                           }
                         },
                         "membershipType": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/DestinyMembershipType"
-                            }
-                          ],
-                          "nullable": true
+                          "nullable": true,
+                          "$ref": "#/components/schemas/DestinyMembershipType"
                         },
                         "membershipId": {
                           "type": "string",
@@ -3278,12 +3238,8 @@
               "type": "object",
               "properties": {
                 "playerInfo": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PlayerInfo"
-                    }
-                  ],
-                  "nullable": true
+                  "nullable": true,
+                  "$ref": "#/components/schemas/PlayerInfo"
                 },
                 "stats": {
                   "$ref": "#/components/schemas/ClanMemberStats"
@@ -3442,12 +3398,8 @@
             "$ref": "#/components/schemas/InstanceBasic"
           },
           "blacklist": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/InstanceBlacklist"
-              }
-            ],
-            "nullable": true
+            "nullable": true,
+            "$ref": "#/components/schemas/InstanceBlacklist"
           },
           "flags": {
             "type": "array",

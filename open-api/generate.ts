@@ -54,7 +54,8 @@ const fixAllOfNullable = (schema: unknown) => {
     if (!schema || typeof schema !== "object" || "$ref" in schema) return
 
     if ("allOf" in schema && Array.isArray(schema["allOf"])) {
-        schema["allOf"] = schema["allOf"]!.filter(item => {
+        // nullable is defined in the wrong place
+        const allOf = schema["allOf"].filter(item => {
             if ("nullable" in item && item.nullable === true) {
                 Object.entries(item).forEach(([k, v]) => {
                     // @ts-expect-error Generic object
@@ -64,6 +65,17 @@ const fixAllOfNullable = (schema: unknown) => {
             }
             return true
         })
+
+        // If there is only one item in the allOf array, we can just redefine the properties on the parent schema
+        if (allOf.length === 1) {
+            for (const [k, v] of Object.entries(allOf[0])) {
+                // @ts-expect-error Redefine the property on the parent schema
+                schema[k] = v
+            }
+            delete schema["allOf"]
+        } else {
+            schema["allOf"] = allOf
+        }
     } else {
         Object.values(schema).forEach(child => {
             fixAllOfNullable(child)
