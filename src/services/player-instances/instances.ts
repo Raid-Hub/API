@@ -1,5 +1,9 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt, convertStringToDate, convertUInt32Value } from "@/integrations/postgres/parsers"
+import {
+    convertStringToBigInt,
+    convertStringToDate,
+    convertUInt32Value
+} from "@/integrations/postgres/transformer"
 import { InstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
 
 export async function getInstances({

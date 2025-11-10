@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertUInt32Value } from "@/integrations/postgres/parsers"
+import { convertUInt32Value } from "@/integrations/postgres/transformer"
 import { activityHistoryQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { InstanceForPlayer } from "@/schema/components/InstanceForPlayer"

@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { ClanLeaderboardEntry } from "@/schema/components/Clan"
 
 export const clanLeaderboardSortColumns = [

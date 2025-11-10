@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertUInt32Value } from "@/integrations/postgres/parsers"
+import { convertUInt32Value } from "@/integrations/postgres/transformer"
 import { ActivityDefinition } from "@/schema/components/ActivityDefinition"
 import { FeatDefinition } from "@/schema/components/FeatDefinition"
 import { VersionDefinition } from "@/schema/components/VersionDefinition"

@@ -1,5 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
-import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/parsers"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { Teammate } from "@/schema/components/Teammate"
 
 export const getTeammates = async (membershipId: bigint | string, { count }: { count: number }) => {

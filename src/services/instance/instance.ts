@@ -3,7 +3,7 @@ import {
     convertStringToBigInt,
     convertStringToDate,
     convertUInt32Value
-} from "@/integrations/postgres/parsers"
+} from "@/integrations/postgres/transformer"
 import { Instance, InstanceBasic } from "@/schema/components/Instance"
 import { InstanceExtended } from "@/schema/components/InstanceExtended"
 import { InstanceMetadata } from "@/schema/components/InstanceMetadata"
