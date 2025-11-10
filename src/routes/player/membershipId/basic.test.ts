@@ -1,5 +1,7 @@
-import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, test } from "bun:test"
+
+import { expectErr, expectOk } from "@/lib/test-utils"
+
 import { playerBasicRoute } from "./basic"
 
 describe("player basic 200", () => {
@@ -9,7 +11,7 @@ describe("player basic 200", () => {
         expectOk(result)
     }
 
-    test("4611686018467831285", () => t("4611686018467831285"))
+    test("returns basic info for valid player id", () => t("4611686018467831285"))
 })
 
 describe("player basic 404", () => {
@@ -23,5 +25,5 @@ describe("player basic 404", () => {
         expectErr(result)
     }
 
-    test("1", () => t("1"))
+    test("returns 404 for invalid player id", () => t("1"))
 })

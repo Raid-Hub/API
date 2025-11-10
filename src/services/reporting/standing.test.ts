@@ -3,12 +3,12 @@ import {
     zInstanceFlag,
     zInstancePlayerStanding
 } from "@/schema/components/InstanceStanding"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getInstanceBlacklist, getInstanceFlags, getInstancePlayersStanding } from "./standing"
 
 describe("getInstanceFlags", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const flags = await getInstanceFlags("16164441855")
         expect(flags.length).toBeGreaterThan(0)
 
@@ -23,7 +23,7 @@ describe("getInstanceFlags", () => {
 })
 
 describe("getInstanceBlacklist", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const blacklist = await getInstanceBlacklist("14846106179")
 
         expect(blacklist).not.toBeNull()
@@ -39,7 +39,7 @@ describe("getInstanceBlacklist", () => {
 })
 
 describe("getInstancePlayersStanding", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const standing = await getInstancePlayersStanding("16164452822")
         expect(standing.length).toBe(1)
         expect(standing[0].playerInfo.membershipId).toBe(4611686018538460817n)
@@ -54,7 +54,7 @@ describe("getInstancePlayersStanding", () => {
         }
     })
 
-    it("returns the correct shape #2", async () => {
+    test("returns the correct shape #2", async () => {
         const standing = await getInstancePlayersStanding("16327328028")
         expect(standing.length).toBe(6)
         expect(standing[1].playerInfo.membershipId).toBe(4611686018470558748n)

@@ -4,11 +4,11 @@ import {
     getIndividualRaidLeaderboard,
     searchIndividualRaidLeaderboard
 } from "@/services/leaderboard/individual/raid"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 
 describe("getIndividualRaidLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getIndividualRaidLeaderboard({
             raidId: 3,
             skip: 904,
@@ -28,7 +28,7 @@ describe("getIndividualRaidLeaderboard", () => {
 })
 
 describe("searchIndividualRaidLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await searchIndividualRaidLeaderboard({
             raidId: 9,
             take: 10,

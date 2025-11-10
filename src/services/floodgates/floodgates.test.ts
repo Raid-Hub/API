@@ -1,5 +1,5 @@
 import * as MockRabbitAPI from "@/integrations/rabbitmq/api"
-import { afterAll, beforeEach, describe, expect, it, spyOn, test } from "bun:test"
+import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
 import { getFloodgatesRecentId, getFloodgatesStatus } from "."
 
 describe("getFloodgatesRecentId with mock", () => {
@@ -90,7 +90,7 @@ describe("getFloodgatesRecentId with mock", () => {
 })
 
 describe("getFloodgatesRecentId no mock", () => {
-    it("is normally null", async () => {
+    test("is normally null", async () => {
         const result = await getFloodgatesRecentId()
 
         expect(result).toBeNull()
@@ -109,7 +109,7 @@ describe("getFloodgatesStatus", () => {
             spyFetchQueue.mockRestore()
         })
 
-        it("queries correctly", async () => {
+        test("queries correctly", async () => {
             spyFetchQueue.mockResolvedValueOnce({
                 messages: 10,
                 backing_queue_status: {
@@ -129,7 +129,7 @@ describe("getFloodgatesStatus", () => {
         })
     })
 
-    it("it reads the data correctly", async () => {
+    test("it reads the data correctly", async () => {
         const result = await getFloodgatesStatus()
 
         expect(result).toEqual({

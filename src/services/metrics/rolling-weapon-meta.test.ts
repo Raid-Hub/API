@@ -1,10 +1,10 @@
 import { zWeaponMetric } from "@/schema/components/Metrics"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getRollingWeaponMeta } from "./rolling-weapon-meta"
 
 describe("getRollingWeaponMeta", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getRollingWeaponMeta({
             sort: "usage",
             count: 10

@@ -1,6 +1,8 @@
+import { describe, test } from "bun:test"
+
 import { generateJWT } from "@/auth/jwt"
 import { expectErr, expectOk } from "@/lib/test-utils"
-import { describe, test } from "bun:test"
+
 import { playerProfileRoute } from "./profile"
 
 describe("player profile 200", () => {
@@ -9,9 +11,9 @@ describe("player profile 200", () => {
         expectOk(result)
     }
 
-    test("4611686018488107374", () => t("4611686018488107374"))
+    test("returns profile for valid player id", () => t("4611686018488107374"))
 
-    test("no clears", () => t("4611686018497002892"))
+    test("returns profile for player with no clears", () => t("4611686018497002892"))
 })
 
 describe("player profile 404", () => {
@@ -25,7 +27,7 @@ describe("player profile 404", () => {
         expectErr(result)
     }
 
-    test("1", () => t("1"))
+    test("returns 404 for invalid player id", () => t("1"))
 })
 
 describe("player profile 403", () => {
@@ -39,7 +41,7 @@ describe("player profile 403", () => {
         expectErr(result)
     }
 
-    test("4611686018467346804", () => t("4611686018467346804"))
+    test("returns 403 for private profile without authorization", () => t("4611686018467346804"))
 })
 
 describe("player profile authorized", () => {

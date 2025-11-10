@@ -1,6 +1,8 @@
+import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
+
 import { instanceCharacterQueue, playersQueue } from "@/integrations/rabbitmq/queues"
 import { expectErr, expectOk } from "@/lib/test-utils"
-import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
+
 import { instanceRoute } from "./instance"
 
 describe("activity 200", () => {
@@ -54,5 +56,5 @@ describe("activity 404", () => {
         expectErr(result)
     }
 
-    test("1", () => t("1"))
+    test("returns 404 for invalid instance id", () => t("1"))
 })

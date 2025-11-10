@@ -13,21 +13,21 @@ app.use("/admin", adminProtected, (req, res) => {
 })
 
 describe("admin protected", () => {
-    test("should return 403 if no authorization is provided", async () => {
+    test("returns 403 when no authorization provided", async () => {
         const res = await request(app).get("/admin")
         expect(res.status).toBe(403)
         expect(res.body.success).toBe(false)
         expect(res.body.code).toBe("InsufficientPermissionsError")
     })
 
-    test("should return 403 if invalid authorization is provided", async () => {
+    test("returns 403 when invalid authorization provided", async () => {
         const res = await request(app).get("/admin").set("Authorization", "Bearer 123")
         expect(res.status).toBe(403)
         expect(res.body.success).toBe(false)
         expect(res.body.code).toBe("InsufficientPermissionsError")
     })
 
-    test("should return 200 if valid authorization is provided", async () => {
+    test("returns 200 when valid admin authorization provided", async () => {
         const token = generateJWT(
             {
                 isAdmin: true,
@@ -46,7 +46,7 @@ describe("admin protected", () => {
         })
     })
 
-    test("should return 403 if valid authorization non-admin is provided", async () => {
+    test("returns 403 when valid non-admin authorization provided", async () => {
         const token = generateJWT(
             {
                 isAdmin: false,

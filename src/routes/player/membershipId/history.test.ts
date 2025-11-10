@@ -1,7 +1,10 @@
-import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, expect, test } from "bun:test"
+
+import { expectErr, expectOk } from "@/lib/test-utils"
+
 import express from "express"
 import request from "supertest"
+
 import { playerHistoryRoute } from "./history"
 
 describe("player activities 200", () => {
@@ -16,11 +19,11 @@ describe("player activities 200", () => {
         return result
     }
 
-    test("4611686018488107374", () => t("4611686018488107374"))
+    test("returns activities for valid player id", () => t("4611686018488107374"))
 
-    test("4611686018467831285", () => t("4611686018467831285"))
+    test("returns activities for another valid player id", () => t("4611686018467831285"))
 
-    test("year cursor", () => t("4611686018501336567"))
+    test("returns activities with year cursor", () => t("4611686018501336567"))
 
     test("end of list", async () =>
         await t("4611686018488107374", new Date("2000-01-01T17:00:00Z")).then(result => {
@@ -49,7 +52,7 @@ describe("player activities 404", () => {
         expectErr(result)
     }
 
-    test("1", () => t("1"))
+    test("returns 404 for invalid player id", () => t("1"))
 })
 
 describe("player activities 403", () => {
@@ -64,10 +67,10 @@ describe("player activities 403", () => {
         expectErr(result)
     }
 
-    test("4611686018467346804", () => t("4611686018467346804"))
+    test("returns 403 for private profile", () => t("4611686018467346804"))
 })
 
-describe("activities middleware test", () => {
+describe("activities middleware", () => {
     const app = express()
 
     app.use(express.json())

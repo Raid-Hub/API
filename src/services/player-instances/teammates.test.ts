@@ -1,10 +1,10 @@
 import { zTeammate } from "@/schema/components/Teammate"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getTeammates } from "./teammates"
 
-describe("getPlayer", () => {
-    it("returns the correct shape", async () => {
+describe("getTeammates", () => {
+    test("returns the correct shape", async () => {
         const data = await getTeammates("4611686018443649478", {
             count: 10
         }).catch(console.error)

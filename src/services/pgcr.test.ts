@@ -1,9 +1,9 @@
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getRawCompressedPGCR } from "./pgcr"
 
 describe("getRawCompressedPGCR", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getRawCompressedPGCR("12685770593").catch(console.error)
 
         const parsed = z

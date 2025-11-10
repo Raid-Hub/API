@@ -1,5 +1,7 @@
-import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, test } from "bun:test"
+
+import { expectErr, expectOk } from "@/lib/test-utils"
+
 import { pgcrRoute } from "./pgcr"
 
 describe("pgcr 200", () => {
@@ -13,7 +15,7 @@ describe("pgcr 200", () => {
         expectOk(result)
     }
 
-    test("13478946450", () => t("13478946450"))
+    test("returns pgcr for valid instance id", () => t("13478946450"))
 })
 
 describe("pgcr 404", () => {
@@ -27,5 +29,5 @@ describe("pgcr 404", () => {
         expectErr(result)
     }
 
-    test("1", () => t("1"))
+    test("returns 404 for invalid instance id", () => t("1"))
 })
