@@ -1,7 +1,7 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/input"
-import { zNaturalNumber } from "@/schema/output"
+import { zInt64, zNaturalNumber } from "@/schema/output"
 import { getInstancePlayerInfo } from "@/services/instance/instance"
 import { blacklistInstance, removeInstanceBlacklist } from "@/services/reporting/update-blacklist"
 import { z } from "zod"
@@ -37,8 +37,8 @@ export const blacklistInstanceRoute = new RaidHubRoute({
                 statusCode: 400,
                 code: ErrorCode.PlayerNotInInstance,
                 schema: z.object({
-                    instanceId: zBigIntString(),
-                    players: z.array(zBigIntString())
+                    instanceId: zInt64(),
+                    players: z.array(zInt64())
                 })
             },
             {

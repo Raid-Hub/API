@@ -18,7 +18,7 @@ export const zAtlasStatus = registry.register(
     z.object({
         status: z.enum(["Crawling", "Idle", "Offline"]),
         medianSecondsBehindNow: z.number().nonnegative().nullable(),
-        estimatedCatchUpTimestamp: zISO8601DateString().nullable(),
+        estimatedCatchUpTimestamp: zISO8601DateString({ nullable: true }),
         latestResolvedInstance: zLatestResolvedInstance.nullable()
     })
 )
@@ -32,6 +32,6 @@ export const zFloodgatesStatus = registry.register(
         resolveRate: z.number().nonnegative(),
         backlog: zWholeNumber(),
         latestResolvedInstance: zLatestResolvedInstance.nullable(),
-        estimatedBacklogEmptied: zISO8601DateString().nullable()
+        estimatedBacklogEmptied: zISO8601DateString({ nullable: true })
     })
 )

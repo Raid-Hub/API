@@ -20,15 +20,13 @@ export const zDateString = <N extends boolean = false>({
 } = {}): N extends true
     ? ZodNullable<ZodType<Date, ZodDateDef, string | number | Date>>
     : ZodType<Date, ZodDateDef, string | number | Date> => {
-    // @ts-expect-error nullablle not supported in spec v3.1
     const base = z.coerce.date().openapi({
         type: "string",
-        format: "date-time",
-        nullable: nullable
+        format: "date-time"
     })
 
     // @ts-expect-error generic hell
-    return nullable ? base.nullable() : base
+    return nullable ? base.nullable().openapi({ nullable: true }) : base
 }
 
 // Input param that accepts string representations of digits

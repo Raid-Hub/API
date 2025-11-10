@@ -6,11 +6,19 @@ export const zNaturalNumber = () => z.number().int().positive()
 
 export const zWholeNumber = () => z.number().int().nonnegative()
 
-export const zISO8601DateString = () =>
-    z.date().openapi({
+export const zISO8601DateString = <N extends boolean = false>({
+    nullable
+}: {
+    nullable?: N
+} = {}): N extends true ? z.ZodNullable<z.ZodDate> : z.ZodDate => {
+    const base = z.date().openapi({
         type: "string",
         format: "date-time"
     })
+
+    // @ts-expect-error generic hell
+    return nullable ? base.nullable().openapi({ nullable: true }) : base
+}
 
 // Output param for a BigInt
 export const zInt64 = () =>

@@ -6,6 +6,7 @@ import {
 } from "@/schema/components/RaidHubPostGameCarnageReport"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import { getRawCompressedPGCR } from "@/services/pgcr"
 import { gunzipSync } from "bun"
 import { z } from "zod"
@@ -32,7 +33,7 @@ Useful if you need to access PGCRs when Bungie's API is down.`,
                 statusCode: 404,
                 code: ErrorCode.PGCRNotFoundError,
                 schema: z.object({
-                    instanceId: zBigIntString()
+                    instanceId: zInt64()
                 })
             }
         ]

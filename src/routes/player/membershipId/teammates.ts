@@ -3,7 +3,7 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zTeammate } from "@/schema/components/Teammate"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import { getPlayer } from "@/services/player"
 import { getTeammates } from "@/services/player-instances/teammates"
 import { z } from "zod"
@@ -13,7 +13,7 @@ export const playerTeammatesRoute = new RaidHubRoute({
     description: `Get a list of a player's top 100 teammates.`,
     isProtectedPlayerRoute: true,
     params: z.object({
-        membershipId: zBigIntString()
+        membershipId: zInt64()
     }),
     response: {
         success: {
@@ -25,14 +25,14 @@ export const playerTeammatesRoute = new RaidHubRoute({
                 statusCode: 404,
                 code: ErrorCode.PlayerNotFoundError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             },
             {
                 statusCode: 403,
                 code: ErrorCode.PlayerPrivateProfileError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             }
         ]

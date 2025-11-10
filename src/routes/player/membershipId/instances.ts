@@ -10,6 +10,7 @@ import {
     zDateString,
     zSplitCommaSeparatedString
 } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import { getPlayer } from "@/services/player"
 import { getInstances } from "@/services/player-instances/instances"
 import { z } from "zod"
@@ -52,7 +53,7 @@ export const playerInstancesRoute = new RaidHubRoute({
                 statusCode: 404,
                 code: ErrorCode.PlayerNotFoundError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             },
             {
@@ -60,7 +61,7 @@ export const playerInstancesRoute = new RaidHubRoute({
                 code: ErrorCode.PlayerProtectedResourceError,
                 schema: z.object({
                     message: z.string(),
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             }
         ]

@@ -4,6 +4,7 @@ import { cacheControl } from "@/middleware/cache-control"
 import { zPlayerInfo } from "@/schema/components/PlayerInfo"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import { getPlayer } from "@/services/player"
 import { z } from "zod"
 
@@ -26,7 +27,7 @@ you only have the membershipId available.`,
                 statusCode: 404,
                 code: ErrorCode.PlayerNotFoundError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             }
         ]

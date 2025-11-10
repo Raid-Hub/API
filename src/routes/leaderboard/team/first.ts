@@ -2,8 +2,8 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zLeaderboardData } from "@/schema/components/LeaderboardData"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zInt64 } from "@/schema/output"
 import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
-import { zBigIntString } from "@/schema/input"
 import {
     getFirstTeamActivityVersionLeaderboard,
     searchFirstTeamActivityVersionLeaderboard
@@ -26,11 +26,11 @@ Use the /contest endpoint instead to get the full rankings for the duration of t
                 statusCode: 404,
                 code: ErrorCode.PlayerNotOnLeaderboardError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             },
             {
-                statusCode: 404,
+                statusCode: 400,
                 code: ErrorCode.InvalidActivityVersionComboError,
                 schema: z.object({
                     activity: z.string(),

@@ -2421,7 +2421,7 @@
         "properties": {
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           },
           "nextCursor": {
             "type": "string",
@@ -2443,7 +2443,7 @@
         "properties": {
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["membershipId"]
@@ -2453,7 +2453,7 @@
         "properties": {
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["membershipId"]
@@ -2582,7 +2582,7 @@
           },
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["message", "membershipId"]
@@ -2695,7 +2695,7 @@
         "properties": {
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["membershipId"]
@@ -3261,7 +3261,7 @@
         "properties": {
           "instanceId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["instanceId"]
@@ -3300,7 +3300,7 @@
         "properties": {
           "groupId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["groupId"]
@@ -3478,13 +3478,13 @@
         "properties": {
           "instanceId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           },
           "players": {
             "type": "array",
             "items": {
               "type": "string",
-              "pattern": "^\\d+n?$"
+              "format": "int64"
             }
           }
         },
@@ -4365,19 +4365,7 @@
                       "enum": ["PlayerPrivateProfileError"]
                     },
                     "error": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/PlayerPrivateProfileError"
-                        },
-                        {
-                          "properties": {
-                            "membershipId": {
-                              "type": "string",
-                              "format": "int64"
-                            }
-                          }
-                        }
-                      ]
+                      "$ref": "#/components/schemas/PlayerPrivateProfileError"
                     }
                   },
                   "required": ["minted", "success", "code", "error"]
@@ -4407,19 +4395,7 @@
                           "enum": ["PlayerNotFoundError"]
                         },
                         "error": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/PlayerNotFoundError"
-                            },
-                            {
-                              "properties": {
-                                "membershipId": {
-                                  "type": "string",
-                                  "format": "int64"
-                                }
-                              }
-                            }
-                          ]
+                          "$ref": "#/components/schemas/PlayerNotFoundError"
                         }
                       },
                       "required": ["minted", "success", "code", "error"]
@@ -4494,7 +4470,7 @@
           {
             "schema": {
               "type": "string",
-              "pattern": "^\\d+n?$"
+              "format": "int64"
             },
             "required": true,
             "name": "membershipId",
@@ -5960,25 +5936,50 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["InvalidActivityVersionComboError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/InvalidActivityVersionComboError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["QueryValidationError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/QueryValidationError"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["QueryValidationError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/QueryValidationError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     }
-                  },
-                  "required": ["minted", "success", "code", "error"]
+                  ]
                 }
               }
             }
@@ -6034,27 +6035,6 @@
                         },
                         "error": {
                           "$ref": "#/components/schemas/PlayerNotOnLeaderboardError"
-                        }
-                      },
-                      "required": ["minted", "success", "code", "error"]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "minted": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "success": {
-                          "type": "boolean",
-                          "enum": [false]
-                        },
-                        "code": {
-                          "type": "string",
-                          "enum": ["InvalidActivityVersionComboError"]
-                        },
-                        "error": {
-                          "$ref": "#/components/schemas/InvalidActivityVersionComboError"
                         }
                       },
                       "required": ["minted", "success", "code", "error"]
@@ -7816,19 +7796,7 @@
                           "enum": ["PlayerNotFoundError"]
                         },
                         "error": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/PlayerNotFoundError"
-                            },
-                            {
-                              "properties": {
-                                "membershipId": {
-                                  "type": "string",
-                                  "format": "int64"
-                                }
-                              }
-                            }
-                          ]
+                          "$ref": "#/components/schemas/PlayerNotFoundError"
                         }
                       },
                       "required": ["minted", "success", "code", "error"]

@@ -5,6 +5,7 @@ import { cacheControl } from "@/middleware/cache-control"
 import { zClanStats } from "@/schema/components/Clan"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import { getClanStats } from "@/services/clans/clan-stats"
 import { PlatformErrorCodes } from "bungie-net-core/enums"
 import { GroupMember } from "bungie-net-core/models"
@@ -27,7 +28,7 @@ export const clanStatsRoute = new RaidHubRoute({
                 statusCode: 404,
                 code: ErrorCode.ClanNotFound,
                 schema: z.object({
-                    groupId: zBigIntString()
+                    groupId: zInt64()
                 })
             },
             {

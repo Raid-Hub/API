@@ -29,7 +29,7 @@ in order to optimize performance. Subsequent requests will return the full numbe
             schema: z
                 .object({
                     membershipId: zInt64(),
-                    nextCursor: zISO8601DateString().nullable(),
+                    nextCursor: zISO8601DateString({ nullable: true }),
                     activities: z.array(zInstanceForPlayer)
                 })
                 .strict()
