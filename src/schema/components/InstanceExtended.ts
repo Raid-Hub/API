@@ -1,5 +1,5 @@
 import { registry } from "@/schema/registry"
-import { zNaturalNumber } from "@/schema/util"
+import { zNaturalNumber } from "@/schema/output"
 import { z } from "zod"
 import { zInstance } from "./Instance"
 import { zInstanceMetadata } from "./InstanceMetadata"

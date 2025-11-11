@@ -1,14 +1,14 @@
 import { zIndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
-import { zNaturalNumber } from "@/schema/util"
+import { zNaturalNumber } from "@/schema/output"
 import {
     getIndividualGlobalLeaderboard,
     searchIndividualGlobalLeaderboard
 } from "@/services/leaderboard/individual/global"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 
 describe("getIndividualGlobalLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getIndividualGlobalLeaderboard({
             skip: 24921,
             take: 27,
@@ -27,7 +27,7 @@ describe("getIndividualGlobalLeaderboard", () => {
 })
 
 describe("searchIndividualGlobalLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await searchIndividualGlobalLeaderboard({
             take: 4,
             category: "clears",

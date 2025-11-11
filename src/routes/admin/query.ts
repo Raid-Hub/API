@@ -1,9 +1,9 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { cacheControl } from "@/middleware/cache-control"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zNaturalNumber } from "@/schema/util"
-import { DatabaseError } from "postgresql-client"
+import { zNaturalNumber } from "@/schema/output"
+import { DatabaseError } from "pg"
 import { z } from "zod"
 
 export const adminQueryRoute = new RaidHubRoute({
@@ -70,7 +70,7 @@ export const adminQueryRoute = new RaidHubRoute({
             )}) AS __foo__ LIMIT 50`
 
             if (req.body.ignoreCost) {
-                const rows = await postgres.queryRows<Record<string, unknown>>(wrappedQuery)
+                const rows = await pgReader.queryRows<Record<string, unknown>>(wrappedQuery)
                 return RaidHubRoute.ok({ data: rows, type: "SELECT" as const })
             }
 
@@ -95,16 +95,16 @@ export const adminQueryRoute = new RaidHubRoute({
                 })
             }
 
-            const rows = await postgres.queryRows<Record<string, unknown>>(wrappedQuery)
+            const rows = await pgReader.queryRows<Record<string, unknown>>(wrappedQuery)
 
             return RaidHubRoute.ok({ data: rows, type: "SELECT" as const })
         } catch (err) {
             if (err instanceof DatabaseError) {
                 return RaidHubRoute.fail(ErrorCode.AdminQuerySyntaxError, {
                     name: err.name,
-                    code: err.code,
-                    line: err.line,
-                    position: err.position
+                    code: err.code || undefined,
+                    line: err.position ? String(err.position) : undefined,
+                    position: err.position ? Number(err.position) : undefined
                 })
             } else {
                 throw err
@@ -114,5 +114,5 @@ export const adminQueryRoute = new RaidHubRoute({
 })
 
 async function explainQuery(query: string) {
-    return await postgres.queryRows<{ "QUERY PLAN": string }>(`EXPLAIN ${query}`)
+    return await pgReader.queryRows<{ "QUERY PLAN": string }>(`EXPLAIN ${query}`)
 }

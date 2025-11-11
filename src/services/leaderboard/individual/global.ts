@@ -1,4 +1,5 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 import { IndividualGlobalLeaderboardCategory } from "@/schema/params/IndividualGlobalLeaderboardCategory"
 
@@ -36,11 +37,11 @@ export const getIndividualGlobalLeaderboard = async ({
 }) => {
     const column = getColumn(category)
 
-    return await postgres.queryRows<IndividualLeaderboardEntry>(
+    return await pgReader.queryRows<IndividualLeaderboardEntry>(
         `SELECT
-            individual_global_leaderboard.${column}_position AS "position",
-            individual_global_leaderboard.${column}_rank AS "rank",
-            individual_global_leaderboard.${column} AS "value",
+            individual_global_leaderboard.${column}_position::int AS "position",
+            individual_global_leaderboard.${column}_rank::int AS "rank",
+            individual_global_leaderboard.${column}::${column === "wfr_score" ? "double precision" : "int"} AS "value",
             JSONB_BUILD_OBJECT(
                 'membershipId', membership_id::text,
                 'membershipType', membership_type,
@@ -58,7 +59,12 @@ export const getIndividualGlobalLeaderboard = async ({
         ORDER BY ${column}_position ASC`,
         {
             params: [skip, take],
-            fetchCount: take
+            transformers: {
+                playerInfo: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                }
+            }
         }
     )
 }
@@ -74,15 +80,13 @@ export const searchIndividualGlobalLeaderboard = async ({
 }) => {
     const column = getColumn(category)
 
-    const result = await postgres.queryRow<{ position: number }>(
-        `SELECT individual_global_leaderboard.${column}_position AS "position" 
-        FROM individual_global_leaderboard 
+    const result = await pgReader.queryRow<{ position: number }>(
+        `SELECT individual_global_leaderboard.${column}_position::int AS "position"
+        FROM individual_global_leaderboard
         WHERE membership_id = $1::bigint
         ORDER BY position ASC
         LIMIT 1`,
-        {
-            params: [membershipId]
-        }
+        { params: [membershipId] }
     )
     if (!result) return null
 

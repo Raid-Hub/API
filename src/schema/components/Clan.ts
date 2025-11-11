@@ -1,5 +1,5 @@
 import { registry } from "@/schema/registry"
-import { zInt64, zISODateString, zNaturalNumber, zWholeNumber } from "@/schema/util"
+import { zInt64, zISO8601DateString, zNaturalNumber, zWholeNumber } from "@/schema/output"
 import { z } from "zod"
 import { zPlayerInfo } from "./PlayerInfo"
 
@@ -28,7 +28,7 @@ export const zClan = registry.register(
         callSign: z.string(),
         motto: z.string(),
         clanBannerData: zClanBannerData,
-        lastUpdated: zISODateString(),
+        lastUpdated: zISO8601DateString(),
         knownMemberCount: zNaturalNumber()
     })
 )

@@ -1,6 +1,6 @@
 import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
 import { registry } from "@/schema/registry"
-import { zInt64, zISODateString, zUInt32 } from "@/schema/util"
+import { zInt64, zISO8601DateString, zUInt32 } from "@/schema/output"
 import { DestinyActivityModeType } from "bungie-net-core/enums"
 import { z } from "zod"
 
@@ -20,7 +20,7 @@ export const zRaidHubPostGameCarnageReport = registry.register(
     "RaidHubPostGameCarnageReport",
     z
         .object({
-            period: zISODateString(),
+            period: zISO8601DateString(),
             startingPhaseIndex: z.number().optional(),
             activityWasStartedFromBeginning: z.boolean().optional(),
             activityDetails: z
@@ -50,7 +50,7 @@ export const zRaidHubPostGameCarnageReport = registry.register(
                                         membershipType: zDestinyMembershipType
                                             .nullable()
                                             .optional(),
-                                        membershipId: z.string(),
+                                        membershipId: zInt64(),
                                         displayName: z.string().nullable().optional(),
                                         bungieGlobalDisplayName: z.string().nullable().optional(),
                                         bungieGlobalDisplayNameCode: z
@@ -68,7 +68,7 @@ export const zRaidHubPostGameCarnageReport = registry.register(
                                 emblemHash: zUInt32()
                             })
                             .strip(),
-                        characterId: z.string(),
+                        characterId: zInt64(),
                         values: z.record(zDestinyHistoricalStatsValuePair),
                         extended: z
                             .object({

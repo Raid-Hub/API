@@ -1,4 +1,5 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { IndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const individualRaidLeaderboardSortColumns = ["clears", "fresh_clears", "sherpas"] as const
@@ -23,11 +24,11 @@ export const getIndividualRaidLeaderboard = async ({
 }) => {
     validateColumn(column)
 
-    return await postgres.queryRows<IndividualLeaderboardEntry>(
+    return await pgReader.queryRows<IndividualLeaderboardEntry>(
         `SELECT
-            individual_raid_leaderboard.${column}_position AS "position",
-            individual_raid_leaderboard.${column}_rank AS "rank",
-            individual_raid_leaderboard.${column} AS "value",
+            individual_raid_leaderboard.${column}_position::int AS "position",
+            individual_raid_leaderboard.${column}_rank::int AS "rank",
+            individual_raid_leaderboard.${column}::int AS "value",
             JSONB_BUILD_OBJECT(
                 'membershipId', membership_id::text,
                 'membershipType', membership_type,
@@ -46,7 +47,12 @@ export const getIndividualRaidLeaderboard = async ({
         ORDER BY ${column}_position ASC`,
         {
             params: [skip, take, raidId],
-            fetchCount: take
+            transformers: {
+                playerInfo: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                }
+            }
         }
     )
 }
@@ -64,15 +70,13 @@ export const searchIndividualRaidLeaderboard = async ({
 }) => {
     validateColumn(column)
 
-    const result = await postgres.queryRow<{ position: number }>(
-        `SELECT individual_raid_leaderboard.${column}_position AS "position" 
-        FROM individual_raid_leaderboard 
+    const result = await pgReader.queryRow<{ position: number }>(
+        `SELECT individual_raid_leaderboard.${column}_position::int AS "position"
+        FROM individual_raid_leaderboard
         WHERE membership_id = $1::bigint AND activity_id = $2
         ORDER BY position ASC
         LIMIT 1`,
-        {
-            params: [membershipId, raidId]
-        }
+        { params: [membershipId, raidId] }
     )
     if (!result) return null
 

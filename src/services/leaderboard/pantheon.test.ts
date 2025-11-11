@@ -1,14 +1,14 @@
 import { zIndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
-import { zNaturalNumber } from "@/schema/util"
+import { zNaturalNumber } from "@/schema/output"
 import {
     getIndividualPantheonLeaderboard,
     searchIndividualPantheonLeaderboard
 } from "@/services/leaderboard/individual/pantheon"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 
 describe("getIndividualPantheonLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getIndividualPantheonLeaderboard({
             versionId: 129,
             skip: 13,
@@ -28,7 +28,7 @@ describe("getIndividualPantheonLeaderboard", () => {
 })
 
 describe("searchIndividualPantheonLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await searchIndividualPantheonLeaderboard({
             versionId: 129,
             take: 15,

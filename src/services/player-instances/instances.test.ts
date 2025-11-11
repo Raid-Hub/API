@@ -1,10 +1,10 @@
 import { zInstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getInstances } from "./instances"
 
 describe("getInstances", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getInstances({
             membershipIds: ["4611686018488107374", "4611686018515944770"],
             count: 100
@@ -20,7 +20,7 @@ describe("getInstances", () => {
         }
     })
 
-    it("filters by activityId + versionId", async () => {
+    test("filters by activityId + versionId", async () => {
         const data = await getInstances({
             membershipIds: ["4611686018488107374"],
             count: 10,
@@ -41,7 +41,7 @@ describe("getInstances", () => {
         }
     })
 
-    it("filters by completed, fresh, and flawless status", async () => {
+    test("filters by completed, fresh, and flawless status", async () => {
         const data = await getInstances({
             membershipIds: ["4611686018488107374"],
             count: 25,
@@ -68,7 +68,7 @@ describe("getInstances", () => {
         }
     })
 
-    it("filters by player count", async () => {
+    test("filters by player count", async () => {
         const playerCount = 6
         const data = await getInstances({
             membershipIds: ["4611686018488107374"],
@@ -87,7 +87,7 @@ describe("getInstances", () => {
         }
     })
 
-    it("filters by player count range", async () => {
+    test("filters by player count range", async () => {
         const minPlayerCount = 2
         const maxPlayerCount = 4
         const data = await getInstances({
@@ -114,7 +114,7 @@ describe("getInstances", () => {
         }
     })
 
-    it("filters by date range", async () => {
+    test("filters by date range", async () => {
         const minDate = new Date("2023-01-01")
         const maxDate = new Date("2023-12-31")
         const data = await getInstances({
@@ -141,7 +141,7 @@ describe("getInstances", () => {
         }
     })
 
-    it("filters by season range", async () => {
+    test("filters by season range", async () => {
         const minSeason = 10
         const maxSeason = 15
         const data = await getInstances({
@@ -166,7 +166,7 @@ describe("getInstances", () => {
         }
     })
 
-    it("filters by season", async () => {
+    test("filters by season", async () => {
         const season = 12
         const data = await getInstances({
             membershipIds: ["4611686018488107374"],
@@ -184,7 +184,7 @@ describe("getInstances", () => {
         }
     })
 
-    it("filters by duration", async () => {
+    test("filters by duration", async () => {
         const minDurationSeconds = 300
         const maxDurationSeconds = 600
         const data = await getInstances({

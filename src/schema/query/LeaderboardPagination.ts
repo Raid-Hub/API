@@ -1,5 +1,5 @@
 import { registry } from "@/schema/registry"
-import { zBigIntString, zPage } from "@/schema/util"
+import { zBigIntString, zPage } from "@/schema/input"
 import { z } from "zod"
 
 export const zLeaderboardPagination = registry.register(

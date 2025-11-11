@@ -1,4 +1,9 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import {
+    convertStringToBigInt,
+    convertStringToDate,
+    convertUInt32Value
+} from "@/integrations/postgres/transformer"
 import { InstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
 
 export async function getInstances({
@@ -116,23 +121,23 @@ export async function getInstances({
 
     params.push(count)
 
-    return await postgres.queryRows<InstanceWithPlayers>(
+    return await pgReader.queryRows<InstanceWithPlayers>(
         `WITH _player_instances AS (${playerStmnts.join(" INTERSECT ")}) 
         SELECT
-            instance_id::text AS "instanceId",
+            instance_id AS "instanceId",
             hash AS "hash",
-            activity_id AS "activityId",
-            version_id AS "versionId",
+            activity_id::int AS "activityId",
+            version_id::int AS "versionId",
             completed AS "completed",
-            player_count AS "playerCount",
-            score AS "score",
+            player_count::int AS "playerCount",
+            score::int AS "score",
             fresh AS "fresh",
             flawless AS "flawless",
             skull_hashes AS "skullHashes",
             date_started AS "dateStarted",
             date_completed AS "dateCompleted",
-            season_id AS "season",
-            duration AS "duration",
+            season_id::int AS "season",
+            duration::int AS "duration",
             platform_type AS "platformType",
             CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
             CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
@@ -171,7 +176,14 @@ export async function getInstances({
         `,
         {
             params,
-            fetchCount: count
+            transformers: {
+                hash: convertUInt32Value,
+                skullHashes: convertUInt32Value,
+                players: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                }
+            }
         }
     )
 }

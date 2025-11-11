@@ -1,8 +1,9 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { Teammate } from "@/schema/components/Teammate"
 
 export const getTeammates = async (membershipId: bigint | string, { count }: { count: number }) => {
-    return await postgres.queryRows<Teammate>(
+    return await pgReader.queryRows<Teammate>(
         `WITH self AS (
             SELECT 
                 instance_id, time_played_seconds, completed
@@ -22,9 +23,9 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
             LIMIT $2
         )
         SELECT  
-            agg_data.time_played as "estimatedTimePlayedSeconds",
-            agg_data.clears,
-            agg_data.count as "instanceCount",
+            agg_data.time_played::int as "estimatedTimePlayedSeconds",
+            agg_data.clears::int,
+            agg_data.count::int as "instanceCount",
             JSONB_BUILD_OBJECT(
                 'membershipId', "membership_id"::text, 
                 'membershipType', "membership_type", 
@@ -32,7 +33,7 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
                 'displayName', "display_name", 
                 'bungieGlobalDisplayName', "bungie_global_display_name", 
                 'bungieGlobalDisplayNameCode', "bungie_global_display_name_code", 
-                'lastSeen', "last_seen",
+                'lastSeen', "last_seen"::text,
                 'isPrivate', "is_private",
                 'cheatLevel', cheat_level
             ) AS "playerInfo"
@@ -40,7 +41,9 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
         JOIN player USING (membership_id);`,
         {
             params: [membershipId, count],
-            fetchCount: count
+            transformers: {
+                playerInfo: { membershipId: convertStringToBigInt, lastSeen: convertStringToDate }
+            }
         }
     )
 }

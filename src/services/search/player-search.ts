@@ -1,4 +1,4 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 import { playerSearchQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
@@ -24,9 +24,9 @@ export async function searchForPlayer(
         playerSearchQueryTimer,
         { prefixLength: searchTerm.split("#")[0]?.length ?? 0 },
         () =>
-            postgres.queryRows<PlayerInfo>(
+            pgReader.queryRows<PlayerInfo>(
                 `SELECT 
-                    membership_id::text AS "membershipId",
+                    membership_id AS "membershipId",
                     membership_type AS "membershipType",
                     icon_path AS "iconPath",
                     display_name AS "displayName",
@@ -39,13 +39,12 @@ export async function searchForPlayer(
                 WHERE lower(${opts.global ? "bungie_name" : "display_name"}) LIKE $1 
                     ${opts.membershipType ? "AND membership_type = $3" : ""}
                     AND last_seen > TIMESTAMP 'epoch'
-                ORDER BY _search_score DESC 
+                ORDER BY _search_score DESC
                 LIMIT $2;`,
                 {
                     params: opts.membershipType
                         ? [searchTerm + "%", opts.count, opts.membershipType]
-                        : [searchTerm + "%", opts.count],
-                    fetchCount: opts.count
+                        : [searchTerm + "%", opts.count]
                 }
             )
     )

@@ -5,7 +5,8 @@ import {
     zRaidHubPostGameCarnageReport
 } from "@/schema/components/RaidHubPostGameCarnageReport"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString } from "@/schema/util"
+import { zBigIntString } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import { getRawCompressedPGCR } from "@/services/pgcr"
 import { gunzipSync } from "bun"
 import { z } from "zod"
@@ -32,7 +33,7 @@ Useful if you need to access PGCRs when Bungie's API is down.`,
                 statusCode: 404,
                 code: ErrorCode.PGCRNotFoundError,
                 schema: z.object({
-                    instanceId: zBigIntString()
+                    instanceId: zInt64()
                 })
             }
         ]
@@ -47,6 +48,15 @@ Useful if you need to access PGCRs when Bungie's API is down.`,
 
         const decompressed = gunzipSync(result.data)
         const pgcr = JSON.parse(decoder.decode(decompressed)) as RaidHubPostGameCarnageReport
+        pgcr.activityDetails.instanceId = BigInt(pgcr.activityDetails.instanceId)
+        pgcr.entries.forEach(entry => {
+            entry.characterId = BigInt(entry.characterId)
+            entry.player.destinyUserInfo.membershipId = BigInt(
+                entry.player.destinyUserInfo.membershipId
+            )
+        })
+        pgcr.period = new Date(pgcr.period)
+
         return RaidHubRoute.ok(pgcr)
     }
 })

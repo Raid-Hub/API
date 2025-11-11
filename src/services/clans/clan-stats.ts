@@ -1,13 +1,14 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { ClanStats } from "@/schema/components/Clan"
 
 export const getClanStats = async (
     groupId: string | bigint,
     membershipIds: bigint[] | string[]
 ) => {
-    const clanStats = await postgres.queryRow<ClanStats>(
+    const clanStats = await pgReader.queryRow<ClanStats>(
         `WITH "membership_ids" AS (
-            SELECT unnest($1)::bigint AS membership_id
+            SELECT unnest($1::bigint[]) AS membership_id
         ),
         "ranked_scores" AS (
             SELECT 
@@ -27,16 +28,16 @@ export const getClanStats = async (
                         'displayName', player."display_name",
                         'bungieGlobalDisplayName', player."bungie_global_display_name",
                         'bungieGlobalDisplayNameCode', player."bungie_global_display_name_code",
-                        'lastSeen', player."last_seen",
+                        'lastSeen', player."last_seen"::text,
                         'isPrivate', player."is_private",
                         'cheatLevel', player."cheat_level"
                     ) END,
                     'stats', JSONB_BUILD_OBJECT(
-                        'clears', COALESCE(player."clears", 0),
-                        'freshClears',  COALESCE(player."fresh_clears", 0),
-                        'sherpas',  COALESCE(player."sherpas", 0),
-                        'totalTimePlayedSeconds', COALESCE(player."total_time_played_seconds", 0),
-                        'contestScore', COALESCE(rs."score", 0)
+                        'clears', COALESCE(player."clears", 0)::int,
+                        'freshClears',  COALESCE(player."fresh_clears", 0)::int,
+                        'sherpas',  COALESCE(player."sherpas", 0)::int,
+                        'totalTimePlayedSeconds', COALESCE(player."total_time_played_seconds", 0)::int,
+                        'contestScore', COALESCE(rs."score", 0)::int
                     )
                 ) as "_member"
             FROM membership_ids
@@ -72,22 +73,22 @@ export const getClanStats = async (
             _member_stats."members",
             JSONB_BUILD_OBJECT(
                 'ranks', CASE WHEN clan_ranks IS NOT NULL THEN JSONB_BUILD_OBJECT(
-                    'clearsRank', clan_ranks."clears_rank",
-                    'freshClearsRank', clan_ranks."fresh_clears_rank",
-                    'sherpasRank', clan_ranks."sherpas_rank",
-                    'timePlayedSecondsRank', clan_ranks."time_played_seconds_rank",
-                    'totalContestScoreRank', clan_ranks."total_contest_score_rank",
-                    'weightedContestScoreRank', clan_ranks."weighted_contest_score_rank"
+                    'clearsRank', clan_ranks."clears_rank"::int,
+                    'freshClearsRank', clan_ranks."fresh_clears_rank"::int,
+                    'sherpasRank', clan_ranks."sherpas_rank"::int,
+                    'timePlayedSecondsRank', clan_ranks."time_played_seconds_rank"::int,
+                    'totalContestScoreRank', clan_ranks."total_contest_score_rank"::int,
+                    'weightedContestScoreRank', clan_ranks."weighted_contest_score_rank"::int
                 ) ELSE NULL END,
                 'stats', JSONB_BUILD_OBJECT(
-                    'clears', COALESCE("live_aggregates"."clears", 0),
-                    'averageClears', ROUND(COALESCE("live_aggregates"."average_clears", 0)),
-                    'freshClears', COALESCE("live_aggregates"."fresh_clears", 0),
-                    'averageFreshClears', ROUND(COALESCE("live_aggregates"."average_fresh_clears", 0)),
-                    'sherpas', COALESCE("live_aggregates"."sherpas", 0),
-                    'averageSherpas', ROUND(COALESCE("live_aggregates"."average_sherpas", 0)),
-                    'timePlayedSeconds', COALESCE("live_aggregates"."time_played_seconds", 0),
-                    'averageTimePlayedSeconds', ROUND(COALESCE("live_aggregates"."average_time_played_seconds", 0)),
+                    'clears', COALESCE("live_aggregates"."clears", 0)::int,
+                    'averageClears', ROUND(COALESCE("live_aggregates"."average_clears", 0))::int,
+                    'freshClears', COALESCE("live_aggregates"."fresh_clears", 0)::int,
+                    'averageFreshClears', ROUND(COALESCE("live_aggregates"."average_fresh_clears", 0))::int,
+                    'sherpas', COALESCE("live_aggregates"."sherpas", 0)::int,
+                    'averageSherpas', ROUND(COALESCE("live_aggregates"."average_sherpas", 0))::int,
+                    'timePlayedSeconds', COALESCE("live_aggregates"."time_played_seconds", 0)::int,
+                    'averageTimePlayedSeconds', ROUND(COALESCE("live_aggregates"."average_time_played_seconds", 0))::int,
                     'totalContestScore', COALESCE("live_aggregates"."total_contest_score", 0),
                     'weightedContestScore', ROUND(COALESCE(clan_ranks."weighted_contest_score", 0))
                 )
@@ -96,7 +97,15 @@ export const getClanStats = async (
         CROSS JOIN "live_aggregates"
         LEFT JOIN clan_ranks ON clan_ranks."group_id" = $2::bigint`,
         {
-            params: [membershipIds, groupId]
+            params: [membershipIds, groupId],
+            transformers: {
+                members: {
+                    playerInfo: {
+                        membershipId: convertStringToBigInt,
+                        lastSeen: convertStringToDate
+                    }
+                }
+            }
         }
     )
 

@@ -1,4 +1,5 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { TeamLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const getFirstTeamActivityVersionLeaderboard = async ({
@@ -12,12 +13,12 @@ export const getFirstTeamActivityVersionLeaderboard = async ({
     skip: number
     take: number
 }) => {
-    return await postgres.queryRows<TeamLeaderboardEntry>(
+    return await pgReader.queryRows<TeamLeaderboardEntry>(
         `SELECT
-            position,
-            rank,
+            position::int,
+            rank::int,
             value,
-            instance_id::text as "instanceId",
+            instance_id as "instanceId",
             "lateral".players
         FROM team_activity_version_leaderboard
         LEFT JOIN LATERAL (
@@ -45,7 +46,12 @@ export const getFirstTeamActivityVersionLeaderboard = async ({
         ORDER BY position ASC`,
         {
             params: [skip, take, activityId, versionId],
-            fetchCount: take
+            transformers: {
+                players: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                }
+            }
         }
     )
 }
@@ -61,16 +67,14 @@ export const searchFirstTeamActivityVersionLeaderboard = async ({
     membershipId: bigint | string
     take: number
 }) => {
-    const result = await postgres.queryRow<{ position: number }>(
-        `SELECT position 
+    const result = await pgReader.queryRow<{ position: number }>(
+        `SELECT position::int 
         FROM team_activity_version_leaderboard 
         WHERE membership_ids @> $1::jsonb
             AND activity_id = $2 AND version_id = $3
         ORDER BY position ASC
         LIMIT 1`,
-        {
-            params: [`${[membershipId]}`, activityId, versionId]
-        }
+        { params: [`${[membershipId]}`, activityId, versionId] }
     )
     if (!result) return null
 

@@ -1,7 +1,8 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { zCheatLevel } from "@/schema/enums/CheatLevel"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString, zInt64 } from "@/schema/util"
+import { zBigIntString } from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import { getPlayer } from "@/services/player"
 import { updatePlayer } from "@/services/reporting/update-player"
 import { z } from "zod"
@@ -37,7 +38,7 @@ export const updatePlayerRoute = new RaidHubRoute({
 
         if (!player) {
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, {
-                membershipId: String(membershipId)
+                membershipId
             })
         }
 

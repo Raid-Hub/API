@@ -1,7 +1,7 @@
 import { zCheatLevel } from "@/schema/enums/CheatLevel"
 import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
+import { zInt64, zISO8601DateString } from "@/schema/output"
 import { registry } from "@/schema/registry"
-import { zInt64, zISODateString } from "@/schema/util"
 import { z } from "zod"
 
 export type PlayerInfo = z.input<typeof zPlayerInfo>
@@ -25,7 +25,7 @@ export const zPlayerInfo = registry.register(
             }),
             bungieGlobalDisplayName: z.string().nullable(),
             bungieGlobalDisplayNameCode: z.string().nullable(),
-            lastSeen: zISODateString(),
+            lastSeen: zISO8601DateString(),
             isPrivate: z.boolean().openapi({
                 description: "Whether or not the player has chosen to hide their on Bungie.net."
             }),
@@ -35,7 +35,7 @@ export const zPlayerInfo = registry.register(
             example: {
                 bungieGlobalDisplayName: "Newo",
                 bungieGlobalDisplayNameCode: "9010",
-                membershipId: "4611686018488107374",
+                membershipId: 4611686018488107374n,
                 displayName: "xx_newo_xx",
                 iconPath: "/common/destiny2_content/icons/93844c8b76ea80683a880479e3506980.jpg",
                 membershipType: 3,

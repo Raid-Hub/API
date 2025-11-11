@@ -1,10 +1,10 @@
 import { zClanLeaderboardEntry } from "@/schema/components/Clan"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getClanLeaderboard } from "./leaderboard"
 
 describe("getClanLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getClanLeaderboard({
             skip: 0,
             take: 10,

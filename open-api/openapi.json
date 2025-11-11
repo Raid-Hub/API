@@ -448,13 +448,9 @@
             "format": "int64"
           },
           "membershipType": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DestinyMembershipType"
-              }
-            ],
             "nullable": true,
-            "description": "The platform on which the player created their account."
+            "description": "The platform on which the player created their account.",
+            "$ref": "#/components/schemas/DestinyMembershipType"
           },
           "iconPath": {
             "type": "string",
@@ -988,12 +984,8 @@
               "type": "object",
               "properties": {
                 "playerInfo": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PlayerInfo"
-                    }
-                  ],
-                  "nullable": true
+                  "nullable": true,
+                  "$ref": "#/components/schemas/PlayerInfo"
                 },
                 "stats": {
                   "$ref": "#/components/schemas/ClanMemberStats"
@@ -1699,15 +1691,12 @@
                           }
                         },
                         "membershipType": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/DestinyMembershipType"
-                            }
-                          ],
-                          "nullable": true
+                          "nullable": true,
+                          "$ref": "#/components/schemas/DestinyMembershipType"
                         },
                         "membershipId": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "int64"
                         },
                         "displayName": {
                           "type": "string",
@@ -1766,7 +1755,8 @@
                   ]
                 },
                 "characterId": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "int64"
                 },
                 "values": {
                   "type": "object",
@@ -1920,12 +1910,8 @@
             "minimum": 0
           },
           "fastestInstance": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Instance"
-              }
-            ],
-            "nullable": true
+            "nullable": true,
+            "$ref": "#/components/schemas/Instance"
           }
         },
         "required": [
@@ -2057,12 +2043,8 @@
           "worldFirstEntries": {
             "type": "object",
             "additionalProperties": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/WorldFirstEntry"
-                }
-              ],
-              "nullable": true
+              "nullable": true,
+              "$ref": "#/components/schemas/WorldFirstEntry"
             }
           }
         },
@@ -2132,6 +2114,7 @@
             "nullable": true
           },
           "latestResolvedInstance": {
+            "nullable": true,
             "$ref": "#/components/schemas/LatestResolvedInstance"
           }
         },
@@ -2162,12 +2145,8 @@
             "minimum": 0
           },
           "latestResolvedInstance": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LatestResolvedInstance"
-              }
-            ],
-            "nullable": true
+            "nullable": true,
+            "$ref": "#/components/schemas/LatestResolvedInstance"
           },
           "estimatedBacklogEmptied": {
             "type": "string",
@@ -2414,7 +2393,7 @@
         "properties": {
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           },
           "nextCursor": {
             "type": "string",
@@ -2436,7 +2415,7 @@
         "properties": {
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["membershipId"]
@@ -2446,7 +2425,7 @@
         "properties": {
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["membershipId"]
@@ -2459,13 +2438,9 @@
             "format": "int64"
           },
           "membershipType": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DestinyMembershipType"
-              }
-            ],
             "nullable": true,
-            "description": "The platform on which the player created their account."
+            "description": "The platform on which the player created their account.",
+            "$ref": "#/components/schemas/DestinyMembershipType"
           },
           "iconPath": {
             "type": "string",
@@ -2544,12 +2519,8 @@
           "worldFirstEntries": {
             "type": "object",
             "additionalProperties": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/WorldFirstEntry"
-                }
-              ],
-              "nullable": true
+              "nullable": true,
+              "$ref": "#/components/schemas/WorldFirstEntry"
             }
           }
         },
@@ -2575,7 +2546,7 @@
           },
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["message", "membershipId"]
@@ -2614,7 +2585,7 @@
         "properties": {
           "instanceId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["instanceId"]
@@ -2688,7 +2659,7 @@
         "properties": {
           "membershipId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["membershipId"]
@@ -3084,15 +3055,12 @@
                           }
                         },
                         "membershipType": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/DestinyMembershipType"
-                            }
-                          ],
-                          "nullable": true
+                          "nullable": true,
+                          "$ref": "#/components/schemas/DestinyMembershipType"
                         },
                         "membershipId": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "int64"
                         },
                         "displayName": {
                           "type": "string",
@@ -3151,7 +3119,8 @@
                   ]
                 },
                 "characterId": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "int64"
                 },
                 "values": {
                   "type": "object",
@@ -3252,7 +3221,7 @@
         "properties": {
           "instanceId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["instanceId"]
@@ -3269,12 +3238,8 @@
               "type": "object",
               "properties": {
                 "playerInfo": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PlayerInfo"
-                    }
-                  ],
-                  "nullable": true
+                  "nullable": true,
+                  "$ref": "#/components/schemas/PlayerInfo"
                 },
                 "stats": {
                   "$ref": "#/components/schemas/ClanMemberStats"
@@ -3291,7 +3256,7 @@
         "properties": {
           "groupId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           }
         },
         "required": ["groupId"]
@@ -3433,12 +3398,8 @@
             "$ref": "#/components/schemas/InstanceBasic"
           },
           "blacklist": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/InstanceBlacklist"
-              }
-            ],
-            "nullable": true
+            "nullable": true,
+            "$ref": "#/components/schemas/InstanceBlacklist"
           },
           "flags": {
             "type": "array",
@@ -3469,13 +3430,13 @@
         "properties": {
           "instanceId": {
             "type": "string",
-            "pattern": "^\\d+n?$"
+            "format": "int64"
           },
           "players": {
             "type": "array",
             "items": {
               "type": "string",
-              "pattern": "^\\d+n?$"
+              "format": "int64"
             }
           }
         },
@@ -5927,25 +5888,50 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["InvalidActivityVersionComboError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/InvalidActivityVersionComboError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["QueryValidationError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/QueryValidationError"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["QueryValidationError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/QueryValidationError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     }
-                  },
-                  "required": ["minted", "success", "code", "error"]
+                  ]
                 }
               }
             }
@@ -6001,27 +5987,6 @@
                         },
                         "error": {
                           "$ref": "#/components/schemas/PlayerNotOnLeaderboardError"
-                        }
-                      },
-                      "required": ["minted", "success", "code", "error"]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "minted": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "success": {
-                          "type": "boolean",
-                          "enum": [false]
-                        },
-                        "code": {
-                          "type": "string",
-                          "enum": ["InvalidActivityVersionComboError"]
-                        },
-                        "error": {
-                          "$ref": "#/components/schemas/InvalidActivityVersionComboError"
                         }
                       },
                       "required": ["minted", "success", "code", "error"]
@@ -7328,19 +7293,7 @@
                           "enum": ["InstanceNotFoundError"]
                         },
                         "error": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/InstanceNotFoundError"
-                            },
-                            {
-                              "properties": {
-                                "instanceId": {
-                                  "type": "string",
-                                  "format": "int64"
-                                }
-                              }
-                            }
-                          ]
+                          "$ref": "#/components/schemas/InstanceNotFoundError"
                         }
                       },
                       "required": ["minted", "success", "code", "error"]
@@ -7588,7 +7541,19 @@
                           "enum": ["InstanceNotFoundError"]
                         },
                         "error": {
-                          "$ref": "#/components/schemas/InstanceNotFoundError"
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/InstanceNotFoundError"
+                            },
+                            {
+                              "properties": {
+                                "instanceId": {
+                                  "type": "string",
+                                  "pattern": "^\\d+n?$"
+                                }
+                              }
+                            }
+                          ]
                         }
                       },
                       "required": ["minted", "success", "code", "error"]
@@ -7783,19 +7748,7 @@
                           "enum": ["PlayerNotFoundError"]
                         },
                         "error": {
-                          "allOf": [
-                            {
-                              "$ref": "#/components/schemas/PlayerNotFoundError"
-                            },
-                            {
-                              "properties": {
-                                "membershipId": {
-                                  "type": "string",
-                                  "format": "int64"
-                                }
-                              }
-                            }
-                          ]
+                          "$ref": "#/components/schemas/PlayerNotFoundError"
                         }
                       },
                       "required": ["minted", "success", "code", "error"]

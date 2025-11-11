@@ -1,7 +1,7 @@
 import { ErrorData } from "@/core/RaidHubRouterTypes"
 import { ErrorCode, zErrorCode } from "@/schema/errors/ErrorCode"
+import { zISO8601DateString } from "@/schema/output"
 import { registry } from "@/schema/registry"
-import { zISODateString } from "@/schema/util"
 import { ZodObject, ZodRawShape, ZodType, z } from "zod"
 
 export const zRaidHubResponse = registry.register(
@@ -9,14 +9,14 @@ export const zRaidHubResponse = registry.register(
     z.discriminatedUnion("success", [
         z
             .object({
-                minted: zISODateString(),
+                minted: zISO8601DateString(),
                 success: z.literal(true),
                 response: z.unknown()
             })
             .strict(),
         z
             .object({
-                minted: zISODateString(),
+                minted: zISO8601DateString(),
                 success: z.literal(false),
                 code: zErrorCode,
                 error: z.unknown()
@@ -27,7 +27,7 @@ export const zRaidHubResponse = registry.register(
 
 export const registerResponse = (path: string, schema: ZodType) =>
     z.object({
-        minted: zISODateString(),
+        minted: z.string().datetime(),
         success: z.literal(true),
         response: registry.register(
             path
@@ -42,7 +42,7 @@ export const registerResponse = (path: string, schema: ZodType) =>
 
 export const registerError = <T extends ZodRawShape>(code: ErrorCode, schema: ZodObject<T>) =>
     z.object({
-        minted: zISODateString(),
+        minted: zISO8601DateString(),
         success: z.literal(false),
         code: z.literal(code),
         error: registry.register(code, schema)
@@ -55,7 +55,7 @@ export type RaidHubResponse<T, E extends ErrorData> = {
     | {
           [K in keyof E]: {
               success: false
-              error: z.input<E[K]["schema"]>
+              error: z.output<E[K]["schema"]>
               code: E[K]["code"]
           }
       }[number]

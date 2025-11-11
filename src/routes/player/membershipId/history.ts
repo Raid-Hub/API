@@ -2,7 +2,8 @@ import { canAccessProtectedResource } from "@/auth/protected-resource"
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { zInstanceForPlayer } from "@/schema/components/InstanceForPlayer"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString, zISODateString } from "@/schema/util"
+import { zBigIntString, zDateString as zISODateStringInput } from "@/schema/input"
+import { zISO8601DateString, zInt64 } from "@/schema/output"
 import { getPlayer } from "@/services/player"
 import { getActivities } from "@/services/player-instances/history"
 import { z } from "zod"
@@ -19,7 +20,7 @@ in order to optimize performance. Subsequent requests will return the full numbe
     }),
     query: z.object({
         count: z.coerce.number().int().min(10).max(5000).default(2000),
-        cursor: zISODateString().optional()
+        cursor: zISODateStringInput().optional()
     }),
 
     response: {
@@ -27,8 +28,8 @@ in order to optimize performance. Subsequent requests will return the full numbe
             statusCode: 200,
             schema: z
                 .object({
-                    membershipId: zBigIntString(),
-                    nextCursor: zISODateString({ nullable: true }),
+                    membershipId: zInt64(),
+                    nextCursor: zISO8601DateString({ nullable: true }),
                     activities: z.array(zInstanceForPlayer)
                 })
                 .strict()
@@ -38,14 +39,14 @@ in order to optimize performance. Subsequent requests will return the full numbe
                 statusCode: 404,
                 code: ErrorCode.PlayerNotFoundError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             },
             {
                 statusCode: 403,
                 code: ErrorCode.PlayerPrivateProfileError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             }
         ]

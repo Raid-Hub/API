@@ -1,4 +1,5 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import {
     InstanceBlacklist,
     InstanceFlag,
@@ -6,27 +7,29 @@ import {
 } from "@/schema/components/InstanceStanding"
 
 export const getInstanceFlags = async (instanceId: bigint | string) => {
-    return await postgres.queryRows<InstanceFlag>(
+    return await pgReader.queryRows<InstanceFlag>(
         `SELECT 
             fi.cheat_check_version AS "cheatCheckVersion",
             fi.cheat_check_bitmask::text AS "cheatCheckBitmask",
             fi.flagged_at AS "flaggedAt",
-            fi.cheat_probability AS "cheatProbability"
+            fi.cheat_probability::double precision AS "cheatProbability"
         FROM flag_instance fi
         WHERE fi.instance_id = $1::bigint
         ORDER BY fi.cheat_probability, fi.flagged_at DESC
         LIMIT 10`,
         {
             params: [instanceId],
-            fetchCount: 10
+            transformers: {
+                cheatCheckBitmask: convertStringToBigInt
+            }
         }
     )
 }
 
 export const getInstanceBlacklist = async (instanceId: bigint | string) => {
-    return await postgres.queryRow<InstanceBlacklist>(
+    return await pgReader.queryRow<InstanceBlacklist>(
         `SELECT 
-            bi.instance_id::text AS "instanceId",
+            bi.instance_id AS "instanceId",
             bi.report_source::text AS "reportSource",
             bi.report_id AS "reportId",
             bi.cheat_check_version AS "cheatCheckVersion",
@@ -35,14 +38,12 @@ export const getInstanceBlacklist = async (instanceId: bigint | string) => {
         FROM blacklist_instance bi
         WHERE bi.instance_id = $1::bigint
         LIMIT 1`,
-        {
-            params: [instanceId]
-        }
+        { params: [instanceId] }
     )
 }
 
 export const getInstancePlayersStanding = async (instanceId: bigint | string) => {
-    return await postgres.queryRows<InstancePlayerStanding>(
+    return await pgReader.queryRows<InstancePlayerStanding>(
         `SELECT 
             json_build_object(
                 'membershipId', p.membership_id::text,
@@ -55,9 +56,9 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                 'isPrivate', p.is_private,
                 'cheatLevel', p.cheat_level
             ) AS "playerInfo",
-            p.clears,
+            p.clears::int,
             ip.completed,
-            ip.time_played_seconds AS "timePlayedSeconds",
+            ip.time_played_seconds::int AS "timePlayedSeconds",
             (
                 SELECT COALESCE(jsonb_agg(f.data), '[]'::jsonb)
                 FROM (
@@ -66,7 +67,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                         'membershipId', fip.membership_id::text,
                         'cheatCheckVersion', fip.cheat_check_version,
                         'cheatCheckBitmask', fip.cheat_check_bitmask::text,
-                        'cheatProbability', fip.cheat_probability,
+                        'cheatProbability', fip.cheat_probability::double precision,
                         'flaggedAt', fip.flagged_at
                     ) AS "data"
                     FROM flag_instance_player fip
@@ -85,7 +86,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                         'instanceDate', i.date_started,
                         'cheatCheckVersion', fip.cheat_check_version,
                         'cheatCheckBitmask', fip.cheat_check_bitmask::text,
-                        'cheatProbability', fip.cheat_probability,
+                        'cheatProbability', fip.cheat_probability::double precision,
                         'flaggedAt', fip.flagged_at
                     ) AS "data"
                     FROM flag_instance_player fip
@@ -124,7 +125,26 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
         LIMIT 12`,
         {
             params: [instanceId],
-            fetchCount: 12
+            transformers: {
+                playerInfo: { membershipId: convertStringToBigInt, lastSeen: convertStringToDate },
+                flags: {
+                    membershipId: convertStringToBigInt,
+                    instanceId: convertStringToBigInt,
+                    cheatCheckBitmask: convertStringToBigInt,
+                    flaggedAt: convertStringToDate
+                },
+                blacklistedInstances: {
+                    instanceId: convertStringToBigInt,
+                    createdAt: convertStringToDate,
+                    instanceDate: convertStringToDate
+                },
+                otherRecentFlags: {
+                    instanceId: convertStringToBigInt,
+                    membershipId: convertStringToBigInt,
+                    cheatCheckBitmask: convertStringToBigInt,
+                    flaggedAt: convertStringToDate
+                }
+            }
         }
     )
 }

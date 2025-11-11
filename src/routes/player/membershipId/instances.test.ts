@@ -1,7 +1,9 @@
+import { describe, expect, test } from "bun:test"
+
 import { generateJWT } from "@/auth/jwt"
 import { expectErr, expectOk } from "@/lib/test-utils"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { describe, expect, test } from "bun:test"
+
 import { playerInstancesRoute } from "./instances"
 
 describe("instances 200", () => {
@@ -105,7 +107,7 @@ describe("instances 200", () => {
 })
 
 describe("instances 404", () => {
-    test("4611686018488107373", async () => {
+    test("returns 404 for player not found", async () => {
         const result = await playerInstancesRoute.$mock({
             params: { membershipId: "4611686018488107373" }
         })
@@ -118,7 +120,7 @@ describe("instances 404", () => {
 })
 
 describe("instances 403", () => {
-    test("4611686018488107374", async () => {
+    test("returns 403 for protected resource", async () => {
         const result = await playerInstancesRoute.$mock({
             params: { membershipId: "4611686018488107374" }
         })

@@ -1,5 +1,5 @@
 import { registry } from "@/schema/registry"
-import { zNumericalRecordKey, zUInt32, zWholeNumber } from "@/schema/util"
+import { zNumericalRecordKey, zUInt32, zWholeNumber } from "@/schema/output"
 import { z } from "zod"
 
 export type WeaponMetric = z.input<typeof zWeaponMetric>

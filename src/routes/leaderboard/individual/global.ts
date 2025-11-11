@@ -2,9 +2,9 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zLeaderboardData } from "@/schema/components/LeaderboardData"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zInt64 } from "@/schema/output"
 import { zIndividualGlobalLeaderboardCategory } from "@/schema/params/IndividualGlobalLeaderboardCategory"
 import { zLeaderboardPagination } from "@/schema/query/LeaderboardPagination"
-import { zBigIntString } from "@/schema/util"
 import {
     getIndividualGlobalLeaderboard,
     getIndividualGlobalLeaderboardValueFormat,
@@ -25,7 +25,7 @@ export const leaderboardIndividualGlobalRoute = new RaidHubRoute({
                 statusCode: 404,
                 code: ErrorCode.PlayerNotOnLeaderboardError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             }
         ],

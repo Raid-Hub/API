@@ -1,5 +1,5 @@
 import { registry } from "@/schema/registry"
-import { zInt64, zUInt32, zWholeNumber } from "@/schema/util"
+import { zInt64, zUInt32, zWholeNumber } from "@/schema/output"
 import { z } from "zod"
 import { zInstanceCharacterWeapon } from "./InstanceCharacterWeapon"
 

@@ -1,4 +1,5 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { TeamLeaderboardEntry } from "@/schema/components/LeaderboardData"
 
 export const getContestTeamLeaderboard = async ({
@@ -10,12 +11,12 @@ export const getContestTeamLeaderboard = async ({
     skip: number
     take: number
 }) => {
-    return await postgres.queryRows<TeamLeaderboardEntry>(
+    return await pgReader.queryRows<TeamLeaderboardEntry>(
         `SELECT
-            position,
-            rank,
+            position::int,
+            rank::int,
             time_after_launch AS "value",
-            instance_id::text as "instanceId",
+            instance_id as "instanceId",
             "lateral".players
         FROM world_first_contest_leaderboard
         LEFT JOIN LATERAL (
@@ -43,7 +44,12 @@ export const getContestTeamLeaderboard = async ({
         ORDER BY position ASC`,
         {
             params: [skip, take, raidId],
-            fetchCount: take
+            transformers: {
+                players: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                }
+            }
         }
     )
 }
@@ -57,16 +63,14 @@ export const searchContestTeamLeaderboard = async ({
     membershipId: bigint | string
     take: number
 }) => {
-    const result = await postgres.queryRow<{ position: number }>(
-        `SELECT position 
+    const result = await pgReader.queryRow<{ position: number }>(
+        `SELECT position::int 
         FROM world_first_contest_leaderboard 
         WHERE membership_ids @> $1::jsonb
             AND activity_id = $2
         ORDER BY position ASC
         LIMIT 1`,
-        {
-            params: [`${[membershipId]}`, raidId]
-        }
+        { params: [`${[membershipId]}`, raidId] }
     )
     if (!result) return null
 

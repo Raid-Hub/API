@@ -1,4 +1,4 @@
-import { postgresWritable } from "@/integrations/postgres"
+import { pgAdmin } from "@/integrations/postgres"
 
 export const blacklistInstance = async (data: {
     instanceId: bigint | string
@@ -9,39 +9,37 @@ export const blacklistInstance = async (data: {
         reason: string
     }[]
 }) => {
-    return await postgresWritable.transaction(async conn => {
+    return await pgAdmin.transaction(async conn => {
         // Insert into blacklist_instance
         const reportSource = data.reportId ? "WebReport" : "Manual"
         await conn.queryRow(
             `INSERT INTO blacklist_instance (instance_id, report_source, report_id, reason)
             VALUES ($1::bigint, $2::"BlacklistReportSource", $3, $4)
             ON CONFLICT (instance_id) DO NOTHING`,
-            {
-                params: [data.instanceId, reportSource, data.reportId, data.reason]
-            }
+            { params: [data.instanceId, reportSource, data.reportId, data.reason] }
         )
 
         // Insert into blacklist_instance_flag
-        const playerStmnt = await conn.prepareStatement(
+        const playerStmnt = await conn.prepare(
             `INSERT INTO blacklist_instance_player (instance_id, membership_id, reason)
             VALUES ($1::bigint, $2::bigint, $3)
             ON CONFLICT (instance_id, membership_id) DO NOTHING`
         )
 
-        await Promise.all(
-            data.players.map(player =>
-                playerStmnt.execute({
-                    params: [data.instanceId, player.membershipId, player.reason]
-                })
+        try {
+            await Promise.all(
+                data.players.map(player =>
+                    playerStmnt.execute({ params: [data.instanceId, player.membershipId, player.reason] })
+                )
             )
-        )
-
-        await playerStmnt.close()
+        } finally {
+            await playerStmnt.close()
+        }
     })
 }
 
 export const removeInstanceBlacklist = async (instanceId: bigint | string) => {
-    return await postgresWritable.transaction(async conn => {
+    return await pgAdmin.transaction(async conn => {
         // Delete from blacklist_instance
         await conn.queryRow(`DELETE FROM blacklist_instance WHERE instance_id = $1::bigint`, {
             params: [instanceId]
@@ -50,9 +48,7 @@ export const removeInstanceBlacklist = async (instanceId: bigint | string) => {
         // Set instance.is_whitelisted to true
         await conn.queryRow(
             `UPDATE instance SET is_whitelisted = true WHERE instance_id = $1::bigint`,
-            {
-                params: [instanceId]
-            }
+            { params: [instanceId] }
         )
     })
 }

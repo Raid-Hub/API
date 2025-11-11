@@ -7,9 +7,10 @@ import {
     zBoolString,
     zCoercedNaturalNumber,
     zCoercedWholeNumber,
-    zISODateString,
+    zDateString,
     zSplitCommaSeparatedString
-} from "@/schema/util"
+} from "@/schema/input"
+import { zInt64 } from "@/schema/output"
 import { getPlayer } from "@/services/player"
 import { getInstances } from "@/services/player-instances/instances"
 import { z } from "zod"
@@ -22,12 +23,10 @@ export const playerInstancesRoute = new RaidHubRoute({
         membershipId: zBigIntString()
     }),
     query: z.object({
-        membershipIds: zSplitCommaSeparatedString(z.array(zBigIntString()).max(6))
-            .default([])
-            .openapi({
-                description:
-                    "A comma-separated list of up to 6 membershipIds the must be present in the instance. You do not need to include the target membershipId from the path parameter in this list."
-            }),
+        membershipIds: zSplitCommaSeparatedString(zBigIntString()).max(6).default([]).openapi({
+            description:
+                "A comma-separated list of up to 6 membershipIds the must be present in the instance. You do not need to include the target membershipId from the path parameter in this list."
+        }),
         activityId: zCoercedNaturalNumber().optional(),
         versionId: zCoercedNaturalNumber().optional(),
         completed: zBoolString().optional(),
@@ -41,8 +40,8 @@ export const playerInstancesRoute = new RaidHubRoute({
         season: zCoercedNaturalNumber().optional(),
         minSeason: zCoercedNaturalNumber().optional(),
         maxSeason: zCoercedNaturalNumber().optional(),
-        minDate: zISODateString().optional(),
-        maxDate: zISODateString().optional()
+        minDate: zDateString().optional(),
+        maxDate: zDateString().optional()
     }),
     response: {
         success: {
@@ -54,7 +53,7 @@ export const playerInstancesRoute = new RaidHubRoute({
                 statusCode: 404,
                 code: ErrorCode.PlayerNotFoundError,
                 schema: z.object({
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             },
             {
@@ -62,7 +61,7 @@ export const playerInstancesRoute = new RaidHubRoute({
                 code: ErrorCode.PlayerProtectedResourceError,
                 schema: z.object({
                     message: z.string(),
-                    membershipId: zBigIntString()
+                    membershipId: zInt64()
                 })
             }
         ]

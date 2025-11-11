@@ -1,13 +1,13 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
 
 export const getLatestInstanceByDate = async () => {
-    const latestActivity = await postgres.queryRow<{
-        instanceId: string
+    const latestActivity = await pgReader.queryRow<{
+        instanceId: bigint
         dateCompleted: Date
         dateResolved: Date
     }>(
         `SELECT 
-            t1.instance_id::text AS "instanceId",
+            t1.instance_id AS "instanceId",
             t1.date_completed AT TIME ZONE 'UTC' AS "dateCompleted", 
             pgcr.date_crawled AS "dateResolved"
         FROM (

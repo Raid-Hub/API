@@ -1,10 +1,13 @@
+import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
+
 import { expectOk } from "@/lib/test-utils"
 import * as AtlasModule from "@/services/atlas"
 import * as FloodgateModule from "@/services/floodgates"
-import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
+
 import * as BungieCoreEndpoints from "bungie-net-core/endpoints/Core"
 import { BungieNetResponse } from "bungie-net-core/interfaces"
 import { CoreSettingsConfiguration } from "bungie-net-core/models"
+
 import { statusRoute, statusState } from "./status"
 
 describe("status 200", async () => {

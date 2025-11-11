@@ -1,14 +1,14 @@
 import { zTeamLeaderboardEntry } from "@/schema/components/LeaderboardData"
-import { zNaturalNumber } from "@/schema/util"
+import { zNaturalNumber } from "@/schema/output"
 import {
     getContestTeamLeaderboard,
     searchContestTeamLeaderboard
 } from "@/services/leaderboard/team/contest"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 
 describe("getContestTeamLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getContestTeamLeaderboard({
             raidId: 5,
             skip: 76,
@@ -27,7 +27,7 @@ describe("getContestTeamLeaderboard", () => {
 })
 
 describe("searchContestTeamLeaderboard", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await searchContestTeamLeaderboard({
             raidId: 6,
             take: 5,

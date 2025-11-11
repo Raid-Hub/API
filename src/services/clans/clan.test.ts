@@ -1,10 +1,10 @@
 import { getClanMembers } from "@/integrations/bungie"
 import { zClanStats } from "@/schema/components/Clan"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { getClanStats } from "./clan-stats"
 
 describe("getClanStats", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const members = await getClanMembers("3148408")
         const data = await getClanStats(
             "3148408",

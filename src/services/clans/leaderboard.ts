@@ -1,4 +1,5 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import { convertStringToBigInt, convertStringToDate } from "@/integrations/postgres/transformer"
 import { ClanLeaderboardEntry } from "@/schema/components/Clan"
 
 export const clanLeaderboardSortColumns = [
@@ -32,7 +33,7 @@ export const getClanLeaderboard = async ({
 }) => {
     validateColumn(column)
 
-    return await postgres.queryRows<ClanLeaderboardEntry>(
+    return await pgReader.queryRows<ClanLeaderboardEntry>(
         `SELECT
             JSONB_BUILD_OBJECT(
                 'groupId', clan."group_id"::text,
@@ -41,16 +42,16 @@ export const getClanLeaderboard = async ({
                 'motto', clan."motto",
                 'clanBannerData', clan."clan_banner_data",
                 'lastUpdated', TO_CHAR(clan."updated_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-                'knownMemberCount', clan_leaderboard."known_member_count"
+                'knownMemberCount', clan_leaderboard."known_member_count"::int
             ) AS "clan",
-            "clears",
-            "average_clears" AS "averageClears",
-            "fresh_clears" AS "freshClears",
-            "average_fresh_clears" AS "averageFreshClears",
-            "sherpas",
-            "average_sherpas" AS "averageSherpas",
-            "time_played_seconds" AS "timePlayedSeconds",
-            "average_time_played_seconds" AS "averageTimePlayedSeconds",
+            "clears"::int,
+            "average_clears"::int AS "averageClears",
+            "fresh_clears"::int AS "freshClears",
+            "average_fresh_clears"::int AS "averageFreshClears",
+            "sherpas"::int,
+            "average_sherpas"::int AS "averageSherpas",
+            "time_played_seconds"::int AS "timePlayedSeconds",
+            "average_time_played_seconds"::int AS "averageTimePlayedSeconds",
             "total_contest_score" AS "totalContestScore",
             "weighted_contest_score" AS "weightedContestScore"
         FROM clan_leaderboard
@@ -60,7 +61,12 @@ export const getClanLeaderboard = async ({
         LIMIT $2`,
         {
             params: [skip, take],
-            fetchCount: take
+            transformers: {
+                clan: {
+                    groupId: convertStringToBigInt,
+                    lastUpdated: convertStringToDate
+                }
+            }
         }
     )
 }

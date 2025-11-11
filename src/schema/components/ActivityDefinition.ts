@@ -1,5 +1,5 @@
+import { zISO8601DateString, zNaturalNumber, zUInt32 } from "@/schema/output"
 import { registry } from "@/schema/registry"
-import { zISODateString, zNaturalNumber, zUInt32 } from "@/schema/util"
 import { z } from "zod"
 
 export type ActivityDefinition = z.input<typeof zActivityDefinition>
@@ -12,10 +12,10 @@ export const zActivityDefinition = registry.register(
             path: z.string(),
             isSunset: z.boolean(),
             isRaid: z.boolean(),
-            releaseDate: zISODateString({ nullable: true }),
-            dayOneEnd: zISODateString({ nullable: true }),
-            contestEnd: zISODateString({ nullable: true }),
-            weekOneEnd: zISODateString({ nullable: true }),
+            releaseDate: zISO8601DateString({ nullable: true }),
+            dayOneEnd: zISO8601DateString({ nullable: true }),
+            contestEnd: zISO8601DateString({ nullable: true }),
+            weekOneEnd: zISO8601DateString({ nullable: true }),
             milestoneHash: zUInt32().nullable(),
             splashSlug: z.string()
         })

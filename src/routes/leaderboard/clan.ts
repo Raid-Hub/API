@@ -1,7 +1,7 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zClanLeaderboardEntry } from "@/schema/components/Clan"
-import { zPage } from "@/schema/util"
+import { zPage } from "@/schema/input"
 import { clanLeaderboardSortColumns, getClanLeaderboard } from "@/services/clans/leaderboard"
 import { z } from "zod"
 

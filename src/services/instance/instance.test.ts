@@ -1,7 +1,7 @@
 import { zInstance } from "@/schema/components/Instance"
 import { zInstanceExtended } from "@/schema/components/InstanceExtended"
 import { zInstanceMetadata } from "@/schema/components/InstanceMetadata"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 import {
     getInstance,
@@ -11,7 +11,7 @@ import {
 } from "./instance"
 
 describe("getInstance", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getInstance("12685770593").catch(console.error)
 
         const parsed = zInstance.safeParse(data)
@@ -23,7 +23,7 @@ describe("getInstance", () => {
         }
     })
     describe("edge cases", () => {
-        it("is day one for day 1 clears on contest tdp", async () => {
+        test("is day one for day 1 clears on contest tdp", async () => {
             const data = await getInstance("16321449037").catch(console.error)
             const parsed = zInstance.safeParse(data)
             if (!parsed.success) {
@@ -37,7 +37,7 @@ describe("getInstance", () => {
             }
         })
 
-        it("is not contest or day one for day 1 clears on non-contest tdp", async () => {
+        test("is not contest or day one for day 1 clears on non-contest tdp", async () => {
             const data = await getInstance("16322031067").catch(console.error)
 
             const parsed = zInstance.safeParse(data)
@@ -52,7 +52,7 @@ describe("getInstance", () => {
             }
         })
 
-        it("is contest for day 1 non-challenge king's fall", async () => {
+        test("is contest for day 1 non-challenge king's fall", async () => {
             const data = await getInstance("11395499732").catch(console.error)
 
             const parsed = zInstance.safeParse(data)
@@ -67,7 +67,7 @@ describe("getInstance", () => {
             }
         })
 
-        it("is not contest for day 1 levi", async () => {
+        test("is not contest for day 1 levi", async () => {
             const data = await getInstance("258758374").catch(console.error)
 
             const parsed = zInstance.safeParse(data)
@@ -85,7 +85,7 @@ describe("getInstance", () => {
 })
 
 describe("getInstanceExtended", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getInstanceExtended("12685770593").catch(console.error)
 
         const parsed = zInstanceExtended.safeParse(data)
@@ -99,7 +99,7 @@ describe("getInstanceExtended", () => {
 })
 
 describe("getInstanceMetadataByHash", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getInstanceMetadataByHash(3711931140).catch(console.error)
 
         const parsed = zInstanceMetadata.safeParse(data)
@@ -113,7 +113,7 @@ describe("getInstanceMetadataByHash", () => {
 })
 
 describe("getLeaderboardEntryForInstance", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getLeaderboardEntryForInstance("13779269605").catch(console.error)
 
         const parsed = z

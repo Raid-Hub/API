@@ -1,11 +1,11 @@
 import { zPopulationByRaidMetric } from "@/schema/components/Metrics"
-import { zISODateString } from "@/schema/util"
+import { zISO8601DateString as zISODateString } from "@/schema/output"
 import { getDailyPlayerPopulation } from "@/services/metrics/daily-player-population"
-import { describe, expect, it } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { z } from "zod"
 
 describe("getDailyPlayerPopulation", () => {
-    it("returns the correct shape", async () => {
+    test("returns the correct shape", async () => {
         const data = await getDailyPlayerPopulation()
 
         const parsed = z

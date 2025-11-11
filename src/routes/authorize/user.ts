@@ -1,7 +1,8 @@
 import { generateJWT } from "@/auth/jwt"
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { zBigIntString, zDigitString, zISODateString } from "@/schema/util"
+import { zBigIntString, zDigitString } from "@/schema/input"
+import { zISO8601DateString } from "@/schema/output"
 import { z } from "zod"
 
 const TOKEN_EXPIRY = 30 * 24 * 3600
@@ -19,7 +20,7 @@ export const userAuthorizationRoute = new RaidHubRoute({
             statusCode: 200,
             schema: z.object({
                 value: z.string(),
-                expires: zISODateString()
+                expires: zISO8601DateString()
             })
         },
         errors: [

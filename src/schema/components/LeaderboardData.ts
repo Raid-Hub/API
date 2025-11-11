@@ -1,5 +1,5 @@
 import { registry } from "@/schema/registry"
-import { zInt64, zNaturalNumber } from "@/schema/util"
+import { zInt64, zNaturalNumber } from "@/schema/output"
 import { z } from "zod"
 import { zPlayerInfo } from "./PlayerInfo"
 

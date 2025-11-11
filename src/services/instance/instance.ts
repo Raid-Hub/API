@@ -1,4 +1,9 @@
-import { postgres } from "@/integrations/postgres"
+import { pgReader } from "@/integrations/postgres"
+import {
+    convertStringToBigInt,
+    convertStringToDate,
+    convertUInt32Value
+} from "@/integrations/postgres/transformer"
 import { Instance, InstanceBasic } from "@/schema/components/Instance"
 import { InstanceExtended } from "@/schema/components/InstanceExtended"
 import { InstanceMetadata } from "@/schema/components/InstanceMetadata"
@@ -6,22 +11,22 @@ import { InstancePlayerExtended } from "@/schema/components/InstancePlayerExtend
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
 
 export async function getInstance(instanceId: bigint | string): Promise<Instance | null> {
-    return await postgres.queryRow<Instance>(
-        `SELECT 
-            instance_id::text AS "instanceId",
+    return await pgReader.queryRow<Instance>(
+        `SELECT
+            instance_id AS "instanceId",
             hash AS "hash",
-            activity_id AS "activityId",
-            version_id AS "versionId",
+            activity_id::int AS "activityId",
+            version_id::int AS "versionId",
             completed AS "completed",
-            player_count AS "playerCount",
-            score AS "score",
+            player_count::int AS "playerCount",
+            score::int AS "score",
             fresh AS "fresh",
             flawless AS "flawless",
             skull_hashes AS "skullHashes",
             date_started AS "dateStarted",
             date_completed AS "dateCompleted",
-            season_id AS "season",
-            duration AS "duration",
+            season_id::int AS "season",
+            duration::int AS "duration",
             platform_type AS "platformType",
             CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
             CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
@@ -34,7 +39,11 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
         WHERE instance_id = $1::bigint
         LIMIT 1;`,
         {
-            params: [instanceId]
+            params: [instanceId],
+            transformers: {
+                hash: convertUInt32Value,
+                skullHashes: convertUInt32Value
+            }
         }
     )
 }
@@ -44,13 +53,13 @@ export async function getInstanceExtended(
 ): Promise<InstanceExtended | null> {
     const instanceQuery = getInstance(instanceId)
     const leaderboardEntryPromise = getLeaderboardEntryForInstance(instanceId)
-    const instancePlayersPromise = postgres.queryRows<InstancePlayerExtended>(
+    const instancePlayersPromise = pgReader.queryRows<InstancePlayerExtended>(
         `
         SELECT 
             completed as "completed",
             is_first_clear as "isFirstClear",
-            ap.sherpas as "sherpas",
-            time_played_seconds as "timePlayedSeconds",
+            ap.sherpas::int as "sherpas",
+            time_played_seconds::int as "timePlayedSeconds",
             JSONB_BUILD_OBJECT(
                 'membershipId', "membership_id"::text, 
                 'membershipType', "membership_type", 
@@ -72,16 +81,16 @@ export async function getInstanceExtended(
                     'classHash', "class_hash", 
                     'emblemHash', "emblem_hash", 
                     'completed', "completed", 
-                    'timePlayedSeconds', "time_played_seconds", 
-                    'startSeconds', "start_seconds", 
-                    'score', "score", 
-                    'kills', "kills", 
-                    'assists', "assists", 
-                    'deaths', "deaths", 
-                    'precisionKills', "precision_kills", 
-                    'superKills', "super_kills", 
-                    'grenadeKills', "grenade_kills", 
-                    'meleeKills', "melee_kills", 
+                    'timePlayedSeconds', "time_played_seconds"::int, 
+                    'startSeconds', "start_seconds"::int, 
+                    'score', "score"::int, 
+                    'kills', "kills"::int, 
+                    'assists', "assists"::int, 
+                    'deaths', "deaths"::int, 
+                    'precisionKills', "precision_kills"::int, 
+                    'superKills', "super_kills"::int, 
+                    'grenadeKills', "grenade_kills"::int, 
+                    'meleeKills', "melee_kills"::int, 
                     'weapons', "weapons_json"
                 )
             ) AS "characters_json"
@@ -92,8 +101,8 @@ export async function getInstanceExtended(
                         JSONB_AGG(
                             JSONB_BUILD_OBJECT(
                                 'weaponHash', w."weapon_hash", 
-                                'kills', w."kills", 
-                                'precisionKills', w."precision_kills"
+                                'kills', w."kills"::int, 
+                                'precisionKills', w."precision_kills"::int
                             )
                         ), '[]'::jsonb
                     ) AS "weapons_json"
@@ -110,12 +119,18 @@ export async function getInstanceExtended(
                     AND "ap"."instance_id" = "ac"."instance_id"
                 ORDER BY "completed" DESC, "time_played_seconds" DESC
             ) AS "c"
-        ) AS "t1" ON true 
+                ) AS "t1" ON true
         WHERE instance_id = $1::bigint
         ORDER BY completed DESC, time_played_seconds DESC;`,
         {
             params: [instanceId],
-            fetchCount: 100000
+            transformers: {
+                playerInfo: {
+                    membershipId: convertStringToBigInt,
+                    lastSeen: convertStringToDate
+                },
+                characters: { characterId: convertStringToBigInt }
+            }
         }
     )
 
@@ -134,9 +149,11 @@ export async function getInstanceExtended(
     })
 }
 
-export async function getInstanceMetadataByHash(hash: number | string): Promise<InstanceMetadata> {
-    const metaData = await postgres.queryRow<InstanceMetadata>(
-        `SELECT 
+export async function getInstanceMetadataByHash(
+    hash: number | string | bigint
+): Promise<InstanceMetadata> {
+    const metaData = await pgReader.queryRow<InstanceMetadata>(
+        `SELECT
             ad.name AS "activityName",
             vd.name AS "versionName",
             ad.is_raid AS "isRaid"
@@ -145,9 +162,7 @@ export async function getInstanceMetadataByHash(hash: number | string): Promise<
         INNER JOIN version_definition vd ON vd.id = ah.version_id
         WHERE hash = $1::bigint
         LIMIT 1;`,
-        {
-            params: [String(hash)]
-        }
+        { params: [hash.toString()] }
     )
     if (!metaData) {
         throw new Error("Metadata not found")
@@ -156,35 +171,33 @@ export async function getInstanceMetadataByHash(hash: number | string): Promise<
 }
 
 export const getLeaderboardEntryForInstance = async (instanceId: bigint | string) => {
-    return await postgres.queryRow<{
+    return await pgReader.queryRow<{
         rank: number
     }>(
-        `SELECT rank
+        `SELECT rank::int
         FROM team_activity_version_leaderboard
         WHERE instance_id = $1::bigint
         ORDER BY rank ASC
         LIMIT 1;`,
-        {
-            params: [instanceId]
-        }
+        { params: [instanceId] }
     )
 }
 
 export async function getInstanceBasic(instanceId: bigint | string) {
-    const instance = await postgres.queryRow<InstanceBasic>(
-        `SELECT 
-            instance_id::text AS "instanceId",
+    const instance = await pgReader.queryRow<InstanceBasic>(
+        `SELECT
+            instance_id AS "instanceId",
             hash AS "hash",
             completed AS "completed",
-            player_count AS "playerCount",
-            score AS "score",
+            player_count::int AS "playerCount",
+            score::int AS "score",
             fresh AS "fresh",
             flawless AS "flawless",
             skull_hashes AS "skullHashes",
             date_started AT TIME ZONE 'UTC' AS "dateStarted",
             date_completed AT TIME ZONE 'UTC' AS "dateCompleted",
-            season_id AS "season",
-            duration AS "duration",
+            season_id::int AS "season",
+            duration::int AS "duration",
             platform_type AS "platformType",
             pgcr.date_crawled AS "dateResolved"
         FROM instance
@@ -192,7 +205,11 @@ export async function getInstanceBasic(instanceId: bigint | string) {
         WHERE instance_id = $1::bigint
         LIMIT 1;`,
         {
-            params: [instanceId]
+            params: [instanceId],
+            transformers: {
+                hash: convertUInt32Value,
+                skullHashes: convertUInt32Value
+            }
         }
     )
 
@@ -200,9 +217,9 @@ export async function getInstanceBasic(instanceId: bigint | string) {
 }
 
 export async function getInstancePlayerInfo(instanceId: bigint | string) {
-    return await postgres.queryRows<PlayerInfo>(
+    return await pgReader.queryRows<PlayerInfo>(
         `SELECT 
-            player.membership_id::text AS "membershipId",
+            player.membership_id AS "membershipId",
             player.membership_type AS "membershipType",
             player.icon_path AS "iconPath",
             player.display_name AS "displayName",
@@ -215,9 +232,6 @@ export async function getInstancePlayerInfo(instanceId: bigint | string) {
         INNER JOIN "player" USING (membership_id)
         WHERE instance_id = $1::bigint
         ORDER BY completed DESC, time_played_seconds DESC;`,
-        {
-            params: [instanceId],
-            fetchCount: 100
-        }
+        { params: [instanceId] }
     )
 }
