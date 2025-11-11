@@ -28,7 +28,7 @@ export const getClanStats = async (
                         'displayName', player."display_name",
                         'bungieGlobalDisplayName', player."bungie_global_display_name",
                         'bungieGlobalDisplayNameCode', player."bungie_global_display_name_code",
-                        'lastSeen', player."last_seen"::text,
+                        'lastSeen', player."last_seen",
                         'isPrivate', player."is_private",
                         'cheatLevel', player."cheat_level"
                     ) END,
