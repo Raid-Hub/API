@@ -33,7 +33,7 @@ export const getTeammates = async (membershipId: bigint | string, { count }: { c
                 'displayName', "display_name", 
                 'bungieGlobalDisplayName', "bungie_global_display_name", 
                 'bungieGlobalDisplayNameCode', "bungie_global_display_name_code", 
-                'lastSeen', "last_seen"::text,
+                'lastSeen', "last_seen",
                 'isPrivate', "is_private",
                 'cheatLevel', cheat_level
             ) AS "playerInfo"
