@@ -16,7 +16,7 @@ export const getAtlasStatus = async (): Promise<
 > => {
     const now = Date.now()
     const queryRangeResponse = await promQueryRange({
-        query: "histogram_quantile(0.50, sum(rate(pgcr_crawl_summary_lag_bucket[2m])) by (le))",
+        query: "histogram_quantile(0.50, sum(rate(pgcr_crawl_summary_lag_seconds_bucket[2m])) by (le))",
         start: new Date(now - intervalMins * 60000),
         end: new Date(now),
         step
