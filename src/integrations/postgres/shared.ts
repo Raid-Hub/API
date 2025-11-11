@@ -12,8 +12,7 @@ export const TABLE_SCHEMAS = [
     "flagging",
     "leaderboard",
     "extended",
-    "raw",
-    "public"
+    "raw"
 ]
 
 export type QueryParams = unknown[]
@@ -78,7 +77,7 @@ export function createPool(config: {
         idleTimeoutMillis: config.idleTimeoutMillis ?? 30000,
         connectionTimeoutMillis: config.connectionTimeoutMillis ?? 10000,
         allowExitOnIdle: false,
-        options: `-c search_path=${TABLE_SCHEMAS.join(",")}`
+        options: `-c search_path=${TABLE_SCHEMAS.join(",")} -c timezone=UTC`
     })
 
     const metricsInterval = setInterval(() => {
