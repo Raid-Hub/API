@@ -5,15 +5,7 @@ import { TransformerTree, parseRowsWithTransformers } from "./transformer"
 
 const logger = new Logger("POSTGRES")
 
-export const TABLE_SCHEMAS = [
-    "core",
-    "definitions",
-    "clan",
-    "flagging",
-    "leaderboard",
-    "extended",
-    "raw"
-]
+export const TABLE_SCHEMAS = ["raw", "public"]
 
 export type QueryParams = unknown[]
 
