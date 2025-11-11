@@ -85,7 +85,7 @@ export class Logger {
         }
         const fieldsStr = this.formatFields(fields)
 
-        const logLine = `${levelTag}${loggerTag} -- ${logKey} ${fieldsStr && ">> " + fieldsStr}`
+        const logLine = `${new Date().toISOString()} ${levelTag}${loggerTag} -- ${logKey} ${fieldsStr && ">> " + fieldsStr}`
 
         switch (level) {
             case LogLevelPrefix.DEBUG:
