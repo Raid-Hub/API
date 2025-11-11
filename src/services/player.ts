@@ -119,7 +119,7 @@ export const getPlayerGlobalStats = async (membershipId: bigint | string) => {
                         'percentile', lb.speed_percentile
                     ) AS "sumOfBest",
                     JSONB_BUILD_OBJECT(
-                        'value', COALESCE(lb.wfr_score, player.wfr_score, 0)::int,
+                        'value', COALESCE(lb.wfr_score, player.wfr_score, 0),
                         'rank', lb.wfr_score_rank::int,
                         'percentile', lb.wfr_score_percentile
                     ) AS "contest"

@@ -4422,7 +4422,7 @@
           {
             "schema": {
               "type": "string",
-              "format": "int64"
+              "pattern": "^\\d+n?$"
             },
             "required": true,
             "name": "membershipId",
