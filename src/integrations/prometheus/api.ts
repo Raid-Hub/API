@@ -1,3 +1,5 @@
+import { internalApiFetch } from "@/lib/utils/internal-api-client"
+
 export type QueryRangeResponse = {
     status: "success"
     data: {
@@ -32,21 +34,12 @@ export const promQueryRange = async (opts: {
     url.searchParams.set("end", opts.end.toISOString())
     url.searchParams.set("step", opts.step)
 
-    const res = await fetch(url)
-
-    if (!res.ok) {
-        throw new Error(`Prometheus HTTP Error: ${res.status}: ${res.statusText}`, {
-            cause: res
-        })
-    }
-
-    return (await res.json()) as QueryRangeResponse
+    return internalApiFetch<QueryRangeResponse>("prometheus", url)
 }
 
 export const promQuery = async (opts: { query: string }): Promise<QueryResponse> => {
     const url = new URL(BASE_URL + "/query")
     url.searchParams.set("query", opts.query)
 
-    const response = await fetch(url)
-    return (await response.json()) as QueryResponse
+    return internalApiFetch<QueryResponse>("prometheus", url)
 }

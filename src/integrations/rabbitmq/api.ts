@@ -1,3 +1,5 @@
+import { internalApiFetch } from "@/lib/utils/internal-api-client"
+
 const VHOST = "/"
 const MANAGEMENT_PORT = 15672
 
@@ -21,18 +23,10 @@ interface RabbitQueueResponse {
 export const fetchRabbitQueue = async (queueName: string) => {
     const url = BASE_URL + "/" + encodeURIComponent(queueName)
 
-    const res = await fetch(url, {
+    return internalApiFetch<RabbitQueueResponse>("rabbitmq", url, {
         headers: {
             Authorization: `Basic ${auth}`,
             Accept: "application/json"
         }
     })
-
-    if (!res.ok) {
-        throw new Error(`RabbitMQ HTTP Error: ${res.status}: ${res.statusText}`, {
-            cause: res
-        })
-    }
-
-    return (await res.json()) as RabbitQueueResponse
 }

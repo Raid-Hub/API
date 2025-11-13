@@ -26,6 +26,7 @@ export enum ErrorCode {
     InvalidClientSecretError = "InvalidClientSecretError",
     /** RaidHub error */
     InternalServerError = "InternalServerError",
+    ServiceUnavailableError = "ServiceUnavailableError",
     /** Bungie */
     BungieServiceOffline = "BungieServiceOffline"
 }

@@ -1,5 +1,6 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { getDestiny2Status } from "@/integrations/bungie"
+import { InternalApiError } from "@/lib/utils/internal-api-client"
 import { cacheControl } from "@/middleware/cache-control"
 import {
     AtlasStatus,
@@ -7,6 +8,7 @@ import {
     zAtlasStatus,
     zFloodgatesStatus
 } from "@/schema/components/Status"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { getAtlasStatus } from "@/services/atlas"
 import { getFloodgatesRecentId, getFloodgatesStatus } from "@/services/floodgates"
 import { getInstanceBasic } from "@/services/instance/instance"
@@ -76,15 +78,39 @@ export const statusRoute = new RaidHubRoute({
                 AtlasPGCR: zAtlasStatus,
                 FloodgatesPGCR: zFloodgatesStatus
             })
-        }
+        },
+        errors: [
+            {
+                statusCode: 503,
+                code: ErrorCode.ServiceUnavailableError,
+                schema: z.object({
+                    serviceName: z.string(),
+                    message: z.string()
+                })
+            }
+        ]
     },
     async handler() {
-        const [atlasPGCR, floodgatesPGCR] = await Promise.all([getAtlasPGCR(), getFloodgatesPGCR()])
+        try {
+            const [atlasPGCR, floodgatesPGCR] = await Promise.all([
+                getAtlasPGCR(),
+                getFloodgatesPGCR()
+            ])
 
-        return RaidHubRoute.ok({
-            AtlasPGCR: atlasPGCR,
-            FloodgatesPGCR: floodgatesPGCR
-        })
+            return RaidHubRoute.ok({
+                AtlasPGCR: atlasPGCR,
+                FloodgatesPGCR: floodgatesPGCR
+            })
+        } catch (err) {
+            if (err instanceof InternalApiError) {
+                return RaidHubRoute.fail(ErrorCode.ServiceUnavailableError, {
+                    serviceName: err.serviceName,
+                    message: "Internal service unavailable"
+                })
+            } else {
+                throw err
+            }
+        }
     }
 })
 
