@@ -48,7 +48,7 @@ export const instanceRoute = new RaidHubRoute({
                             player.characters
                                 .filter(c => !c.classHash || !c.emblemHash)
                                 .map(c =>
-                                    instanceCharacterQueue.send({
+                                    instanceCharacterQueue.sendJson({
                                         instanceId,
                                         membershipId: player.playerInfo.membershipId,
                                         characterId: c.characterId
@@ -57,11 +57,9 @@ export const instanceRoute = new RaidHubRoute({
                         )
                     ),
                     Promise.allSettled(
-                        data.players.slice(0, 12).map(p =>
-                            playersQueue.send({
-                                membershipId: p.playerInfo.membershipId
-                            })
-                        )
+                        data.players
+                            .slice(0, 12)
+                            .map(p => playersQueue.send(p.playerInfo.membershipId))
                     )
                 ])
             })

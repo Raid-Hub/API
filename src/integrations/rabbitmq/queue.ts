@@ -4,7 +4,9 @@ import { RabbitConnection } from "./connection"
 
 const logger = new Logger("RABBITMQ")
 
-export class RabbitQueue<T> {
+type Primitive = string | number | bigint | boolean
+
+export class RabbitQueue<T extends Primitive | Record<string, unknown>> {
     readonly queueName: string
     private isReady = false
     private isConnecting = false
@@ -26,7 +28,19 @@ export class RabbitQueue<T> {
         }
     }
 
-    async send(message: T) {
+    private static primitiveToBuffer(value: Primitive): Buffer {
+        switch (typeof value) {
+            case "string":
+                return Buffer.from(value)
+            case "number":
+            case "bigint":
+                return Buffer.from(value.toString())
+            case "boolean":
+                return Buffer.from(value ? "true" : "false")
+        }
+    }
+
+    private async sendBuffer(buffer: Buffer, contentType: string) {
         try {
             await this.connect()
             const channel = await this.channel
@@ -34,7 +48,9 @@ export class RabbitQueue<T> {
                 throw new Error("Failed to create channel")
             }
 
-            return channel.sendToQueue(this.queueName, Buffer.from(JSON.stringify(message)))
+            return channel.sendToQueue(this.queueName, buffer, {
+                contentType
+            })
         } catch (err) {
             logger.error(
                 "RABBITMQ_SEND_FAILED",
@@ -45,5 +61,21 @@ export class RabbitQueue<T> {
                 }
             )
         }
+    }
+
+    /**
+     * Send a primitive value (string, number, bigint, boolean)
+     */
+    async send(value: Primitive & T) {
+        const buffer = RabbitQueue.primitiveToBuffer(value)
+        return this.sendBuffer(buffer, "text/plain")
+    }
+
+    /**
+     * Send a JSON object
+     */
+    async sendJson(value: T extends Primitive ? never : T) {
+        const buffer = Buffer.from(JSON.stringify(value))
+        return this.sendBuffer(buffer, "application/json")
     }
 }

@@ -7,24 +7,20 @@ const rabbitmq = new RabbitConnection({
     port: process.env.RABBITMQ_PORT ?? 5672
 })
 
-export const playersQueue = new RabbitQueue<{
-    membershipId: bigint | string
-}>({
-    queueName: "player_requests",
+export const playersQueue = new RabbitQueue<bigint>({
+    queueName: "player_crawl",
     connection: rabbitmq
 })
 
-export const clanQueue = new RabbitQueue<{
-    groupId: bigint | string
-}>({
-    queueName: "clan",
+export const clanQueue = new RabbitQueue<bigint>({
+    queueName: "clan_crawl",
     connection: rabbitmq
 })
 
 export const instanceCharacterQueue = new RabbitQueue<{
-    instanceId: bigint | string
-    membershipId: bigint | string
-    characterId: bigint | string
+    instanceId: bigint
+    membershipId: bigint
+    characterId: bigint
 }>({
     queueName: "character_fill",
     connection: rabbitmq

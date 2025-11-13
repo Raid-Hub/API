@@ -43,6 +43,7 @@
           "InsufficientPermissionsError",
           "InvalidClientSecretError",
           "InternalServerError",
+          "ServiceUnavailableError",
           "BungieServiceOffline"
         ]
       },
@@ -2361,6 +2362,18 @@
         },
         "required": ["AtlasPGCR", "FloodgatesPGCR"]
       },
+      "ServiceUnavailableError": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["serviceName", "message"]
+      },
       "PlayerSearchResponse": {
         "type": "object",
         "properties": {
@@ -3664,6 +3677,34 @@
                     },
                     "error": {
                       "$ref": "#/components/schemas/InternalServerError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ServiceUnavailableError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["ServiceUnavailableError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/ServiceUnavailableError"
                     }
                   },
                   "required": ["minted", "success", "code", "error"]

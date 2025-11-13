@@ -36,7 +36,7 @@ you only have the membershipId available.`,
         const member = await getPlayer(req.params.membershipId)
 
         after(async () => {
-            await playersQueue.send({ membershipId: req.params.membershipId })
+            await playersQueue.send(req.params.membershipId)
         })
 
         if (!member) {
