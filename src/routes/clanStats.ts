@@ -62,19 +62,14 @@ export const clanStatsRoute = new RaidHubRoute({
             return handleErr(err, groupId)
         }
 
-        const stats = await getClanStats(
-            groupId,
-            members.map(m => m.destinyUserInfo.membershipId)
-        )
+        const membershipIds = members.map(member => BigInt(member.destinyUserInfo.membershipId))
+
+        const stats = await getClanStats(groupId, membershipIds)
 
         after(async () => {
             await Promise.allSettled([
-                clanQueue.send({ groupId }),
-                ...members.map(member =>
-                    playersQueue.send({
-                        membershipId: BigInt(member.destinyUserInfo.membershipId)
-                    })
-                )
+                clanQueue.send(groupId),
+                ...membershipIds.map(id => playersQueue.send(id))
             ])
         })
 

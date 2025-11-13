@@ -57,11 +57,9 @@ export const instanceRoute = new RaidHubRoute({
                         )
                     ),
                     Promise.allSettled(
-                        data.players.slice(0, 12).map(p =>
-                            playersQueue.send({
-                                membershipId: p.playerInfo.membershipId
-                            })
-                        )
+                        data.players
+                            .slice(0, 12)
+                            .map(p => playersQueue.send(p.playerInfo.membershipId))
                     )
                 ])
             })

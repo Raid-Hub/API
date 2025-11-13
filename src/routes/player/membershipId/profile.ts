@@ -58,7 +58,7 @@ This is used to hydrate the RaidHub profile page`,
         const player = await getPlayer(membershipId)
 
         after(async () => {
-            await playersQueue.send({ membershipId: req.params.membershipId })
+            await playersQueue.send(req.params.membershipId)
         })
 
         if (!player) {
