@@ -37,7 +37,7 @@ export const getClanStats = async (
                         'freshClears',  COALESCE(player."fresh_clears", 0)::int,
                         'sherpas',  COALESCE(player."sherpas", 0)::int,
                         'totalTimePlayedSeconds', COALESCE(player."total_time_played_seconds", 0)::int,
-                        'contestScore', COALESCE(rs."score", 0)::double precision
+                        'contestScore', COALESCE(rs."score", 0)::DOUBLE PRECISION
                     )
                 ) as "_member"
             FROM membership_ids
