@@ -127,15 +127,23 @@ describe("getFloodgatesStatus", () => {
                 ingressRateSeconds: 1.0
             })
         })
-    })
 
-    test("it reads the data correctly", async () => {
-        const result = await getFloodgatesStatus()
+        test("it reads the data correctly", async () => {
+            spyFetchQueue.mockResolvedValueOnce({
+                messages: 4,
+                backing_queue_status: {
+                    avg_egress_rate: 0.154,
+                    avg_ingress_rate: 0.21
+                }
+            })
 
-        expect(result).toEqual({
-            waiting: expect.any(Number),
-            ackRateSeconds: expect.any(Number),
-            ingressRateSeconds: expect.any(Number)
+            const result = await getFloodgatesStatus()
+
+            expect(result).toEqual({
+                waiting: expect.any(Number),
+                ackRateSeconds: expect.any(Number),
+                ingressRateSeconds: expect.any(Number)
+            })
         })
     })
 })

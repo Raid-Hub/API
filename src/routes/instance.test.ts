@@ -6,7 +6,7 @@ import { expectErr, expectOk } from "@/lib/test-utils"
 import { instanceRoute } from "./instance"
 
 describe("activity 200", () => {
-    const spyCharQueueSend = spyOn(instanceCharacterQueue, "send")
+    const spyCharQueueSend = spyOn(instanceCharacterQueue, "sendJson")
     const spyPlayersQueueSend = spyOn(playersQueue, "send")
 
     beforeEach(() => {
