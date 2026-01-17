@@ -31,7 +31,7 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
             CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
             CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
             date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
-            b.instance_id IS NOT NULL AS "isBlacklisted"
+            (b.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted"
         FROM instance
         INNER JOIN activity_version av USING (hash)
         INNER JOIN activity_definition ON activity_definition.id = av.activity_id

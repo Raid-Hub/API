@@ -81,6 +81,19 @@ describe("getInstance", () => {
                 expect(parsed.data.isWeekOne).toBe(true)
             }
         })
+
+        test("whitelisted instance is not blacklisted", async () => {
+            const data = await getInstance("16707634209").catch(console.error)
+
+            const parsed = zInstance.safeParse(data)
+            if (!parsed.success) {
+                console.error(parsed.error.errors)
+                expect(parsed.error.errors).toEqual([])
+            } else {
+                expect(parsed.success).toBe(true)
+                expect(parsed.data.isBlacklisted).toBe(false)
+            }
+        })
     })
 })
 
