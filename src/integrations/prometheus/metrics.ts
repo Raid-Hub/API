@@ -1,10 +1,22 @@
-import { Gauge, Histogram } from "prom-client"
+import { Counter, Gauge, Histogram } from "prom-client"
 
 export const httpRequestTimer = new Histogram({
     name: "incoming_api_request_duration_ms",
     help: "Duration of HTTP requests in ms",
     labelNames: ["path", "status_code"],
     buckets: [0.1, 1, 5, 15, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000, 10000]
+})
+
+export const httpRequestCountByRegion = new Counter({
+    name: "incoming_api_requests_total",
+    help: "Total number of HTTP requests by region (country code)",
+    labelNames: ["region"]
+})
+
+export const httpRequestCountByContinent = new Counter({
+    name: "incoming_api_requests_by_continent_total",
+    help: "Total number of HTTP requests by continent (requires CF Managed Transform)",
+    labelNames: ["continent"]
 })
 
 const QueryBuckets = [0.1, 0.5, 1, 5, 10, 50, 100, 250, 500, 1000, 5000, 10000]
