@@ -13,12 +13,6 @@ export const httpRequestCountByRegion = new Counter({
     labelNames: ["region"]
 })
 
-export const httpRequestCountByContinent = new Counter({
-    name: "incoming_api_requests_by_continent_total",
-    help: "Total number of HTTP requests by continent (requires CF Managed Transform)",
-    labelNames: ["continent"]
-})
-
 const QueryBuckets = [0.1, 0.5, 1, 5, 10, 50, 100, 250, 500, 1000, 5000, 10000]
 
 export const activityHistoryQueryTimer = new Histogram({

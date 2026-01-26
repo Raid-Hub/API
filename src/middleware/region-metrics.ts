@@ -1,5 +1,4 @@
 import {
-    httpRequestCountByContinent,
     httpRequestCountByRegion
 } from "@/integrations/prometheus/metrics"
 import { RequestHandler } from "express"
@@ -40,7 +39,6 @@ export const regionMetrics = <
 
         res.once("finish", () => {
             httpRequestCountByRegion.labels(res.locals._region).inc()
-            httpRequestCountByContinent.labels(res.locals._continent).inc()
         })
 
         next()
