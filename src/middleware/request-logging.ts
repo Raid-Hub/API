@@ -6,10 +6,11 @@ import { RaidHubLocals } from "./types"
 const logger = new Logger("REQUEST_LOGGING")
 
 /**
- * Middleware to log request completion with duration and status.
- * Should be used alongside duration metrics middleware.
+ * Middleware to log request completion with duration and related metadata.
+ * Should be used alongside duration metrics middleware, which is responsible
+ * for populating timing information (e.g. `_duration`) on `res.locals`.
  * 
- * Adds _startTime and _duration properties to the locals.
+ * This middleware logs the request duration and Cloudflare region/ASN/continent.
  */
 export const requestLogging = <
     P extends ParamsDictionary = ParamsDictionary,
