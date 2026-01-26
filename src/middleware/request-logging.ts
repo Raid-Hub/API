@@ -18,10 +18,14 @@ export const requestLogging = <
     ReqBody = unknown,
     ReqQuery extends Query = Query
 >(): RequestHandler<P, ResBody, ReqBody, ReqQuery, RaidHubLocals> => {
-    return (_, res, next) => {
+    return (req, res, next) => {
         res.once("finish", () => {
             const locals = (res.locals as RaidHubLocals)
             logger.debug("REQUEST_COMPLETED", {
+                path: req.path,
+                url: req.ip,
+                method: req.method,
+                statusCode: req.statusCode,
                 duration: `${locals._duration}ms`,
                 region: locals._region,
                 asn: locals._asn,
