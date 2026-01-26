@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any */
-import { httpRequestTimer } from "@/integrations/prometheus/metrics"
+import { durationMetrics } from "@/middleware/duration-metrics"
+import { regionMetrics } from "@/middleware/region-metrics"
+import { requestLogging } from "@/middleware/request-logging"
 import { Logger } from "@/lib/utils/logging"
 import { zApiKeyError } from "@/schema/errors/ApiKeyError"
 import { BodyValidationError, zBodyValidationError } from "@/schema/errors/BodyValidationError"
@@ -207,7 +209,9 @@ export class RaidHubRoute<
     get express() {
         return this.router[this.method](
             "/",
-            this.measureDuration,
+            durationMetrics(this.getFullPath()),
+            regionMetrics(),
+            requestLogging(),
             this.validateParams,
             this.validateQuery,
             this.validateBody,
@@ -264,29 +268,6 @@ export class RaidHubRoute<
                 error: result.error
             } as const
         }
-    }
-
-    private measureDuration: RequestHandler<
-        z.output<Params>,
-        any,
-        z.output<Body>,
-        z.output<Query>
-    > = (req, res, next) => {
-        const start = Date.now()
-        res.on("finish", () => {
-            const responseTimeInMs = Date.now() - start
-            const path = this.getFullPath()
-            const code = res.statusCode.toString()
-            httpRequestTimer.labels(path, code).observe(responseTimeInMs)
-
-            logger.debug("REQUEST_COMPLETED", {
-                path: req.path,
-                method: req.method,
-                statusCode: res.statusCode,
-                duration: `${responseTimeInMs}ms`
-            })
-        })
-        next()
     }
 
     setParent(parent: RaidHubRouter) {
