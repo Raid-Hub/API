@@ -39,6 +39,24 @@ describe("zBoolString", () => {
         }
     })
 
+    test("should parse number 1 as boolean true", () => {
+        const schema = zBoolString()
+        const result = schema.safeParse(1)
+        expect(result.success).toBe(true)
+        if (result.success) {
+            expect(result.data).toBe(true)
+        }
+    })
+
+    test("should parse number 0 as boolean false", () => {
+        const schema = zBoolString()
+        const result = schema.safeParse(0)
+        expect(result.success).toBe(true)
+        if (result.success) {
+            expect(result.data).toBe(false)
+        }
+    })
+
     test("should parse boolean true as boolean true", () => {
         const schema = zBoolString()
         const result = schema.safeParse(true)
