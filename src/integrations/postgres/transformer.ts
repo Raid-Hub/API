@@ -81,8 +81,12 @@ export function convertStringToDate(value: unknown, key: string): Date | null {
     if (value === null) {
         return null
     }
+    // pg driver maybe return Date objects for timestamp/timestamptz columns
+    if (value instanceof Date) {
+        return value
+    }
     if (typeof value !== "string") {
-        throw new Error(`Key ${key}: Expected a stringified date, got ${typeof value}`)
+        throw new Error(`Key ${key}: Expected a stringified date or Date, got ${typeof value}`)
     }
     const date = new Date(value)
     if (isNaN(date.getTime())) {

@@ -27,5 +27,5 @@ describe("player standing not found", () => {
         }
     }
 
-    test("fake id", () => t("9999999999999999999"))
+    test("fake id", () => t("1111111111111111111"))
 })
