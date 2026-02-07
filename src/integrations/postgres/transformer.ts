@@ -86,7 +86,9 @@ export function convertStringToDate(value: unknown, key: string): Date | null {
         return value
     }
     if (typeof value !== "string") {
-        throw new Error(`Key ${key}: Expected a stringified date or Date, got ${typeof value}`)
+        throw new Error(
+            `Key ${key}: Expected a stringified date or Date, got ${typeof value}::${value}`
+        )
     }
     const date = new Date(value)
     if (isNaN(date.getTime())) {
