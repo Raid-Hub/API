@@ -29,12 +29,23 @@ export class RaidHubRoute<
     M extends "get" | "post" | "patch" | "put" | "delete",
     ResponseBody extends ZodType,
     ErrorResponse extends ErrorData,
-    Params extends ZodObject<any, any, any, { [x: string]: any }, { [x: string]: any }> =
-        z.ZodObject<{}>,
-    Query extends ZodObject<any, any, any, { [x: string]: any }, { [x: string]: any }> =
-        z.ZodObject<{}>,
+    Params extends ZodObject<
+        any,
+        any,
+        any,
+        { [x: string]: any },
+        { [x: string]: any }
+    > = z.ZodObject<{}>,
+    Query extends ZodObject<
+        any,
+        any,
+        any,
+        { [x: string]: any },
+        { [x: string]: any }
+    > = z.ZodObject<{}>,
     Body extends ZodType = ZodUnknown
-> implements IRaidHubRoute {
+> implements IRaidHubRoute
+{
     readonly method: M
     readonly description: string
     readonly paramsSchema: Params | null
@@ -340,7 +351,7 @@ export class RaidHubRoute<
                 deprecated: this.isDeprecated ? true : undefined,
                 method: this.method,
                 description: this.description,
-                summary: "",
+                summary: this.getFullPath(),
                 security,
                 request: {
                     params: this.paramsSchema ?? undefined,
