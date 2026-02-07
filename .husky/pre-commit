@@ -1,12 +1,16 @@
-staged_changes=$(git diff --name-only)
+# Get staged .ts and .json files
+staged=$(git diff --cached --name-only | grep -E '\.(ts|json)$' || true)
 
-# Run lint + format (auto-fix)
-bunx lint-staged
+if [ -n "$staged" ]; then
+  echo "$staged" | xargs bunx eslint --fix --max-warnings=0 || exit 1
+  echo "$staged" | xargs bunx prettier --write
+fi
 
-# Check if lint-staged made any changes
-if [ -n "$(git diff --name-only)" ]; then
+diff=$(git diff --name-only)
+
+if [ -n "$diff" ]; then
   echo "🚨 Lint or format applied fixes. Stage them and commit again."
-  git diff --name-only | while read -r f; do
+  echo "$diff" | while read -r f; do
     printf '\033[31m%s\033[0m\n' "$f"
   done
   exit 1

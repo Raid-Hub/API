@@ -32,7 +32,19 @@ jobs:
                   bun install --frozen-lockfile
 
             - name: Lint
-              run: bun lint
+              run: bun run lint --max-warnings=0
+    formatt:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: oven-sh/setup-bun@v1
+
+            - name: Bun Install
+              run: |
+                  bun install --frozen-lockfile
+
+            - name: Format
+              run: bun run format --check
 
     verify-open-api-doc:
         runs-on: ubuntu-latest

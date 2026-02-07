@@ -15,6 +15,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "bun --watch ./src/index.ts",
+    "test": "bun test tests/",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.json",
     "format": "bun prettier '**/*.{ts,json}' --write",
@@ -23,8 +24,8 @@
   },
   "lint-staged": {
     "*.{ts,json}": [
-      "bun run lint --fix --max-warnings=0",
-      "bun run format"
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
     ]
   },
   "devDependencies": {
