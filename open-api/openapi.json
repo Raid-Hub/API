@@ -3525,7 +3525,7 @@
     "/player/{membershipId}/history": {
       "get": {
         "description": "/activities is deprecated. Use /history now. Get a player's activity history. This endpoint uses date cursors to paginate through a player's activity history. \nThe first request should not include a cursor. Subsequent requests should include the `nextCursor` \nvalue from the previous response. Note that the first request may not return the full number of activities requested\nin order to optimize performance. Subsequent requests will return the full number of activities requested.",
-        "summary": "/player/:membershipId/history",
+        "summary": "/player/{membershipId}/history",
         "security": [
           {
             "Bearer Token": []
@@ -3758,7 +3758,7 @@
     "/player/{membershipId}/basic": {
       "get": {
         "description": "An extremely low-cost API call. Get basic information Bungie information about a player. The information is not\nguaranteed to be fully up-to-date, however, it should be accurate enough for most use cases where\nyou only have the membershipId available.",
-        "summary": "/player/:membershipId/basic",
+        "summary": "/player/{membershipId}/basic",
         "parameters": [
           {
             "schema": {
@@ -3910,7 +3910,7 @@
     "/player/{membershipId}/profile": {
       "get": {
         "description": "Get a player's profile information. This includes global stats, activity stats, and world first entries. \nThis is used to hydrate the RaidHub profile page",
-        "summary": "/player/:membershipId/profile",
+        "summary": "/player/{membershipId}/profile",
         "security": [
           {
             "Bearer Token": []
@@ -4095,7 +4095,7 @@
     "/player/{membershipId}/teammates": {
       "get": {
         "description": "Get a list of a player's top 100 teammates.",
-        "summary": "/player/:membershipId/teammates",
+        "summary": "/player/{membershipId}/teammates",
         "security": [
           {
             "Bearer Token": []
@@ -4280,7 +4280,7 @@
     "/player/{membershipId}/instances": {
       "get": {
         "description": "Find a set of instances based on the query parameters. Some parameters will not work together, such as providing a season outside the range of the min/max season. Requires authentication.",
-        "summary": "/player/:membershipId/instances",
+        "summary": "/player/{membershipId}/instances",
         "parameters": [
           {
             "schema": {
@@ -4645,7 +4645,7 @@
     "/instance/{instanceId}": {
       "get": {
         "description": "/activity is deprecated. Use /instance now. This returns a PGCR object with a shape more aligned with how RaidHub displays PGCRs.",
-        "summary": "/instance/:instanceId",
+        "summary": "/instance/{instanceId}",
         "parameters": [
           {
             "schema": {
@@ -4797,7 +4797,7 @@
     "/leaderboard/individual/global/{category}": {
       "get": {
         "description": "Individual leaderboards across all raids",
-        "summary": "/leaderboard/individual/global/:category",
+        "summary": "/leaderboard/individual/global/{category}",
         "parameters": [
           {
             "schema": {
@@ -5008,7 +5008,7 @@
     "/leaderboard/individual/raid/{raid}/{category}": {
       "get": {
         "description": "Individual leaderboards for a specific raid",
-        "summary": "/leaderboard/individual/raid/:raid/:category",
+        "summary": "/leaderboard/individual/raid/{raid}/{category}",
         "parameters": [
           {
             "schema": {
@@ -5249,7 +5249,7 @@
     "/leaderboard/individual/pantheon/{version}/{category}": {
       "get": {
         "description": "Individual leaderboards for a specific pantheon version",
-        "summary": "/leaderboard/individual/pantheon/:version/:category",
+        "summary": "/leaderboard/individual/pantheon/{version}/{category}",
         "parameters": [
           {
             "schema": {
@@ -5490,7 +5490,7 @@
     "/leaderboard/team/first/{activity}/{version}": {
       "get": {
         "description": "Ranking of the first 1000 completions of each activity version. \nUse the /contest endpoint instead to get the full rankings for the duration of the contest.",
-        "summary": "/leaderboard/team/first/:activity/:version",
+        "summary": "/leaderboard/team/first/{activity}/{version}",
         "parameters": [
           {
             "schema": {
@@ -5734,7 +5734,7 @@
     "/leaderboard/team/contest/{raid}": {
       "get": {
         "description": "Ranking of all teams which completed the official contest version of the raid during the contest period.",
-        "summary": "/leaderboard/team/contest/:raid",
+        "summary": "/leaderboard/team/contest/{raid}",
         "parameters": [
           {
             "schema": {
@@ -6127,7 +6127,7 @@
     "/pgcr/{instanceId}": {
       "get": {
         "description": "Get a raw post game carnage report by instanceId. \nThis is essentially the raw data from the Bungie API, with a few fields trimmed off. \nIt should be a subset of the data returned by the Bungie API. \nUseful if you need to access PGCRs when Bungie's API is down.",
-        "summary": "/pgcr/:instanceId",
+        "summary": "/pgcr/{instanceId}",
         "parameters": [
           {
             "schema": {
@@ -6279,7 +6279,7 @@
     "/clan/{groupId}": {
       "get": {
         "description": "Get the stats for a clan. Data updates weekly.",
-        "summary": "/clan/:groupId",
+        "summary": "/clan/{groupId}",
         "parameters": [
           {
             "schema": {
@@ -6889,7 +6889,7 @@
     "/admin/reporting/standing/{instanceId}": {
       "get": {
         "description": "Find a set of instances based on the query parameters. Some parameters will not work together, such as providing a season outside the range of the min/max season. Requires authentication.",
-        "summary": "/admin/reporting/standing/:instanceId",
+        "summary": "/admin/reporting/standing/{instanceId}",
         "parameters": [
           {
             "schema": {
@@ -7041,7 +7041,7 @@
     "/admin/reporting/blacklist/{instanceId}": {
       "put": {
         "description": "Blacklist an instance from leaderboards, as well as the players involved.",
-        "summary": "/admin/reporting/blacklist/:instanceId",
+        "summary": "/admin/reporting/blacklist/{instanceId}",
         "parameters": [
           {
             "schema": {
@@ -7301,7 +7301,7 @@
     "/admin/reporting/player/{membershipId}": {
       "get": {
         "description": "Get a player's standing information including recent flags and blacklisted instances. Requires authentication.",
-        "summary": "/admin/reporting/player/:membershipId",
+        "summary": "/admin/reporting/player/{membershipId}",
         "parameters": [
           {
             "schema": {
@@ -7451,7 +7451,7 @@
       },
       "patch": {
         "description": "Update fields on a player. Currently, only the cheat level can be updated.",
-        "summary": "/admin/reporting/player/:membershipId",
+        "summary": "/admin/reporting/player/{membershipId}",
         "parameters": [
           {
             "schema": {
