@@ -3,8 +3,10 @@ import { convertStringToBigInt, convertStringToDate } from "@/integrations/postg
 import {
     InstanceBlacklist,
     InstanceFlag,
+    InstancePlayerFlag,
     InstancePlayerStanding
 } from "@/schema/components/InstanceStanding"
+import { PlayerBlacklistedInstance } from "@/schema/components/PlayerStanding"
 
 export const getInstanceFlags = async (instanceId: bigint | string) => {
     return await pgReader.queryRows<InstanceFlag>(
@@ -65,6 +67,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                     SELECT jsonb_build_object(
                         'instanceId', fip.instance_id::text,
                         'membershipId', fip.membership_id::text,
+                        'instanceDate', (SELECT date_started FROM instance WHERE instance_id = $1::bigint),
                         'cheatCheckVersion', fip.cheat_check_version,
                         'cheatCheckBitmask', fip.cheat_check_bitmask::text,
                         'cheatProbability', fip.cheat_probability::double precision,
@@ -131,7 +134,8 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                     membershipId: convertStringToBigInt,
                     instanceId: convertStringToBigInt,
                     cheatCheckBitmask: convertStringToBigInt,
-                    flaggedAt: convertStringToDate
+                    flaggedAt: convertStringToDate,
+                    instanceDate: convertStringToDate
                 },
                 blacklistedInstances: {
                     instanceId: convertStringToBigInt,
@@ -142,8 +146,62 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                     instanceId: convertStringToBigInt,
                     membershipId: convertStringToBigInt,
                     cheatCheckBitmask: convertStringToBigInt,
-                    flaggedAt: convertStringToDate
+                    flaggedAt: convertStringToDate,
+                    instanceDate: convertStringToDate
                 }
+            }
+        }
+    )
+}
+
+export const getPlayerRecentFlags = async (membershipId: bigint | string) => {
+    return await pgReader.queryRows<InstancePlayerFlag>(
+        `SELECT 
+            fip.instance_id::text AS "instanceId",
+            fip.membership_id::text AS "membershipId",
+            fip.cheat_check_version AS "cheatCheckVersion",
+            fip.cheat_check_bitmask::text AS "cheatCheckBitmask",
+            fip.cheat_probability::double precision AS "cheatProbability",
+            fip.flagged_at AS "flaggedAt",
+            i.date_started AS "instanceDate"
+        FROM flag_instance_player fip
+        JOIN instance i USING (instance_id)
+        WHERE fip.membership_id = $1::bigint
+        ORDER BY fip.flagged_at DESC
+        LIMIT 50`,
+        {
+            params: [membershipId],
+            transformers: {
+                instanceId: convertStringToBigInt,
+                membershipId: convertStringToBigInt,
+                cheatCheckBitmask: convertStringToBigInt,
+                flaggedAt: convertStringToDate,
+                instanceDate: convertStringToDate
+            }
+        }
+    )
+}
+
+export const getPlayerBlacklistedInstances = async (membershipId: bigint | string) => {
+    return await pgReader.queryRows<PlayerBlacklistedInstance>(
+        `SELECT 
+            bi.instance_id::text AS "instanceId",
+            i.date_started AS "instanceDate",
+            bi.reason AS "reason",
+            bip.reason AS "individualReason",
+            bi.created_at AS "createdAt"
+        FROM blacklist_instance_player bip
+        JOIN blacklist_instance bi USING (instance_id)
+        JOIN instance i USING (instance_id)
+        WHERE bip.membership_id = $1::bigint
+        ORDER BY i.date_started DESC
+        LIMIT 50`,
+        {
+            params: [membershipId],
+            transformers: {
+                instanceId: convertStringToBigInt,
+                instanceDate: convertStringToDate,
+                createdAt: convertStringToDate
             }
         }
     )

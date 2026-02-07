@@ -75,7 +75,7 @@ describe("activities middleware", () => {
 
     app.use(express.json())
 
-    app.use("/test/:membershipId", playerHistoryRoute.express)
+    app.use("/test/:membershipId", playerHistoryRoute.mountable)
 
     test("1 day cache on 200 cursor query", async () => {
         const res = await request(app)

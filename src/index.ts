@@ -44,7 +44,7 @@ app.options("*", (req, res) => {
 })
 
 // parse incoming request body with json, apply the router, handle any uncaught errors
-app.use(verifyApiKey, json(), compression(), router.express, errorHandler)
+app.use(verifyApiKey, json(), compression(), router.mountable, errorHandler)
 
 // Start the server
 app.listen(port, () => {

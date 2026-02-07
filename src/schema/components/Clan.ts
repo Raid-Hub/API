@@ -90,16 +90,14 @@ export const zClanMemberStats = registry.register(
     })
 )
 
+/** Route response schema; registered via route's registerResponse(path, schema), not here. */
 export type ClanStats = z.input<typeof zClanStats>
-export const zClanStats = registry.register(
-    "ClanStats",
-    z.object({
-        aggregateStats: zClanAggregateStats,
-        members: z.array(
-            z.object({
-                playerInfo: zPlayerInfo.nullable(),
-                stats: zClanMemberStats
-            })
-        )
-    })
-)
+export const zClanStats = z.object({
+    aggregateStats: zClanAggregateStats,
+    members: z.array(
+        z.object({
+            playerInfo: zPlayerInfo.nullable(),
+            stats: zClanMemberStats
+        })
+    )
+})

@@ -124,7 +124,8 @@ export const zInstancePlayerFlag = registry.register(
         cheatProbability: z.number().nonnegative(),
         cheatCheckBitmask: zCheatCheckBitmask,
         instanceId: zInt64(),
-        membershipId: zInt64()
+        membershipId: zInt64(),
+        instanceDate: zISO8601DateString()
     })
 )
 
