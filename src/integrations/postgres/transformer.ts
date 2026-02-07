@@ -71,6 +71,10 @@ export function convertStringToBigInt(value: unknown, key: string): bigint | nul
     if (value === null) {
         return null
     }
+    // Already a bigint
+    if (typeof value === "bigint") {
+        return value
+    }
     if (typeof value !== "string") {
         throw new Error(`Key ${key}: Expected a stringified bigint, got ${typeof value}`)
     }
