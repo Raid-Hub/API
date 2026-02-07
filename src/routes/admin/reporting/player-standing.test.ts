@@ -1,11 +1,11 @@
 import { expectErr, expectOk } from "@/lib/test-utils"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { describe, expect, test } from "bun:test"
-import { playerStandingRoute } from "./player-standing"
+import { getPlayerStanding } from "./player-standing"
 
 describe("player standing 200", () => {
     const t = async (membershipId: string) => {
-        const result = await playerStandingRoute.$mock({ params: { membershipId } })
+        const result = await getPlayerStanding.$mock({ params: { membershipId } })
 
         expectOk(result)
     }
@@ -15,7 +15,7 @@ describe("player standing 200", () => {
 
 describe("player standing not found", () => {
     const t = async (membershipId: string) => {
-        const result = await playerStandingRoute.$mock({
+        const result = await getPlayerStanding.$mock({
             params: {
                 membershipId
             }

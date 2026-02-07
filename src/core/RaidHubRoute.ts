@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any */
+import { Logger } from "@/lib/utils/logging"
 import { durationMetrics } from "@/middleware/duration-metrics"
 import { regionMetrics } from "@/middleware/region-metrics"
 import { requestLogging } from "@/middleware/request-logging"
-import { Logger } from "@/lib/utils/logging"
 import { zApiKeyError } from "@/schema/errors/ApiKeyError"
 import { BodyValidationError, zBodyValidationError } from "@/schema/errors/BodyValidationError"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
@@ -29,23 +29,12 @@ export class RaidHubRoute<
     M extends "get" | "post" | "patch" | "put" | "delete",
     ResponseBody extends ZodType,
     ErrorResponse extends ErrorData,
-    Params extends ZodObject<
-        any,
-        any,
-        any,
-        { [x: string]: any },
-        { [x: string]: any }
-    > = z.ZodObject<{}>,
-    Query extends ZodObject<
-        any,
-        any,
-        any,
-        { [x: string]: any },
-        { [x: string]: any }
-    > = z.ZodObject<{}>,
+    Params extends ZodObject<any, any, any, { [x: string]: any }, { [x: string]: any }> =
+        z.ZodObject<{}>,
+    Query extends ZodObject<any, any, any, { [x: string]: any }, { [x: string]: any }> =
+        z.ZodObject<{}>,
     Body extends ZodType = ZodUnknown
-> implements IRaidHubRoute
-{
+> implements IRaidHubRoute {
     readonly method: M
     readonly description: string
     readonly paramsSchema: Params | null
@@ -71,9 +60,9 @@ export class RaidHubRoute<
         z.input<ResponseBody>,
         ErrorResponse
     >
-    private readonly router: Router
+    private readonly expressRouter: Router
 
-    // Construct a new route for the API and attach it into a router with myRoute.express
+    // Construct a new route for the API and attach it into a router with myRoute.router
     constructor(args: {
         method: M
         description: string
@@ -99,7 +88,7 @@ export class RaidHubRoute<
             errors?: ErrorResponse | never[]
         }
     }) {
-        this.router = Router({
+        this.expressRouter = Router({
             strict: true,
             mergeParams: true
         })
@@ -205,9 +194,9 @@ export class RaidHubRoute<
         }
     }
 
-    // This is the express router that is returned and used to create the actual express route
-    get express() {
-        return this.router[this.method](
+    /** Router to mount at a path (use with router.use(path, route.mountable)) */
+    get mountable() {
+        return this.expressRouter[this.method](
             "/",
             durationMetrics(this.getFullPath()),
             regionMetrics(),
@@ -348,10 +337,10 @@ export class RaidHubRoute<
         return [
             {
                 path,
-                summary: path,
                 deprecated: this.isDeprecated ? true : undefined,
                 method: this.method,
                 description: this.description,
+                summary: "",
                 security,
                 request: {
                     params: this.paramsSchema ?? undefined,

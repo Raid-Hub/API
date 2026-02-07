@@ -7,7 +7,7 @@ import { getPlayer } from "@/services/player"
 import { updatePlayer } from "@/services/reporting/update-player"
 import { z } from "zod"
 
-export const updatePlayerRoute = new RaidHubRoute({
+export const patchPlayer = new RaidHubRoute({
     method: "patch",
     description: "Update fields on a player. Currently, only the cheat level can be updated.",
     params: z.object({

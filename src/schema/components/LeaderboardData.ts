@@ -26,25 +26,23 @@ export const zIndividualLeaderboardEntry = registry.register(
     })
 )
 
+/** Route response schema; registered via route's registerResponse(path, schema), not here. */
 export type LeaderboardData<T extends "team" | "individual"> = z.input<typeof zLeaderboardData> & {
     type: T
 }
-export const zLeaderboardData = registry.register(
-    "LeaderboardData",
-    z.discriminatedUnion("type", [
-        z.object({
-            type: z.literal("team"),
-            format: z.enum(["duration", "numerical"]),
-            page: zNaturalNumber(),
-            count: zNaturalNumber(),
-            entries: z.array(zTeamLeaderboardEntry)
-        }),
-        z.object({
-            type: z.literal("individual"),
-            format: z.enum(["duration", "numerical"]),
-            page: zNaturalNumber(),
-            count: zNaturalNumber(),
-            entries: z.array(zIndividualLeaderboardEntry)
-        })
-    ])
-)
+export const zLeaderboardData = z.discriminatedUnion("type", [
+    z.object({
+        type: z.literal("team"),
+        format: z.enum(["duration", "numerical"]),
+        page: zNaturalNumber(),
+        count: zNaturalNumber(),
+        entries: z.array(zTeamLeaderboardEntry)
+    }),
+    z.object({
+        type: z.literal("individual"),
+        format: z.enum(["duration", "numerical"]),
+        page: zNaturalNumber(),
+        count: zNaturalNumber(),
+        entries: z.array(zIndividualLeaderboardEntry)
+    })
+])

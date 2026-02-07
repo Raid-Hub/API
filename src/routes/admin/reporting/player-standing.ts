@@ -10,7 +10,7 @@ import {
 } from "@/services/reporting/standing"
 import { z } from "zod"
 
-export const playerStandingRoute = new RaidHubRoute({
+export const getPlayerStanding = new RaidHubRoute({
     method: "get",
     description:
         "Get a player's standing information including recent flags and blacklisted instances. Requires authentication.",

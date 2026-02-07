@@ -4,14 +4,6 @@ import { z } from "zod"
 import { zInstancePlayerFlag } from "./InstanceStanding"
 import { zPlayerInfo } from "./PlayerInfo"
 
-export type PlayerStandingFlag = z.infer<typeof zPlayerStandingFlag>
-export const zPlayerStandingFlag = registry.register(
-    "PlayerStandingFlag",
-    zInstancePlayerFlag.extend({
-        instanceDate: zISO8601DateString()
-    })
-)
-
 export type PlayerBlacklistedInstance = z.infer<typeof zPlayerBlacklistedInstance>
 export const zPlayerBlacklistedInstance = registry.register(
     "PlayerBlacklistedInstance",
@@ -24,12 +16,10 @@ export const zPlayerBlacklistedInstance = registry.register(
     })
 )
 
+/** Route response schema; registered via route's registerResponse(path, schema), not here. */
 export type PlayerStandingResponse = z.infer<typeof zPlayerStandingResponse>
-export const zPlayerStandingResponse = registry.register(
-    "PlayerStandingResponse",
-    z.object({
-        playerInfo: zPlayerInfo,
-        recentFlags: z.array(zPlayerStandingFlag),
-        blacklistedInstances: z.array(zPlayerBlacklistedInstance)
-    })
-)
+export const zPlayerStandingResponse = z.object({
+    playerInfo: zPlayerInfo,
+    recentFlags: z.array(zInstancePlayerFlag),
+    blacklistedInstances: z.array(zPlayerBlacklistedInstance)
+})

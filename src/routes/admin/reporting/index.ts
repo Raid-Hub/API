@@ -1,8 +1,8 @@
 import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { blacklistInstanceRoute } from "./blacklist"
 import { reportingStandingInstanceRoute } from "./instance-standing"
-import { playerStandingRoute } from "./player-standing"
-import { updatePlayerRoute } from "./player"
+import { getPlayerStanding } from "./player-standing"
+import { patchPlayer } from "./player"
 
 export const reportingRouter = new RaidHubRouter({
     routes: [
@@ -16,11 +16,7 @@ export const reportingRouter = new RaidHubRouter({
         },
         {
             path: "/player/:membershipId",
-            route: updatePlayerRoute
-        },
-        {
-            path: "/player-standing/:membershipId",
-            route: playerStandingRoute
+            route: [getPlayerStanding, patchPlayer]
         }
     ]
 })

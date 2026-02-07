@@ -5,8 +5,11 @@ import { IncomingHttpHeaders } from "http"
 import { ZodType, z } from "zod"
 import { RaidHubRouter } from "./RaidHubRouter"
 
+export type RaidHubHttpMethod = "get" | "post" | "patch" | "put" | "delete"
+
 export interface IRaidHubRoute {
-    express: Router
+    method?: RaidHubHttpMethod
+    get mountable(): Router
     $generateOpenApiRoutes(): RouteConfig[]
     setParent(parent: RaidHubRouter | null): void
     getParent(): RaidHubRouter | null

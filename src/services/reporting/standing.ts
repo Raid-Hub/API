@@ -3,12 +3,10 @@ import { convertStringToBigInt, convertStringToDate } from "@/integrations/postg
 import {
     InstanceBlacklist,
     InstanceFlag,
+    InstancePlayerFlag,
     InstancePlayerStanding
 } from "@/schema/components/InstanceStanding"
-import {
-    PlayerBlacklistedInstance,
-    PlayerStandingFlag
-} from "@/schema/components/PlayerStanding"
+import { PlayerBlacklistedInstance } from "@/schema/components/PlayerStanding"
 
 export const getInstanceFlags = async (instanceId: bigint | string) => {
     return await pgReader.queryRows<InstanceFlag>(
@@ -69,6 +67,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                     SELECT jsonb_build_object(
                         'instanceId', fip.instance_id::text,
                         'membershipId', fip.membership_id::text,
+                        'instanceDate', (SELECT date_started FROM instance WHERE instance_id = $1::bigint),
                         'cheatCheckVersion', fip.cheat_check_version,
                         'cheatCheckBitmask', fip.cheat_check_bitmask::text,
                         'cheatProbability', fip.cheat_probability::double precision,
@@ -135,7 +134,8 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                     membershipId: convertStringToBigInt,
                     instanceId: convertStringToBigInt,
                     cheatCheckBitmask: convertStringToBigInt,
-                    flaggedAt: convertStringToDate
+                    flaggedAt: convertStringToDate,
+                    instanceDate: convertStringToDate
                 },
                 blacklistedInstances: {
                     instanceId: convertStringToBigInt,
@@ -146,7 +146,8 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
                     instanceId: convertStringToBigInt,
                     membershipId: convertStringToBigInt,
                     cheatCheckBitmask: convertStringToBigInt,
-                    flaggedAt: convertStringToDate
+                    flaggedAt: convertStringToDate,
+                    instanceDate: convertStringToDate
                 }
             }
         }
@@ -154,7 +155,7 @@ export const getInstancePlayersStanding = async (instanceId: bigint | string) =>
 }
 
 export const getPlayerRecentFlags = async (membershipId: bigint | string) => {
-    return await pgReader.queryRows<PlayerStandingFlag>(
+    return await pgReader.queryRows<InstancePlayerFlag>(
         `SELECT 
             fip.instance_id::text AS "instanceId",
             fip.membership_id::text AS "membershipId",
