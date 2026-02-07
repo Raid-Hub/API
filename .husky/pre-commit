@@ -1,1 +1,13 @@
-bun lint --fix
+staged_changes=$(git diff --name-only)
+
+# Run lint + format (auto-fix)
+bunx lint-staged
+
+# Check if lint-staged made any changes
+if [ -n "$(git diff --name-only)" ]; then
+  echo "🚨 Lint or format applied fixes. Stage them and commit again."
+  git diff --name-only | while read -r f; do
+    printf '\033[31m%s\033[0m\n' "$f"
+  done
+  exit 1
+fi

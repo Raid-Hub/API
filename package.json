@@ -17,15 +17,15 @@
     "dev": "bun --watch ./src/index.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.json",
-    "format": "prettier '**/*.{ts,json}'",
+    "format": "bun prettier '**/*.{ts,json}' --write",
     "docs": "bun run ./open-api/generate.ts",
     "compile": "bun build --compile --sourcemap ./src/index.ts --outfile $1"
   },
   "lint-staged": {
     "*.{ts,json}": [
-      "eslint --fix"
-    ],
-    "*.js": "eslint --cache --fix"
+      "bun run lint --fix --max-warnings=0",
+      "bun run format"
+    ]
   },
   "devDependencies": {
     "@asteasolutions/zod-to-openapi": "^6.3.1",
