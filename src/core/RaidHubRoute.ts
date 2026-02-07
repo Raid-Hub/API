@@ -351,7 +351,7 @@ export class RaidHubRoute<
                 deprecated: this.isDeprecated ? true : undefined,
                 method: this.method,
                 description: this.description,
-                summary: this.getFullPath(),
+                summary: path,
                 security,
                 request: {
                     params: this.paramsSchema ?? undefined,
