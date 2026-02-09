@@ -1,17 +1,39 @@
+# Restore stashed unstaged changes. On conflict, restore working tree and re-apply stash.
+restore_stash() {
+  if git stash apply stash@{0} 2>/dev/null; then
+    git stash drop stash@{0}
+  else
+    git restore .
+    git stash pop
+    echo "⚠️  Lint/format fixes conflicted with unstaged changes; restored your working tree."
+    exit 1
+  fi
+}
+
 # Get staged .ts and .json files
 staged=$(git diff --cached --name-only | grep -E '\.(ts|json)$' || true)
 
 if [ -n "$staged" ]; then
-  echo "$staged" | xargs bunx eslint --fix --max-warnings=0 || exit 1
+  stash_used=
+  # Stash unstaged changes so lint/format only see staged content
+  if ! git diff --quiet; then
+    git stash push -m "pre-commit: unstaged changes" --keep-index
+    stash_used=1
+  fi
+
+  echo "$staged" | xargs bunx eslint --fix --max-warnings=0 || { [ -n "$stash_used" ] && restore_stash; exit 1; }
   echo "$staged" | xargs bunx prettier --write
-fi
 
-diff=$(git diff --name-only)
+  # Fail if lint/format changed any of the files we ran on
+  diff=$(echo "$staged" | xargs git diff --name-only -- 2>/dev/null | sort -u)
+  if [ -n "$diff" ]; then
+    [ -n "$stash_used" ] && restore_stash
+    echo "🚨 Lint or format applied fixes. Stage them and commit again."
+    echo "$diff" | while read -r f; do
+      printf '\033[31m%s\033[0m\n' "$f"
+    done
+    exit 1
+  fi
 
-if [ -n "$diff" ]; then
-  echo "🚨 Lint or format applied fixes. Stage them and commit again."
-  echo "$diff" | while read -r f; do
-    printf '\033[31m%s\033[0m\n' "$f"
-  done
-  exit 1
+  [ -n "$stash_used" ] && restore_stash
 fi
