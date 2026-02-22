@@ -18,7 +18,7 @@ const inFlightRequests = new Map<string, Promise<unknown>>()
 export const bungiePlatformHttp = (opts: { ttl: number }) => ({
     fetch: async <T>(config: BungieFetchConfig) => {
         const cacheKey = config.url.toString()
-        
+
         // Check cache first
         if (inMemoryCache.has(cacheKey)) {
             return inMemoryCache.get(cacheKey)!.data as T
@@ -82,9 +82,12 @@ export const bungiePlatformHttp = (opts: { ttl: number }) => ({
                         cause: body
                     })
                 } else {
-                    throw new Error(`Invalid response (${response.status}): ${response.statusText}`, {
-                        cause: body
-                    })
+                    throw new Error(
+                        `Invalid response (${response.status}): ${response.statusText}`,
+                        {
+                            cause: body
+                        }
+                    )
                 }
             }
         })()

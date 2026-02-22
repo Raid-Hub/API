@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test"
 import "@/schema/registry" // Initialize OpenAPI extensions
+import { describe, expect, test } from "bun:test"
 import { zBoolString } from "./input"
 
 describe("zBoolString", () => {

@@ -1,9 +1,7 @@
-import {
-    httpRequestCountByRegion
-} from "@/integrations/prometheus/metrics"
+import { httpRequestCountByRegion } from "@/integrations/prometheus/metrics"
 import { RequestHandler } from "express"
-import { RaidHubLocals } from "./types"
 import { ParamsDictionary, Query } from "express-serve-static-core"
+import { RaidHubLocals } from "./types"
 
 /**
  * Helper to extract a string header value, handling both string and array cases
@@ -23,7 +21,7 @@ function extractHeader(header: string | string[] | undefined): string {
  * - Country (CF-IPCountry) - ISO 3166-1 alpha-2 country code (always available)
  * - Continent (CF-IPContinent) - Continent code (requires "Add visitor location headers" Managed Transform)
  * - ASN (CF-IPASNum) - Autonomous System Number (always available)
- * 
+ *
  * Adds _region, _continent, and _asn properties to the locals.
  */
 export const regionMetrics = <

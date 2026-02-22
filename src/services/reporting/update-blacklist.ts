@@ -29,7 +29,9 @@ export const blacklistInstance = async (data: {
         try {
             await Promise.all(
                 data.players.map(player =>
-                    playerStmnt.execute({ params: [data.instanceId, player.membershipId, player.reason] })
+                    playerStmnt.execute({
+                        params: [data.instanceId, player.membershipId, player.reason]
+                    })
                 )
             )
         } finally {
