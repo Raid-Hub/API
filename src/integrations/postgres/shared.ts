@@ -45,7 +45,7 @@ export async function executeQuery<T>(
     } catch (error) {
         const executeTime = Date.now() - startTime
         const err = error instanceof Error ? error : new Error(String(error))
-        logger.error("QUERY_ERROR", err, {
+        logger.warn("QUERY_ERROR", err, {
             duration: `${executeTime}ms`,
             operation,
             sql: sql.substring(0, 200)
