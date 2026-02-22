@@ -3,6 +3,7 @@ import { playerSearchQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
 import { DestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
+import { getPlayer } from "@/services/player"
 
 /**
  * Case insensitive search
@@ -18,14 +19,17 @@ export async function searchForPlayer(
     searchTerm: string
     results: PlayerInfo[]
 }> {
-    const searchTerm = query.trim().toLowerCase()
+    const trimmedQuery = query.trim()
+    const searchTerm = trimmedQuery.toLowerCase()
+    const isMembershipIdQuery = /^\d+$/.test(trimmedQuery)
 
-    const results = await withHistogramTimer(
-        playerSearchQueryTimer,
-        { prefixLength: searchTerm.split("#")[0]?.length ?? 0 },
-        () =>
-            pgReader.queryRows<PlayerInfo>(
-                `SELECT 
+    const [nameResults, membershipIdResult] = await Promise.all([
+        withHistogramTimer(
+            playerSearchQueryTimer,
+            { prefixLength: searchTerm.split("#")[0]?.length ?? 0 },
+            () =>
+                pgReader.queryRows<PlayerInfo>(
+                    `SELECT 
                     membership_id AS "membershipId",
                     membership_type AS "membershipType",
                     icon_path AS "iconPath",
@@ -41,13 +45,23 @@ export async function searchForPlayer(
                     AND last_seen > TIMESTAMP 'epoch'
                 ORDER BY _search_score DESC
                 LIMIT $2;`,
-                {
-                    params: opts.membershipType
-                        ? [searchTerm + "%", opts.count, opts.membershipType]
-                        : [searchTerm + "%", opts.count]
-                }
-            )
-    )
+                    {
+                        params: opts.membershipType
+                            ? [searchTerm + "%", opts.count, opts.membershipType]
+                            : [searchTerm + "%", opts.count]
+                    }
+                )
+        ),
+        isMembershipIdQuery ? getPlayer(trimmedQuery).catch(() => null) : Promise.resolve(null)
+    ])
+
+    let results = nameResults
+    if (membershipIdResult) {
+        const membershipIdBigInt = BigInt(trimmedQuery)
+        if (!results.some(r => r.membershipId === membershipIdBigInt)) {
+            results = [membershipIdResult, ...results]
+        }
+    }
 
     return {
         searchTerm,
