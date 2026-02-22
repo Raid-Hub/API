@@ -1,4 +1,4 @@
-import { Logger, LogFields } from "@/lib/utils/logging"
+import { LogFields, Logger } from "@/lib/utils/logging"
 import {
     ClickHouseLogLevel,
     ErrorLogParams,

@@ -9,7 +9,7 @@ const logger = new Logger("REQUEST_LOGGING")
  * Middleware to log request completion with duration and related metadata.
  * Should be used alongside duration metrics middleware, which is responsible
  * for populating timing information (e.g. `_duration`) on `res.locals`.
- * 
+ *
  * This middleware logs the request duration and Cloudflare region/ASN/continent.
  */
 export const requestLogging = <
@@ -20,7 +20,7 @@ export const requestLogging = <
 >(): RequestHandler<P, ResBody, ReqBody, ReqQuery, RaidHubLocals> => {
     return (req, res, next) => {
         res.once("finish", () => {
-            const locals = (res.locals as RaidHubLocals)
+            const locals = res.locals as RaidHubLocals
             logger.debug("REQUEST_COMPLETED", {
                 path: req.path,
                 url: req.ip,

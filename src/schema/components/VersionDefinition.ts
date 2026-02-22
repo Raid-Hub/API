@@ -1,5 +1,5 @@
-import { registry } from "@/schema/registry"
 import { zNaturalNumber } from "@/schema/output"
+import { registry } from "@/schema/registry"
 import { z } from "zod"
 
 export type VersionDefinition = z.input<typeof zVersionDefinition>

@@ -48,9 +48,7 @@ export class RaidHubRouter implements IRaidHubRoute {
     }
 
     getFullPath(child: IRaidHubRoute): string {
-        const path = this.routes.find(({ route }) =>
-            normalizeRoute(route).includes(child)
-        )?.path
+        const path = this.routes.find(({ route }) => normalizeRoute(route).includes(child))?.path
         if (!path) throw new Error("Child not found")
 
         return (this.parent ? this.parent.getFullPath(this) : "") + path
