@@ -72,4 +72,15 @@ describe("player search 200", () => {
             expect(data.parsed.results).toHaveLength(0)
         }
     })
+
+    test("membership id", async () => {
+        const data = await t({
+            query: "4611686018467831285"
+        })
+
+        if (data.type === "ok") {
+            expect(data.parsed.results.length).toBeGreaterThan(0)
+            expect(data.parsed.results[0].membershipId).toBe(BigInt("4611686018467831285"))
+        }
+    })
 })
