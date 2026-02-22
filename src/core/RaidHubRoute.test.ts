@@ -137,10 +137,10 @@ const testFailRoute = new RaidHubRoute({
     }
 })
 
-app.use("/test/", testEmptyRoute.express)
-app.use("/test/post", testPostRoute.express)
-app.use("/test/fail", testFailRoute.express)
-app.use("/test/:testId", testGetRoute.express)
+app.use("/test/", testEmptyRoute.mountable)
+app.use("/test/post", testPostRoute.mountable)
+app.use("/test/fail", testFailRoute.mountable)
+app.use("/test/:testId", testGetRoute.mountable)
 
 app.use(errorHandler)
 

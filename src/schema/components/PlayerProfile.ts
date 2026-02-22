@@ -53,15 +53,13 @@ export const zWorldFirstEntry = registry.register(
     })
 )
 
+/** Route response schema; registered via route's registerResponse(path, schema), not here. */
 export type PlayerProfile = z.input<typeof zPlayerProfile>
-export const zPlayerProfile = registry.register(
-    "PlayerProfile",
-    z.object({
-        playerInfo: zPlayerInfo,
-        stats: z.object({
-            global: zPlayerProfileGlobalStats,
-            activity: z.record(zNumericalRecordKey(), zPlayerProfileActivityStats)
-        }),
-        worldFirstEntries: z.record(zNumericalRecordKey(), zWorldFirstEntry.nullable())
-    })
-)
+export const zPlayerProfile = z.object({
+    playerInfo: zPlayerInfo,
+    stats: z.object({
+        global: zPlayerProfileGlobalStats,
+        activity: z.record(zNumericalRecordKey(), zPlayerProfileActivityStats)
+    }),
+    worldFirstEntries: z.record(zNumericalRecordKey(), zWorldFirstEntry.nullable())
+})

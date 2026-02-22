@@ -1,5 +1,4 @@
 import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
-import { registry } from "@/schema/registry"
 import { zInt64, zISO8601DateString, zUInt32 } from "@/schema/output"
 import { DestinyActivityModeType } from "bungie-net-core/enums"
 import { z } from "zod"
@@ -15,11 +14,10 @@ const zDestinyHistoricalStatsValuePair = z
     })
     .strip()
 
+/** Route response schema; registered via route's registerResponse(path, schema), not here. */
 export type RaidHubPostGameCarnageReport = z.input<typeof zRaidHubPostGameCarnageReport>
-export const zRaidHubPostGameCarnageReport = registry.register(
-    "RaidHubPostGameCarnageReport",
-    z
-        .object({
+export const zRaidHubPostGameCarnageReport = z
+    .object({
             period: zISO8601DateString(),
             startingPhaseIndex: z.number().optional(),
             activityWasStartedFromBeginning: z.boolean().optional(),
@@ -92,11 +90,10 @@ export const zRaidHubPostGameCarnageReport = registry.register(
             )
         })
         .strip()
-        .openapi({
-            description: "A raw PGCR with a few redundant fields removed",
-            externalDocs: {
-                description: "Bungie.net API documentation",
-                url: "https://bungie-net.github.io/multi/schema_Destiny-HistoricalStats-DestinyPostGameCarnageReportData.html#schema_Destiny-HistoricalStats-DestinyPostGameCarnageReportData"
-            }
-        })
-)
+    .openapi({
+        description: "A raw PGCR with a few redundant fields removed",
+        externalDocs: {
+            description: "Bungie.net API documentation",
+            url: "https://bungie-net.github.io/multi/schema_Destiny-HistoricalStats-DestinyPostGameCarnageReportData.html#schema_Destiny-HistoricalStats-DestinyPostGameCarnageReportData"
+        }
+    })
