@@ -17,9 +17,10 @@ import {
 import { z } from "zod"
 
 export const reportingStandingInstanceRoute = new RaidHubRoute({
+    isAdministratorRoute: true,
     method: "get",
     description:
-        "Find a set of instances based on the query parameters. Some parameters will not work together, such as providing a season outside the range of the min/max season. Requires authentication.",
+        "Get the standing information for a specific instance, including flags, blacklist status, and per-player standing data.",
     params: z.object({
         instanceId: zBigIntString()
     }),

@@ -8,6 +8,7 @@ import { getPlayerBlacklistedInstances, getPlayerRecentFlags } from "@/services/
 import { z } from "zod"
 
 export const getPlayerStanding = new RaidHubRoute({
+    isAdministratorRoute: true,
     method: "get",
     description:
         "Get a player's standing information including recent flags and blacklisted instances. Requires authentication.",

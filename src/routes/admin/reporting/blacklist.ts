@@ -7,6 +7,7 @@ import { blacklistInstance, removeInstanceBlacklist } from "@/services/reporting
 import { z } from "zod"
 
 export const blacklistInstanceRoute = new RaidHubRoute({
+    isAdministratorRoute: true,
     method: "put",
     description: "Blacklist an instance from leaderboards, as well as the players involved.",
     params: z.object({
