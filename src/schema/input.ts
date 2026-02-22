@@ -9,9 +9,17 @@ export const zCoercedWholeNumber = () => z.coerce.number().int().nonnegative()
 export const zPage = () => z.coerce.number().int().positive().default(1)
 
 export const zBoolString = () =>
-    z.coerce.boolean().openapi({
-        type: "boolean"
-    }) as ZodType<boolean, ZodBooleanDef, string | number | boolean>
+    // @ts-expect-error - ZodEffects type doesn't match ZodBoolean but the type assertion
+    // on line 21 ensures the correct external signature is maintained for API consumers
+    z
+        .preprocess(val => {
+            if (val === "true" || val === "1" || val === 1) return true
+            if (val === "false" || val === "0" || val === 0) return false
+            return val
+        }, z.boolean())
+        .openapi({
+            type: "boolean"
+        }) as ZodType<boolean, ZodBooleanDef, string | number | boolean>
 
 export const zDateString = <N extends boolean = false>({
     nullable
