@@ -1,6 +1,7 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { getDestiny2Status } from "@/integrations/bungie"
 import { InternalApiError } from "@/lib/utils/internal-api-client"
+import { Logger } from "@/lib/utils/logging"
 import { cacheControl } from "@/middleware/cache-control"
 import {
     AtlasStatus,
@@ -14,6 +15,8 @@ import { getFloodgatesRecentId, getFloodgatesStatus } from "@/services/floodgate
 import { getInstanceBasic } from "@/services/instance/instance"
 import { getLatestInstanceByDate } from "@/services/instance/latest"
 import { z } from "zod"
+
+const logger = new Logger("STATUS_ROUTE")
 
 // This state tracks the status of the Destiny API and debounces it with a grace period of 60 seconds.
 export const statusState = {
@@ -103,6 +106,13 @@ export const statusRoute = new RaidHubRoute({
             })
         } catch (err) {
             if (err instanceof InternalApiError) {
+                // log the error as a error for sentry
+                logger.error("INTERNAL_API_ERROR", err, {
+                    serviceName: err.serviceName,
+                    url: err.url.toString(),
+                    status: err.status,
+                    statusText: err.statusText
+                })
                 return RaidHubRoute.fail(ErrorCode.ServiceUnavailableError, {
                     serviceName: err.serviceName,
                     message: "Internal service unavailable"
