@@ -4,13 +4,11 @@ import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/input"
 import { zInt64 } from "@/schema/output"
 import { getPlayer } from "@/services/player"
-import {
-    getPlayerBlacklistedInstances,
-    getPlayerRecentFlags
-} from "@/services/reporting/standing"
+import { getPlayerBlacklistedInstances, getPlayerRecentFlags } from "@/services/reporting/standing"
 import { z } from "zod"
 
 export const getPlayerStanding = new RaidHubRoute({
+    isAdministratorRoute: true,
     method: "get",
     description:
         "Get a player's standing information including recent flags and blacklisted instances. Requires authentication.",

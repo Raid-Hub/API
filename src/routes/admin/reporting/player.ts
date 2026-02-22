@@ -8,6 +8,7 @@ import { updatePlayer } from "@/services/reporting/update-player"
 import { z } from "zod"
 
 export const patchPlayer = new RaidHubRoute({
+    isAdministratorRoute: true,
     method: "patch",
     description: "Update fields on a player. Currently, only the cheat level can be updated.",
     params: z.object({

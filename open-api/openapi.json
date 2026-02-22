@@ -6888,8 +6888,13 @@
     },
     "/admin/reporting/standing/{instanceId}": {
       "get": {
-        "description": "Find a set of instances based on the query parameters. Some parameters will not work together, such as providing a season outside the range of the min/max season. Requires authentication.",
+        "description": "Get the standing information for a specific instance, including flags, blacklist status, and per-player standing data.",
         "summary": "/admin/reporting/standing/{instanceId}",
+        "security": [
+          {
+            "Administrator Token": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -6947,6 +6952,34 @@
                     },
                     "error": {
                       "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InsufficientPermissionsError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InsufficientPermissionsError"
                     }
                   },
                   "required": ["minted", "success", "code", "error"]
@@ -7042,6 +7075,11 @@
       "put": {
         "description": "Blacklist an instance from leaderboards, as well as the players involved.",
         "summary": "/admin/reporting/blacklist/{instanceId}",
+        "security": [
+          {
+            "Administrator Token": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -7202,6 +7240,34 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InsufficientPermissionsError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InsufficientPermissionsError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -7302,6 +7368,11 @@
       "get": {
         "description": "Get a player's standing information including recent flags and blacklisted instances. Requires authentication.",
         "summary": "/admin/reporting/player/{membershipId}",
+        "security": [
+          {
+            "Administrator Token": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -7359,6 +7430,34 @@
                     },
                     "error": {
                       "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InsufficientPermissionsError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InsufficientPermissionsError"
                     }
                   },
                   "required": ["minted", "success", "code", "error"]
@@ -7452,6 +7551,11 @@
       "patch": {
         "description": "Update fields on a player. Currently, only the cheat level can be updated.",
         "summary": "/admin/reporting/player/{membershipId}",
+        "security": [
+          {
+            "Administrator Token": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -7559,6 +7663,34 @@
                     },
                     "error": {
                       "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InsufficientPermissionsError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InsufficientPermissionsError"
                     }
                   },
                   "required": ["minted", "success", "code", "error"]
