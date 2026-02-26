@@ -10,6 +10,23 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
+            - uses: oven-sh/setup-bun@v1
+
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+
+            - name: Build with sourcemaps
+              run: bun build --sourcemap=external ./src/index.ts --outfile ./dist/index.js
+
+            - name: Upload sourcemaps to Sentry
+              env:
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                  SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+                  SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+              run: |
+                  npx @sentry/cli sourcemaps inject ./dist
+                  npx @sentry/cli sourcemaps upload --release=${{ github.sha }} ./dist
+
             - name: Install cloudflared
               run: ./.github/scripts/install-cloudflared.sh
 
@@ -27,4 +44,4 @@ jobs:
                   branch_ref="${{ github.ref }}"
                   branch_name="${branch_ref#refs/heads/}"
                   ssh -o ProxyCommand="cloudflared access ssh --hostname %h" root@ssh.raidhub.io \
-                  "/RaidHub/API-env/deploy.sh $branch_name api2"
+                  "SENTRY_RELEASE=${{ github.sha }} /RaidHub/API-env/deploy.sh $branch_name api2"
