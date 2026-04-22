@@ -31,17 +31,10 @@ git -C "${SERVICES_DIR}" remote add origin "https://github.com/${RAIDHUB_SERVICE
 git -C "${SERVICES_DIR}" fetch --depth=1 origin "${RAIDHUB_SERVICES_COMMIT}"
 git -C "${SERVICES_DIR}" checkout --detach FETCH_HEAD
 
-cp "${SERVICES_DIR}/example.env" "${SERVICES_DIR}/.env"
-
-cat <<'EOF' >> "${SERVICES_DIR}/.env"
-POSTGRES_DB=raidhub
-POSTGRES_USER=dev
-POSTGRES_PASSWORD=password
-RABBITMQ_USER=dev
-RABBITMQ_PASSWORD=password
-CLICKHOUSE_USER=default
-CLICKHOUSE_PASSWORD=
-EOF
+(
+    cd "${SERVICES_DIR}"
+    make env
+)
 
 docker compose -f "${SERVICES_DIR}/docker-compose.yml" --env-file "${SERVICES_DIR}/.env" up -d postgres rabbitmq clickhouse prometheus
 
