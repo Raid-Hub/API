@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-VERSIONS_FILE="${ROOT_DIR}/.github/ci/versions.env"
+VERSIONS_FILE="${ROOT_DIR}/.github/raidhub-services-version.env"
 SERVICES_DIR="${ROOT_DIR}/RaidHub-Services"
 
 if [[ ! -f "${VERSIONS_FILE}" ]]; then
