@@ -1,8 +1,9 @@
-import { afterAll, beforeAll, describe, test } from "bun:test"
+import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 
 import { generateJWT } from "@/auth/jwt"
 import { getFixturePool } from "@/lib/test-fixture-db"
 import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 
 import { playerTeammatesRoute } from "./teammates"
 
@@ -93,6 +94,12 @@ describe("teammates 200", () => {
         })
 
         expectOk(result)
+        if (result.type === "ok") {
+            expect(result.parsed.length).toBeGreaterThan(0)
+            expect(
+                result.parsed.some(t => String(t.playerInfo.membershipId) === teammatePlayerB)
+            ).toBe(true)
+        }
     })
 })
 
@@ -105,6 +112,9 @@ describe("teammates 403", () => {
         })
 
         expectErr(result)
+        if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.PlayerPrivateProfileError)
+        }
     })
 })
 
@@ -117,6 +127,9 @@ describe("teammates 404", () => {
         })
 
         expectErr(result)
+        if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.PlayerNotFoundError)
+        }
     }
 
     test("returns 404 for invalid player id", () => t("1"))
