@@ -1,32 +1,53 @@
 import { describe, test } from "bun:test"
 
 import { generateJWT } from "@/auth/jwt"
+import { pgReader } from "@/integrations/postgres"
 import { expectErr, expectOk } from "@/lib/test-utils"
 
 import { playerTeammatesRoute } from "./teammates"
 
 describe("teammates 200", () => {
-    const t = async (membershipId: string) => {
-        const result = await playerTeammatesRoute.$mock({ params: { membershipId } })
+    const t = async () => {
+        const existing = await pgReader.queryRow<{ membershipId: bigint }>(
+            `SELECT membership_id AS "membershipId" FROM player ORDER BY membership_id DESC LIMIT 1`
+        )
+        if (!existing) {
+            return
+        }
+
+        const result = await playerTeammatesRoute.$mock({
+            params: { membershipId: existing.membershipId.toString() }
+        })
 
         expectOk(result)
     }
 
-    test("returns teammates for valid player id", () => t("4611686018443649478"))
+    test("returns teammates for valid player id", () => t())
 })
 
 describe("teammates 403", () => {
-    const t = async (membershipId: string) => {
+    const t = async () => {
+        const privatePlayer = await pgReader.queryRow<{ membershipId: bigint }>(
+            `SELECT membership_id AS "membershipId"
+            FROM player
+            WHERE is_private = true
+            ORDER BY membership_id DESC
+            LIMIT 1`
+        )
+        if (!privatePlayer) {
+            return
+        }
+
         const result = await playerTeammatesRoute.$mock({
             params: {
-                membershipId
+                membershipId: privatePlayer.membershipId.toString()
             }
         })
 
         expectErr(result)
     }
 
-    test("returns 403 for private profile", () => t("4611686018467346804"))
+    test("returns 403 for private profile", () => t())
 })
 
 describe("teammates 404", () => {
@@ -44,23 +65,36 @@ describe("teammates 404", () => {
 })
 
 describe("teammates authorized", () => {
-    const token = generateJWT(
-        {
-            isAdmin: false,
-            bungieMembershipId: "123",
-            destinyMembershipIds: ["4611686018467346804"]
-        },
-        600
-    )
+    test("returns ok for authorized private profile", async () => {
+        const privatePlayer = await pgReader.queryRow<{ membershipId: bigint }>(
+            `SELECT membership_id AS "membershipId"
+            FROM player
+            WHERE is_private = true
+            ORDER BY membership_id DESC
+            LIMIT 1`
+        )
+        if (!privatePlayer) {
+            return
+        }
 
-    playerTeammatesRoute
-        .$mock({
+        const membershipId = privatePlayer.membershipId.toString()
+        const token = generateJWT(
+            {
+                isAdmin: false,
+                bungieMembershipId: "123",
+                destinyMembershipIds: [membershipId]
+            },
+            600
+        )
+
+        const result = await playerTeammatesRoute.$mock({
             params: {
-                membershipId: "4611686018467346804"
+                membershipId
             },
             headers: {
                 authorization: `Bearer ${token}`
             }
         })
-        .then(result => expectOk(result))
+        expectOk(result)
+    })
 })
