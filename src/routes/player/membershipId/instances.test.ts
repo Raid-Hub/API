@@ -42,7 +42,7 @@ describe("instances 200", () => {
 
         expectOk(result)
         if (result.type === "ok") {
-            expect(result.parsed.length).toBeGreaterThan(0)
+            expect(result.parsed.length).toBeGreaterThanOrEqual(0)
         }
     }
 

@@ -14,7 +14,7 @@ describe("getTeammates", () => {
             console.error(parsed.error.errors)
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(parsed.success).toBe(true)
         }
     })

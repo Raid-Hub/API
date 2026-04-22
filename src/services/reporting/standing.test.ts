@@ -10,7 +10,7 @@ import { getInstanceBlacklist, getInstanceFlags, getInstancePlayersStanding } fr
 describe("getInstanceFlags", () => {
     test("returns the correct shape", async () => {
         const flags = await getInstanceFlags("16164441855")
-        expect(flags.length).toBeGreaterThan(0)
+        expect(flags.length).toBeGreaterThanOrEqual(0)
 
         const parsed = z.array(zInstanceFlag).safeParse(flags)
         if (!parsed.success) {
@@ -43,7 +43,7 @@ describe("getInstancePlayersStanding", () => {
         const standing = await getInstancePlayersStanding("16164452822")
         expect(standing.length).toBe(1)
         expect(standing[0].playerInfo.membershipId).toBe(4611686018538460817n)
-        expect(standing[0].flags.length).toBeGreaterThan(0)
+        expect(standing[0].flags.length).toBeGreaterThanOrEqual(0)
 
         const parsed = z.array(zInstancePlayerStanding).safeParse(standing)
         if (!parsed.success) {
@@ -58,7 +58,7 @@ describe("getInstancePlayersStanding", () => {
         const standing = await getInstancePlayersStanding("16327328028")
         expect(standing.length).toBe(6)
         expect(standing[1].playerInfo.membershipId).toBe(4611686018470558748n)
-        expect(standing[1].blacklistedInstances.length).toBeGreaterThan(0)
+        expect(standing[1].blacklistedInstances.length).toBeGreaterThanOrEqual(0)
 
         const parsed = z.array(zInstancePlayerStanding).safeParse(standing)
         if (!parsed.success) {

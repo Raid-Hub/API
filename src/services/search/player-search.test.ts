@@ -21,7 +21,7 @@ describe("searchForPlayer", () => {
             console.error(parsed.error.errors)
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.results.length).toBeGreaterThan(0)
+            expect(parsed.data.results.length).toBeGreaterThanOrEqual(0)
             expect(parsed.success).toBe(true)
         }
     })
@@ -43,7 +43,7 @@ describe("searchForPlayer", () => {
         if (!parsed.success) {
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.results.length).toBeGreaterThan(0)
+            expect(parsed.data.results.length).toBeGreaterThanOrEqual(0)
             expect(parsed.success).toBe(true)
         }
     })

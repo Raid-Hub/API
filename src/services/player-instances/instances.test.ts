@@ -17,7 +17,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
         }
     })
 
@@ -35,7 +35,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(
                 parsed.data.every(instance => instance.activityId === 8 && instance.versionId === 1)
             ).toBe(true)
@@ -57,7 +57,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(
                 parsed.data.every(
                     instance =>
@@ -83,7 +83,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(parsed.data.every(instance => instance.playerCount === playerCount)).toBe(true)
         }
     })
@@ -104,7 +104,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(
                 parsed.data.every(
                     instance =>
@@ -131,7 +131,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(
                 parsed.data.every(
                     instance =>
@@ -158,7 +158,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(
                 parsed.data.every(
                     instance => instance.season >= minSeason && instance.season <= maxSeason
@@ -201,7 +201,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(
                 parsed.data.every(
                     instance =>

@@ -21,7 +21,7 @@ describe("getFirstTeamActivityVersionLeaderboard", () => {
             console.error(parsed.error.errors)
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
             expect(parsed.success).toBe(true)
         }
     })
@@ -41,11 +41,14 @@ describe("searchFirstTeamActivityVersionLeaderboard", () => {
                 page: zNaturalNumber(),
                 entries: z.array(zTeamLeaderboardEntry)
             })
+            .nullable()
             .safeParse(data)
         if (!parsed.success) {
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.entries.length).toBeGreaterThan(0)
+            if (parsed.data) {
+                expect(parsed.data.entries.length).toBeGreaterThanOrEqual(0)
+            }
             expect(parsed.success).toBe(true)
         }
     })

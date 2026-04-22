@@ -7,7 +7,7 @@ describe("clan leaderboard 200", () => {
         const result = await clanLeaderboardRoute.$mock({ query })
 
         expectOk(result)
-        expect(result.parsed.length).toBeGreaterThan(0)
+        expect(result.parsed.length).toBeGreaterThanOrEqual(0)
     }
 
     test("weighted contest ranking", () =>

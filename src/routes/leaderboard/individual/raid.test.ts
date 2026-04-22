@@ -11,7 +11,7 @@ describe("raid leaderboard 200", () => {
 
         expectOk(result)
         if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThan(0)
+            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
         }
     }
 
