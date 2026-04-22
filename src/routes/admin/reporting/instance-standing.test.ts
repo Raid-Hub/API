@@ -42,10 +42,10 @@ beforeAll(async () => {
 
     await fixtureDb.query(
         `INSERT INTO core.instance (
-            instance_id, hash, score, flawless, completed, fresh, player_count, date_started, date_completed, duration, platform_type, is_whitelisted
+            instance_id, hash, score, flawless, completed, fresh, player_count, date_started, date_completed, duration, platform_type, is_whitelisted, skull_hashes
         )
         SELECT
-            $1::bigint, av.hash, 0, false, true, true, 1, NOW() - INTERVAL '10 minutes', NOW() - INTERVAL '5 minutes', 300, 3, false
+            $1::bigint, av.hash, 0, false, true, true, 1, NOW() - INTERVAL '10 minutes', NOW() - INTERVAL '5 minutes', 300, 3, false, ARRAY[]::bigint[]
         FROM definitions.activity_version av
         ORDER BY av.hash
         LIMIT 1`,
