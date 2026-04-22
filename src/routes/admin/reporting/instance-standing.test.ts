@@ -16,13 +16,18 @@ const fixtureDb = new Pool({
 })
 
 beforeAll(async () => {
-    await fixtureDb.query(
-        `DELETE FROM raw.pgcr WHERE instance_id = $1::bigint;
-         DELETE FROM core.instance_player WHERE instance_id = $1::bigint;
-         DELETE FROM core.instance WHERE instance_id = $1::bigint;
-         DELETE FROM core.player WHERE membership_id = $2::bigint;`,
-        [fixtureInstanceId, fixtureMembershipId]
-    )
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        fixtureInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.instance_player WHERE instance_id = $1::bigint`, [
+        fixtureInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.instance WHERE instance_id = $1::bigint`, [
+        fixtureInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.player WHERE membership_id = $1::bigint`, [
+        fixtureMembershipId
+    ])
 
     await fixtureDb.query(
         `INSERT INTO core.player (
@@ -61,13 +66,18 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await fixtureDb.query(
-        `DELETE FROM raw.pgcr WHERE instance_id = $1::bigint;
-         DELETE FROM core.instance_player WHERE instance_id = $1::bigint;
-         DELETE FROM core.instance WHERE instance_id = $1::bigint;
-         DELETE FROM core.player WHERE membership_id = $2::bigint;`,
-        [fixtureInstanceId, fixtureMembershipId]
-    )
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        fixtureInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.instance_player WHERE instance_id = $1::bigint`, [
+        fixtureInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.instance WHERE instance_id = $1::bigint`, [
+        fixtureInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.player WHERE membership_id = $1::bigint`, [
+        fixtureMembershipId
+    ])
     await fixtureDb.end()
 })
 

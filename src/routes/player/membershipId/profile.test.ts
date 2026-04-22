@@ -95,8 +95,8 @@ describe("player profile authorized", () => {
         600
     )
 
-    playerProfileRoute
-        .$mock({
+    test("returns profile for authorized private profile", async () => {
+        const result = await playerProfileRoute.$mock({
             params: {
                 membershipId: privateMembershipId
             },
@@ -104,5 +104,6 @@ describe("player profile authorized", () => {
                 authorization: `Bearer ${token}`
             }
         })
-        .then(result => expectOk(result))
+        expectOk(result)
+    })
 })
