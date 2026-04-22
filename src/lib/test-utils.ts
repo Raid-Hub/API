@@ -17,9 +17,6 @@ export const expectOk = <
 >(
     result: T
 ) => {
-    if (result.type === "err") {
-        expect(result.parsed).toBe(null)
-    }
     expect(result.type).toBe("ok")
 }
 
@@ -38,8 +35,5 @@ export const expectErr = <
 >(
     result: T
 ) => {
-    if (result.type === "ok") {
-        expect(result.parsed).toBe(null)
-    }
     expect(result.type).toBe("err")
 }
