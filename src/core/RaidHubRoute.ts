@@ -282,60 +282,6 @@ export class RaidHubRoute<
         return this.parent ? this.parent.getFullPath(this) : "/"
     }
 
-    getDerivedRouteId() {
-        const normalizedPath = this.getFullPath()
-            .replace(/\/+/g, "/")
-            .replace(/^\/|\/$/g, "")
-            .replace(/:(\w+)/g, "{$1}")
-        return `${this.method.toUpperCase()} ${normalizedPath || "/"}`
-    }
-
-    async invoke(
-        req: {
-            params?: unknown
-            query?: unknown
-            body?: unknown
-            headers?: IncomingHttpHeaders
-            auth?: import("@/auth/jwt").JWTAuthContext
-            discord?: import("@/integrations/discord/context-jwt").DiscordInvocationContext
-        } = {},
-        after?: (callback: () => Promise<void>) => void
-    ) {
-        const callbacks: (() => Promise<void>)[] = []
-        const result = await this.handler(
-            {
-                params: this.paramsSchema?.parse(req.params) ?? {},
-                query: this.querySchema?.parse(req.query ?? {}) ?? {},
-                body: this.bodySchema?.parse(req.body) ?? {},
-                headers: req.headers ?? {},
-                auth: req.auth,
-                discord: req.discord
-            },
-            callback => {
-                callbacks.push(callback)
-                after?.(callback)
-            }
-        )
-
-        for (const callback of callbacks) {
-            try {
-                await callback()
-            } catch (err) {
-                logger.error(
-                    "ROUTE_AFTER_CALLBACK_ERROR",
-                    err instanceof Error ? err : new Error(String(err)),
-                    {
-                        path: this.getFullPath(),
-                        method: this.method.toUpperCase(),
-                        mode: "invoke"
-                    }
-                )
-            }
-        }
-
-        return result
-    }
-
     deprecatedCopy() {
         return new RaidHubRoute({
             isDeprecated: true,

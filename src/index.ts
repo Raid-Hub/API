@@ -7,7 +7,6 @@ import path from "path"
 import { verifyApiKey } from "./auth/api-keys"
 import { attachDiscordContext } from "./auth/discord-context"
 import { attachUserAuth } from "./auth/user-context"
-import { discordInteractionsRouter } from "./integrations/discord/interactions"
 import { servePrometheus } from "./integrations/prometheus/server"
 import { Logger } from "./lib/utils/logging"
 import { errorHandler } from "./middleware/error-handler"
@@ -45,9 +44,6 @@ app.options("*", (req, res) => {
     res.header("Access-Control-Allow-Headers", "*")
     res.sendStatus(204)
 })
-
-// Discord validates signatures against raw request bytes.
-app.use("/integrations/discord", express.raw({ type: "*/*" }), discordInteractionsRouter)
 
 // parse incoming request body with json, apply the router, handle any uncaught errors
 app.use(
