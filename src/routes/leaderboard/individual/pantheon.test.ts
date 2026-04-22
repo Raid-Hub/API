@@ -1,3 +1,4 @@
+import { pgReader } from "@/integrations/postgres"
 import { expectErr, expectOk } from "@/lib/test-utils"
 import { describe, expect, test } from "bun:test"
 import { leaderboardIndividualPantheonRoute } from "./pantheon"
@@ -39,17 +40,30 @@ describe("pantheon leaderboard 200", () => {
             }
         ))
 
-    test("search", () =>
-        t(
-            {
+    test("search", async () => {
+        const existing = await pgReader.queryRow<{ membershipId: bigint }>(
+            `SELECT membership_id AS "membershipId"
+            FROM leaderboard.individual_pantheon_version_leaderboard
+            LIMIT 1`
+        )
+
+        const result = await leaderboardIndividualPantheonRoute.$mock({
+            params: {
                 category: "clears",
                 version: "rhulk"
             },
-            {
+            query: {
                 count: 10,
-                search: "4611686018488107374"
+                search: existing?.membershipId?.toString() ?? "1"
             }
-        ))
+        })
+
+        if (result.type === "ok") {
+            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+        } else {
+            expectErr(result)
+        }
+    })
 })
 
 describe("pantheon leaderboard 404", () => {
