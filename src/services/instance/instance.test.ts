@@ -77,8 +77,8 @@ describe("getInstanceExtended", () => {
 
 describe("getInstanceMetadataByHash", () => {
     test("returns the correct shape", async () => {
-        const existing = await pgReader.queryRow<{ hash: number }>(
-            `SELECT hash::int AS "hash" FROM activity_version ORDER BY hash DESC LIMIT 1`
+        const existing = await pgReader.queryRow<{ hash: string }>(
+            `SELECT hash::text AS "hash" FROM activity_version ORDER BY hash DESC LIMIT 1`
         )
         if (!existing) {
             return
