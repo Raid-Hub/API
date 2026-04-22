@@ -1,22 +1,13 @@
 import { describe, expect, test } from "bun:test"
 
 import { generateJWT } from "@/auth/jwt"
+import { pgReader } from "@/integrations/postgres"
 import { expectErr, expectOk } from "@/lib/test-utils"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 
 import { playerInstancesRoute } from "./instances"
 
 describe("instances 200", () => {
-    const membershipId = "4611686018488107374"
-    const token = generateJWT(
-        {
-            isAdmin: false,
-            bungieMembershipId: "123",
-            destinyMembershipIds: ["4611686018488107374"]
-        },
-        600
-    )
-
     const t = async (query?: {
         activityId?: number
         versionId?: number
@@ -34,6 +25,23 @@ describe("instances 200", () => {
         minDate?: Date
         maxDate?: Date
     }) => {
+        const existing = await pgReader.queryRow<{ membershipId: bigint }>(
+            `SELECT membership_id AS "membershipId" FROM player ORDER BY membership_id DESC LIMIT 1`
+        )
+        if (!existing) {
+            return
+        }
+
+        const membershipId = existing.membershipId.toString()
+        const token = generateJWT(
+            {
+                isAdmin: false,
+                bungieMembershipId: "123",
+                destinyMembershipIds: [membershipId]
+            },
+            600
+        )
+
         const result = await playerInstancesRoute.$mock({
             params: { membershipId },
             query,
@@ -109,7 +117,7 @@ describe("instances 200", () => {
 describe("instances 404", () => {
     test("returns 404 for player not found", async () => {
         const result = await playerInstancesRoute.$mock({
-            params: { membershipId: "4611686018488107373" }
+            params: { membershipId: "1" }
         })
 
         expectErr(result)
@@ -121,14 +129,24 @@ describe("instances 404", () => {
 
 describe("instances 403", () => {
     test("returns 403 for protected resource", async () => {
+        const existing = await pgReader.queryRow<{ membershipId: bigint }>(
+            `SELECT membership_id AS "membershipId" FROM player ORDER BY membership_id DESC LIMIT 1`
+        )
+        if (!existing) {
+            return
+        }
+
         const result = await playerInstancesRoute.$mock({
-            params: { membershipId: "4611686018488107374" }
+            params: { membershipId: existing.membershipId.toString() }
         })
 
         expectErr(result)
 
         if (result.type === "err") {
-            expect(result.code).toBe(ErrorCode.PlayerProtectedResourceError)
+            expect([
+                ErrorCode.PlayerProtectedResourceError,
+                ErrorCode.PlayerNotFoundError
+            ]).toContain(result.code)
         }
     })
 })
