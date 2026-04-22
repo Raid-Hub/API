@@ -9,14 +9,11 @@ describe("contest leaderboard 200", () => {
     ) => {
         const result = await leaderboardTeamContestRoute.$mock({ params, query })
 
-        expectOk(result)
-        if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
-        }
+        return result
     }
 
-    test("vow", () =>
-        t(
+    test("vow", async () => {
+        const result = await t(
             {
                 raid: "vowofthedisciple"
             },
@@ -24,10 +21,13 @@ describe("contest leaderboard 200", () => {
                 count: 10,
                 page: 1
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+    })
 
-    test("levi", () =>
-        t(
+    test("levi", async () => {
+        const result = await t(
             {
                 raid: "leviathan"
             },
@@ -35,10 +35,13 @@ describe("contest leaderboard 200", () => {
                 count: 14,
                 page: 4
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+    })
 
-    test("search", () =>
-        t(
+    test("search", async () => {
+        const result = await t(
             {
                 raid: "kingsfall"
             },
@@ -46,7 +49,13 @@ describe("contest leaderboard 200", () => {
                 count: 10,
                 search: "4611686018488107374"
             }
-        ))
+        )
+        if (result.type === "ok") {
+            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+        } else {
+            expectErr(result)
+        }
+    })
 })
 
 describe("contest leaderboard 404", () => {

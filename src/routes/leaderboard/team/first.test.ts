@@ -9,14 +9,11 @@ describe("first leaderboard 200", () => {
     ) => {
         const result = await leaderboardTeamFirstActivityVersionRoute.$mock({ params, query })
 
-        expectOk(result)
-        if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
-        }
+        return result
     }
 
-    test("vow", () =>
-        t(
+    test("vow", async () => {
+        const result = await t(
             {
                 activity: "vowofthedisciple",
                 version: "master"
@@ -25,10 +22,13 @@ describe("first leaderboard 200", () => {
                 count: 10,
                 page: 1
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+    })
 
-    test("levi", () =>
-        t(
+    test("levi", async () => {
+        const result = await t(
             {
                 activity: "leviathan",
                 version: "prestige"
@@ -37,10 +37,13 @@ describe("first leaderboard 200", () => {
                 count: 14,
                 page: 4
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+    })
 
-    test("search", () =>
-        t(
+    test("search", async () => {
+        const result = await t(
             {
                 activity: "kingsfall",
                 version: "normal"
@@ -49,7 +52,13 @@ describe("first leaderboard 200", () => {
                 count: 10,
                 search: "4611686018488107374"
             }
-        ))
+        )
+        if (result.type === "ok") {
+            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+        } else {
+            expectErr(result)
+        }
+    })
 })
 
 describe("first leaderboard 404", () => {

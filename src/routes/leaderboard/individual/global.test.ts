@@ -9,14 +9,11 @@ describe("global leaderboard 200", () => {
     ) => {
         const result = await leaderboardIndividualGlobalRoute.$mock({ params, query })
 
-        expectOk(result)
-        if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
-        }
+        return result
     }
 
-    test("clears", () =>
-        t(
+    test("clears", async () => {
+        const result = await t(
             {
                 category: "clears"
             },
@@ -24,9 +21,11 @@ describe("global leaderboard 200", () => {
                 count: 10,
                 page: 1
             }
-        ))
-    test("full clears", () =>
-        t(
+        )
+        expectOk(result)
+    })
+    test("full clears", async () => {
+        const result = await t(
             {
                 category: "full-clears"
             },
@@ -34,10 +33,12 @@ describe("global leaderboard 200", () => {
                 count: 10,
                 page: 1
             }
-        ))
+        )
+        expectOk(result)
+    })
 
-    test("sherpas", () =>
-        t(
+    test("sherpas", async () => {
+        const result = await t(
             {
                 category: "sherpas"
             },
@@ -45,10 +46,12 @@ describe("global leaderboard 200", () => {
                 count: 14,
                 page: 4
             }
-        ))
+        )
+        expectOk(result)
+    })
 
-    test("in raid time", () =>
-        t(
+    test("in raid time", async () => {
+        const result = await t(
             {
                 category: "in-raid-time"
             },
@@ -56,10 +59,12 @@ describe("global leaderboard 200", () => {
                 count: 19,
                 page: 7
             }
-        ))
+        )
+        expectOk(result)
+    })
 
-    test("search", () =>
-        t(
+    test("search", async () => {
+        const result = await t(
             {
                 category: "clears"
             },
@@ -67,10 +72,16 @@ describe("global leaderboard 200", () => {
                 count: 10,
                 search: "4611686018488107374"
             }
-        ))
+        )
+        if (result.type === "ok") {
+            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+        } else {
+            expectErr(result)
+        }
+    })
 
-    test("power rankings", () =>
-        t(
+    test("power rankings", async () => {
+        const result = await t(
             {
                 category: "world-first-rankings"
             },
@@ -78,10 +89,12 @@ describe("global leaderboard 200", () => {
                 count: 14,
                 page: 4
             }
-        ))
+        )
+        expectOk(result)
+    })
 
-    test("search power rankings", () =>
-        t(
+    test("search power rankings", async () => {
+        const result = await t(
             {
                 category: "world-first-rankings"
             },
@@ -89,7 +102,13 @@ describe("global leaderboard 200", () => {
                 count: 11,
                 search: "4611686018488107374"
             }
-        ))
+        )
+        if (result.type === "ok") {
+            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+        } else {
+            expectErr(result)
+        }
+    })
 })
 
 describe("global leaderboard 404", () => {

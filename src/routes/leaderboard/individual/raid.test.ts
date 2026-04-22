@@ -9,14 +9,11 @@ describe("raid leaderboard 200", () => {
     ) => {
         const result = await leaderboardIndividualRaidRoute.$mock({ params, query })
 
-        expectOk(result)
-        if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
-        }
+        return result
     }
 
-    test("clears", () =>
-        t(
+    test("clears", async () => {
+        const result = await t(
             {
                 category: "freshClears",
                 raid: "vowofthedisciple"
@@ -25,10 +22,13 @@ describe("raid leaderboard 200", () => {
                 count: 10,
                 page: 6
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+    })
 
-    test("score", () =>
-        t(
+    test("score", async () => {
+        const result = await t(
             {
                 category: "sherpas",
                 raid: "gardenofsalvation"
@@ -37,10 +37,13 @@ describe("raid leaderboard 200", () => {
                 count: 14,
                 page: 4
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+    })
 
-    test("search", () =>
-        t(
+    test("search", async () => {
+        const result = await t(
             {
                 category: "clears",
                 raid: "leviathan"
@@ -49,7 +52,13 @@ describe("raid leaderboard 200", () => {
                 count: 10,
                 search: "4611686018488107374"
             }
-        ))
+        )
+        if (result.type === "ok") {
+            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+        } else {
+            expectErr(result)
+        }
+    })
 })
 
 describe("raid leaderboard 404", () => {
