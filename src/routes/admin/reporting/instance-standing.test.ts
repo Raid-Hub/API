@@ -1,7 +1,7 @@
 import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { Pool } from "pg"
-import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { reportingStandingInstanceRoute } from "./instance-standing"
 
 const fixtureInstanceId = "999000000101"
@@ -54,10 +54,10 @@ beforeAll(async () => {
         [fixtureInstanceId, fixtureMembershipId]
     )
 
-    await fixtureDb.query(`INSERT INTO raw.pgcr (instance_id, data, date_crawled) VALUES ($1::bigint, $2, NOW())`, [
-        fixtureInstanceId,
-        Buffer.from("{}")
-    ])
+    await fixtureDb.query(
+        `INSERT INTO raw.pgcr (instance_id, data, date_crawled) VALUES ($1::bigint, $2, NOW())`,
+        [fixtureInstanceId, Buffer.from("{}")]
+    )
 })
 
 afterAll(async () => {

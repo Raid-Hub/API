@@ -1,7 +1,7 @@
 import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { Pool } from "pg"
-import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { getPlayerStanding } from "./player-standing"
 
 const fixtureMembershipId = "4611686019000000301"
@@ -15,7 +15,9 @@ const fixtureDb = new Pool({
 })
 
 beforeAll(async () => {
-    await fixtureDb.query(`DELETE FROM core.player WHERE membership_id = $1::bigint`, [fixtureMembershipId])
+    await fixtureDb.query(`DELETE FROM core.player WHERE membership_id = $1::bigint`, [
+        fixtureMembershipId
+    ])
     await fixtureDb.query(
         `INSERT INTO core.player (
             membership_id, membership_type, icon_path, display_name,
@@ -29,7 +31,9 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await fixtureDb.query(`DELETE FROM core.player WHERE membership_id = $1::bigint`, [fixtureMembershipId])
+    await fixtureDb.query(`DELETE FROM core.player WHERE membership_id = $1::bigint`, [
+        fixtureMembershipId
+    ])
     await fixtureDb.end()
 })
 
