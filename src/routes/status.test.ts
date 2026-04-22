@@ -1,6 +1,6 @@
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
-import { Pool } from "pg"
 
+import { getFixturePool } from "@/lib/test-fixture-db"
 import { expectOk } from "@/lib/test-utils"
 import * as AtlasModule from "@/services/atlas"
 import * as FloodgateModule from "@/services/floodgates"
@@ -14,15 +14,9 @@ import { statusRoute, statusState } from "./status"
 const fixtureInstanceId = 999000000001n
 const fixturePgcrData = Buffer.from("{}")
 
-const fixtureDb = new Pool({
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-    database: "raidhub",
-    host: process.env.POSTGRES_HOST || "localhost",
-    port: Number(process.env.POSTGRES_PORT || 5432)
-})
+const fixtureDb = getFixturePool()
 
-describe("status 200", async () => {
+describe("status 200", () => {
     const spyGetAtlasStatus = spyOn(AtlasModule, "getAtlasStatus")
     const spyGetCommonSettings = spyOn(BungieCoreEndpoints, "getCommonSettings")
     const spyGetFloodgatesRecentId = spyOn(FloodgateModule, "getFloodgatesRecentId")
@@ -102,7 +96,6 @@ describe("status 200", async () => {
         await fixtureDb.query("DELETE FROM core.instance WHERE instance_id = $1", [
             fixtureInstanceId.toString()
         ])
-        await fixtureDb.end()
     })
 
     const t = async () => {

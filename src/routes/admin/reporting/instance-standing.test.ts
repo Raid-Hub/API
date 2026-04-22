@@ -1,19 +1,13 @@
+import { getFixturePool } from "@/lib/test-fixture-db"
 import { expectErr, expectOk } from "@/lib/test-utils"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { afterAll, beforeAll, describe, expect, test } from "bun:test"
-import { Pool } from "pg"
 import { reportingStandingInstanceRoute } from "./instance-standing"
 
 const fixtureInstanceId = "999000000101"
 const fixtureMembershipId = "4611686019000000201"
 
-const fixtureDb = new Pool({
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-    database: "raidhub",
-    host: process.env.POSTGRES_HOST || "localhost",
-    port: Number(process.env.POSTGRES_PORT || 5432)
-})
+const fixtureDb = getFixturePool()
 
 beforeAll(async () => {
     await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
@@ -78,7 +72,6 @@ afterAll(async () => {
     await fixtureDb.query(`DELETE FROM core.player WHERE membership_id = $1::bigint`, [
         fixtureMembershipId
     ])
-    await fixtureDb.end()
 })
 
 describe("instance standing 200", () => {

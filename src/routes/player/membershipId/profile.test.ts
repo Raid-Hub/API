@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, test } from "bun:test"
-import { Pool } from "pg"
 
 import { generateJWT } from "@/auth/jwt"
+import { getFixturePool } from "@/lib/test-fixture-db"
 import { expectErr, expectOk } from "@/lib/test-utils"
 
 import { playerProfileRoute } from "./profile"
@@ -10,15 +10,13 @@ const publicMembershipId = "4611686019000000101"
 const noClearsMembershipId = "4611686019000000102"
 const privateMembershipId = "4611686019000000103"
 
-const fixtureDb = new Pool({
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-    database: "raidhub",
-    host: process.env.POSTGRES_HOST || "localhost",
-    port: Number(process.env.POSTGRES_PORT || 5432)
-})
+const fixtureDb = getFixturePool()
 
 beforeAll(async () => {
+    await fixtureDb.query(
+        `DELETE FROM core.player_stats WHERE membership_id IN ($1::bigint, $2::bigint, $3::bigint)`,
+        [publicMembershipId, noClearsMembershipId, privateMembershipId]
+    )
     await fixtureDb.query(
         `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint, $3::bigint)`,
         [publicMembershipId, noClearsMembershipId, privateMembershipId]
@@ -40,10 +38,13 @@ beforeAll(async () => {
 
 afterAll(async () => {
     await fixtureDb.query(
+        `DELETE FROM core.player_stats WHERE membership_id IN ($1::bigint, $2::bigint, $3::bigint)`,
+        [publicMembershipId, noClearsMembershipId, privateMembershipId]
+    )
+    await fixtureDb.query(
         `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint, $3::bigint)`,
         [publicMembershipId, noClearsMembershipId, privateMembershipId]
     )
-    await fixtureDb.end()
 })
 
 describe("player profile 200", () => {

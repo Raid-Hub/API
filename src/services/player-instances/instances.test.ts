@@ -1,13 +1,138 @@
+import { getFixturePool } from "@/lib/test-fixture-db"
 import { zInstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
 import { getInstancePlayerInfo } from "@/services/instance/instance"
-import { describe, expect, test } from "bun:test"
+import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getInstances } from "./instances"
+
+const fixtureDb = getFixturePool()
+const svcInstMembershipA = "4611686019000000705"
+const svcInstMembershipB = "4611686019000000706"
+const svcInstInstanceId = "999000000705"
+
+let fixtureActivityId: number
+let fixtureVersionId: number
+let fixtureSeason: number
+
+beforeAll(async () => {
+    await fixtureDb.query(`DELETE FROM core.instance_player WHERE instance_id = $1::bigint`, [
+        svcInstInstanceId
+    ])
+    await fixtureDb.query(
+        `DELETE FROM flagging.flag_instance_player WHERE instance_id = $1::bigint`,
+        [svcInstInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM flagging.blacklist_instance_player WHERE instance_id = $1::bigint`,
+        [svcInstInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM flagging.blacklist_instance WHERE instance_id = $1::bigint`,
+        [svcInstInstanceId]
+    )
+    await fixtureDb.query(`DELETE FROM flagging.flag_instance WHERE instance_id = $1::bigint`, [
+        svcInstInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        svcInstInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.instance WHERE instance_id = $1::bigint`, [
+        svcInstInstanceId
+    ])
+    await fixtureDb.query(
+        `DELETE FROM core.player_stats WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [svcInstMembershipA, svcInstMembershipB]
+    )
+    await fixtureDb.query(
+        `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [svcInstMembershipA, svcInstMembershipB]
+    )
+
+    await fixtureDb.query(
+        `INSERT INTO core.player (
+            membership_id, membership_type, icon_path, display_name,
+            bungie_global_display_name, bungie_global_display_name_code, last_seen, first_seen,
+            clears, fresh_clears, sherpas, total_time_played_seconds, sum_of_best, wfr_score,
+            cheat_level, is_private, is_whitelisted, updated_at
+        ) VALUES
+        ($1::bigint, 3, NULL, 'fixture_svc_inst_a', 'fixture_svc_inst_a', '0705', NOW(), NOW(), 1, 1, 0, 100, 100, 0, 0, false, false, NOW()),
+        ($2::bigint, 3, NULL, 'fixture_svc_inst_b', 'fixture_svc_inst_b', '0706', NOW(), NOW(), 1, 1, 0, 100, 100, 0, 0, false, false, NOW())`,
+        [svcInstMembershipA, svcInstMembershipB]
+    )
+
+    await fixtureDb.query(
+        `INSERT INTO core.instance (
+            instance_id, hash, score, flawless, completed, fresh, player_count, date_started, date_completed, duration, platform_type, is_whitelisted, skull_hashes
+        )
+        SELECT
+            $1::bigint, av.hash, 0, false, true, true, 3, TIMESTAMPTZ '2023-07-10 12:00:00Z', TIMESTAMPTZ '2023-07-10 14:00:00Z', 450, 3, false, ARRAY[]::bigint[]
+        FROM definitions.activity_version av
+        ORDER BY av.hash
+        LIMIT 1`,
+        [svcInstInstanceId]
+    )
+
+    await fixtureDb.query(
+        `INSERT INTO core.instance_player (
+            instance_id, membership_id, completed, time_played_seconds, sherpas, is_first_clear
+        ) VALUES
+        ($1::bigint, $2::bigint, true, 400, 0, false),
+        ($1::bigint, $3::bigint, true, 400, 0, false)`,
+        [svcInstInstanceId, svcInstMembershipA, svcInstMembershipB]
+    )
+
+    const meta = await fixtureDb.query<{ activityId: number; versionId: number; season: number }>(
+        `SELECT av.activity_id::int AS "activityId", av.version_id::int AS "versionId", i.season_id::int AS "season"
+        FROM core.instance i
+        INNER JOIN definitions.activity_version av USING (hash)
+        WHERE i.instance_id = $1::bigint`,
+        [svcInstInstanceId]
+    )
+    const row = meta.rows[0]!
+    fixtureActivityId = row.activityId
+    fixtureVersionId = row.versionId
+    fixtureSeason = row.season
+})
+
+afterAll(async () => {
+    await fixtureDb.query(`DELETE FROM core.instance_player WHERE instance_id = $1::bigint`, [
+        svcInstInstanceId
+    ])
+    await fixtureDb.query(
+        `DELETE FROM flagging.flag_instance_player WHERE instance_id = $1::bigint`,
+        [svcInstInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM flagging.blacklist_instance_player WHERE instance_id = $1::bigint`,
+        [svcInstInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM flagging.blacklist_instance WHERE instance_id = $1::bigint`,
+        [svcInstInstanceId]
+    )
+    await fixtureDb.query(`DELETE FROM flagging.flag_instance WHERE instance_id = $1::bigint`, [
+        svcInstInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        svcInstInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.instance WHERE instance_id = $1::bigint`, [
+        svcInstInstanceId
+    ])
+    await fixtureDb.query(
+        `DELETE FROM core.player_stats WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [svcInstMembershipA, svcInstMembershipB]
+    )
+    await fixtureDb.query(
+        `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [svcInstMembershipA, svcInstMembershipB]
+    )
+})
 
 describe("getInstances", () => {
     test("returns the correct shape", async () => {
         const data = await getInstances({
-            membershipIds: ["4611686018488107374", "4611686018515944770"],
+            membershipIds: [svcInstMembershipA, svcInstMembershipB],
             count: 100
         }).catch(console.error)
 
@@ -17,16 +142,16 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
         }
     })
 
     test("filters by activityId + versionId", async () => {
         const data = await getInstances({
-            membershipIds: ["4611686018488107374"],
+            membershipIds: [svcInstMembershipA],
             count: 10,
-            activityId: 8,
-            versionId: 1
+            activityId: fixtureActivityId,
+            versionId: fixtureVersionId
         }).catch(console.error)
 
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
@@ -35,16 +160,20 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(
-                parsed.data.every(instance => instance.activityId === 8 && instance.versionId === 1)
+                parsed.data.every(
+                    instance =>
+                        instance.activityId === fixtureActivityId &&
+                        instance.versionId === fixtureVersionId
+                )
             ).toBe(true)
         }
     })
 
     test("filters by completed, fresh, and flawless status", async () => {
         const data = await getInstances({
-            membershipIds: ["4611686018488107374"],
+            membershipIds: [svcInstMembershipA],
             count: 25,
             completed: true,
             flawless: false,
@@ -57,7 +186,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(
                 parsed.data.every(
                     instance =>
@@ -70,9 +199,9 @@ describe("getInstances", () => {
     })
 
     test("filters by player count", async () => {
-        const playerCount = 6
+        const playerCount = 3
         const data = await getInstances({
-            membershipIds: ["4611686018488107374"],
+            membershipIds: [svcInstMembershipA],
             count: 10,
             playerCount
         }).catch(console.error)
@@ -83,7 +212,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.data.every(instance => instance.playerCount === playerCount)).toBe(true)
         }
     })
@@ -92,7 +221,7 @@ describe("getInstances", () => {
         const minPlayerCount = 2
         const maxPlayerCount = 4
         const data = await getInstances({
-            membershipIds: ["4611686018488107374"],
+            membershipIds: [svcInstMembershipA],
             count: 10,
             minPlayerCount,
             maxPlayerCount
@@ -104,7 +233,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(
                 parsed.data.every(
                     instance =>
@@ -119,7 +248,7 @@ describe("getInstances", () => {
         const minDate = new Date("2023-01-01")
         const maxDate = new Date("2023-12-31")
         const data = await getInstances({
-            membershipIds: ["4611686018488107374"],
+            membershipIds: [svcInstMembershipA],
             count: 10,
             minDate,
             maxDate
@@ -131,7 +260,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(
                 parsed.data.every(
                     instance =>
@@ -143,10 +272,10 @@ describe("getInstances", () => {
     })
 
     test("filters by season range", async () => {
-        const minSeason = 10
-        const maxSeason = 15
+        const minSeason = Math.max(0, fixtureSeason - 2)
+        const maxSeason = fixtureSeason + 2
         const data = await getInstances({
-            membershipIds: ["4611686018488107374"],
+            membershipIds: [svcInstMembershipA],
             count: 10,
             minSeason,
             maxSeason
@@ -158,7 +287,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(
                 parsed.data.every(
                     instance => instance.season >= minSeason && instance.season <= maxSeason
@@ -168,11 +297,10 @@ describe("getInstances", () => {
     })
 
     test("filters by season", async () => {
-        const season = 12
         const data = await getInstances({
-            membershipIds: ["4611686018488107374"],
+            membershipIds: [svcInstMembershipA],
             count: 10,
-            season
+            season: fixtureSeason
         }).catch(console.error)
 
         const parsed = z.array(zInstanceWithPlayers).safeParse(data)
@@ -181,7 +309,8 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.every(instance => instance.season == season)).toBe(true)
+            expect(parsed.data.length).toBeGreaterThan(0)
+            expect(parsed.data.every(instance => instance.season === fixtureSeason)).toBe(true)
         }
     })
 
@@ -189,7 +318,7 @@ describe("getInstances", () => {
         const minDurationSeconds = 300
         const maxDurationSeconds = 600
         const data = await getInstances({
-            membershipIds: ["4611686018488107374"],
+            membershipIds: [svcInstMembershipA],
             count: 10,
             minDurationSeconds,
             maxDurationSeconds
@@ -201,7 +330,7 @@ describe("getInstances", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.success).toBe(true)
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(
                 parsed.data.every(
                     instance =>
@@ -213,13 +342,11 @@ describe("getInstances", () => {
     })
 
     test("whitelisted instance is not blacklisted", async () => {
-        const players = await getInstancePlayerInfo("16707634209").catch(console.error)
-        if (!players || players.length === 0) {
-            console.error("No players found for instance 16707634209")
-            return
-        }
+        const players = await getInstancePlayerInfo(svcInstInstanceId).catch(console.error)
+        expect(players).not.toBeNull()
+        expect(players!.length).toBeGreaterThan(0)
 
-        const membershipIds = players.map(p => p.membershipId.toString())
+        const membershipIds = players!.map(p => p.membershipId.toString())
         const data = await getInstances({
             membershipIds,
             count: 100
@@ -230,10 +357,9 @@ describe("getInstances", () => {
             console.error(parsed.error.errors)
             expect(parsed.error.errors).toEqual([])
         } else {
-            const instance = parsed.data.find(i => i.instanceId === 16707634209n)
-            if (instance) {
-                expect(instance.isBlacklisted).toBe(false)
-            }
+            const instance = parsed.data.find(i => i.instanceId === BigInt(svcInstInstanceId))
+            expect(instance).toBeDefined()
+            expect(instance!.isBlacklisted).toBe(false)
             expect(parsed.success).toBe(true)
         }
     })

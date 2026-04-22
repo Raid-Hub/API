@@ -1,18 +1,30 @@
-import { pgReader } from "@/integrations/postgres"
-import { describe, expect, test } from "bun:test"
+import { getFixturePool } from "@/lib/test-fixture-db"
+import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getRawCompressedPGCR } from "./pgcr"
 
+const fixtureDb = getFixturePool()
+const fixturePgcrInstanceId = "999000000703"
+
+beforeAll(async () => {
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        fixturePgcrInstanceId
+    ])
+    await fixtureDb.query(
+        `INSERT INTO raw.pgcr (instance_id, data, date_crawled) VALUES ($1::bigint, $2, NOW())`,
+        [fixturePgcrInstanceId, Buffer.from("{}")]
+    )
+})
+
+afterAll(async () => {
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        fixturePgcrInstanceId
+    ])
+})
+
 describe("getRawCompressedPGCR", () => {
     test("returns the correct shape", async () => {
-        const existing = await pgReader.queryRow<{ instanceId: bigint }>(
-            `SELECT instance_id AS "instanceId" FROM pgcr ORDER BY instance_id DESC LIMIT 1`
-        )
-        if (!existing) {
-            return
-        }
-
-        const data = await getRawCompressedPGCR(existing.instanceId.toString()).catch(console.error)
+        const data = await getRawCompressedPGCR(fixturePgcrInstanceId).catch(console.error)
 
         const parsed = z
             .object({
