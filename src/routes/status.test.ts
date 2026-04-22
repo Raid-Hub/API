@@ -44,7 +44,9 @@ describe("status 200", async () => {
             }
         } as unknown as BungieNetResponse<CoreSettingsConfiguration>)
 
-        await fixtureDb.query("DELETE FROM raw.pgcr WHERE instance_id = $1", [fixtureInstanceId.toString()])
+        await fixtureDb.query("DELETE FROM raw.pgcr WHERE instance_id = $1", [
+            fixtureInstanceId.toString()
+        ])
         await fixtureDb.query("DELETE FROM core.instance WHERE instance_id = $1", [
             fixtureInstanceId.toString()
         ])
@@ -94,7 +96,9 @@ describe("status 200", async () => {
         spyGetCommonSettings.mockRestore()
         spyGetFloodgatesRecentId.mockRestore()
         spyGetFloodgatesStatus.mockRestore()
-        await fixtureDb.query("DELETE FROM raw.pgcr WHERE instance_id = $1", [fixtureInstanceId.toString()])
+        await fixtureDb.query("DELETE FROM raw.pgcr WHERE instance_id = $1", [
+            fixtureInstanceId.toString()
+        ])
         await fixtureDb.query("DELETE FROM core.instance WHERE instance_id = $1", [
             fixtureInstanceId.toString()
         ])
