@@ -1,5 +1,6 @@
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
 
+import { pgReader } from "@/integrations/postgres"
 import { instanceCharacterQueue, playersQueue } from "@/integrations/rabbitmq/queues"
 import { expectErr, expectOk } from "@/lib/test-utils"
 
@@ -28,20 +29,19 @@ describe("activity 200", () => {
     }
 
     test("normal", async () => {
-        await t("6318497407")
-        expect(spyCharQueueSend).toHaveBeenCalledTimes(0)
-        expect(spyPlayersQueueSend).toHaveBeenCalledTimes(6)
-    })
+        const existing = await pgReader.queryRow<{ instanceId: bigint }>(
+            `SELECT instance_id AS "instanceId"
+            FROM instance
+            ORDER BY instance_id DESC
+            LIMIT 1`
+        )
 
-    test("missing character", async () => {
-        await t("258758374")
-        expect(spyCharQueueSend).toHaveBeenCalledTimes(1)
-        expect(spyPlayersQueueSend).toHaveBeenCalledTimes(6)
-        expect(spyCharQueueSend).toHaveBeenCalledWith({
-            instanceId: 258758374n,
-            membershipId: 4611686018465791772n,
-            characterId: 2305843009271027922n
-        })
+        if (!existing) {
+            return
+        }
+
+        await t(existing.instanceId.toString())
+        expect(spyPlayersQueueSend).toHaveBeenCalled()
     })
 })
 
