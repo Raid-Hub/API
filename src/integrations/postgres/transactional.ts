@@ -32,7 +32,7 @@ export function createTransactional(config: {
             const tx = {
                 async queryRow<T>(sql: string, options: QueryOptions = {}): Promise<T | null> {
                     const rows = await executeQuery<T>(client, sql, "query_row", options)
-                    return (rows[0] as T) || null
+                    return (rows[0]) || null
                 },
                 async queryRows<T>(sql: string, options: QueryOptions = {}): Promise<T[]> {
                     return executeQuery<T>(client, sql, "query_rows", options)

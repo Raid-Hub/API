@@ -85,7 +85,7 @@ in order to optimize performance. Subsequent requests will return the full numbe
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, { membershipId })
         } else if (
             player.isPrivate &&
-            !(await canAccessProtectedResource(membershipId, req.headers.authorization ?? ""))
+            !(await canAccessProtectedResource(membershipId, req.auth))
         ) {
             return RaidHubRoute.fail(ErrorCode.PlayerPrivateProfileError, { membershipId })
         }

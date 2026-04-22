@@ -24,6 +24,7 @@ export enum ErrorCode {
     /** Auth */
     InsufficientPermissionsError = "InsufficientPermissionsError",
     InvalidClientSecretError = "InvalidClientSecretError",
+    InvalidDiscordAuthError = "InvalidDiscordAuthError",
     /** RaidHub error */
     InternalServerError = "InternalServerError",
     ServiceUnavailableError = "ServiceUnavailableError",

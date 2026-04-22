@@ -10,6 +10,7 @@ import { metricsRouter } from "./metrics"
 import { pgcrRoute } from "./pgcr"
 import { playerRouter } from "./player"
 import { statusRoute } from "./status"
+import { subscriptionsRouter } from "./subscriptions"
 
 export const router = new RaidHubRouter({
     routes: [
@@ -56,6 +57,10 @@ export const router = new RaidHubRouter({
         {
             path: "/authorize/user",
             route: userAuthorizationRoute
+        },
+        {
+            path: "/subscriptions",
+            route: subscriptionsRouter
         }
     ]
 })

@@ -48,7 +48,7 @@ export const playerTeammatesRoute = new RaidHubRoute({
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, { membershipId })
         } else if (
             player.isPrivate &&
-            !(await canAccessProtectedResource(membershipId, req.headers.authorization ?? ""))
+            !(await canAccessProtectedResource(membershipId, req.auth))
         ) {
             return RaidHubRoute.fail(ErrorCode.PlayerPrivateProfileError, { membershipId })
         }

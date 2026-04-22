@@ -1,0 +1,7 @@
+[
+  {
+    "description": "Copy to api-keys.json and set unique keys. origin * allows any Origin header.",
+    "origin": "*",
+    "key": "00000000-0000-4000-8000-000000000001"
+  }
+]

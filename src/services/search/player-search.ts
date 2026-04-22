@@ -12,6 +12,7 @@ export async function searchForPlayer(
     query: string,
     opts: {
         count: number
+        offset: number
         membershipType?: Exclude<DestinyMembershipType, -1>
         global: boolean
     }
@@ -41,18 +42,20 @@ export async function searchForPlayer(
                     cheat_level AS "cheatLevel"
                 FROM player 
                 WHERE lower(${opts.global ? "bungie_name" : "display_name"}) LIKE $1 
-                    ${opts.membershipType ? "AND membership_type = $3" : ""}
+                    ${opts.membershipType ? "AND membership_type = $4" : ""}
                     AND last_seen > TIMESTAMP 'epoch'
                 ORDER BY _search_score DESC
-                LIMIT $2;`,
+                LIMIT $2 OFFSET $3;`,
                     {
                         params: opts.membershipType
-                            ? [searchTerm + "%", opts.count, opts.membershipType]
-                            : [searchTerm + "%", opts.count]
+                            ? [searchTerm + "%", opts.count, opts.offset, opts.membershipType]
+                            : [searchTerm + "%", opts.count, opts.offset]
                     }
                 )
         ),
-        isMembershipIdQuery ? getPlayer(trimmedQuery).catch(() => null) : Promise.resolve(null)
+        isMembershipIdQuery && opts.offset === 0
+            ? getPlayer(trimmedQuery).catch(() => null)
+            : Promise.resolve(null)
     ])
 
     let results = nameResults

@@ -13,6 +13,9 @@ Players who have not attempted a raid may not appear in the search results.
 Results are ordered by a combination of the number of raid completions and last played date.`,
     query: z.object({
         count: z.coerce.number().int().min(1).max(50).default(20),
+        offset: z.coerce.number().int().min(0).max(5000).default(0).openapi({
+            description: "Number of leading search hits to skip (for pagination). Must be 0 when count is the full result window."
+        }),
         query: z.string().min(1).max(40),
         membershipType: zDestinyMembershipType.default(-1).openapi({
             description:
@@ -30,6 +33,7 @@ Results are ordered by a combination of the number of raid completions and last 
                 .object({
                     params: z.object({
                         count: zNaturalNumber(),
+                        offset: zNaturalNumber(),
                         query: z.string()
                     }),
                     results: z.array(zPlayerInfo)
@@ -39,15 +43,16 @@ Results are ordered by a combination of the number of raid completions and last 
     },
     middleware: [cacheControl(120)],
     async handler(req) {
-        const { query, count, membershipType, global } = req.query
+        const { query, count, offset, membershipType, global } = req.query
         const { searchTerm, results } = await searchForPlayer(query, {
             count,
+            offset,
             membershipType: membershipType === -1 ? undefined : membershipType,
             global
         })
 
         return RaidHubRoute.ok({
-            params: { count, query: searchTerm },
+            params: { count, offset, query: searchTerm },
             results
         })
     }

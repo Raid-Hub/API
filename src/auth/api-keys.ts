@@ -12,7 +12,7 @@ const KeySchema = z.object({
     key: z.string()
 })
 
-const apiKeys = file(process.env.API_KEYS_PATH!, { type: "application/json" })
+const apiKeys = file(process.env.API_KEYS_PATH, { type: "application/json" })
     .json()
     .then(
         (

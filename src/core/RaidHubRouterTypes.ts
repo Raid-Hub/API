@@ -1,3 +1,5 @@
+import type { JWTAuthContext } from "@/auth/jwt"
+import type { DiscordInvocationContext } from "@/integrations/discord/context-jwt"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { RouteConfig } from "@asteasolutions/zod-to-openapi"
 import { Router } from "express"
@@ -36,6 +38,8 @@ export type RaidHubHandler<
         query: z.output<Query>
         body: z.output<Body>
         headers: IncomingHttpHeaders
+        auth?: JWTAuthContext
+        discord?: DiscordInvocationContext
     },
     after: (callback: () => Promise<void>) => void
 ) => Promise<RaidHubHandlerReturn<T, ErrorResponse>>

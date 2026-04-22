@@ -7,6 +7,7 @@ describe("searchForPlayer", () => {
     test("returns the correct shape", async () => {
         const data = await searchForPlayer("Newo", {
             count: 10,
+            offset: 0,
             global: true
         }).catch(console.error)
 
@@ -29,6 +30,7 @@ describe("searchForPlayer", () => {
     test("returns the correct shape with platform", async () => {
         const data = await searchForPlayer(" Newo", {
             count: 10,
+            offset: 0,
             global: false,
             membershipType: 2
         }).catch(console.error)

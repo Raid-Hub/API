@@ -1,0 +1,195 @@
+import { afterAll, beforeEach, describe, expect, test } from "bun:test"
+
+import { pgAdmin } from "@/integrations/postgres"
+import { getDiscordWebhookStatus, upsertDiscordWebhook } from "./discord-webhooks"
+
+describe("discord webhook subscriptions service", () => {
+    const originalQueryRow = pgAdmin.queryRow.bind(pgAdmin)
+    const originalQueryRows = pgAdmin.queryRows.bind(pgAdmin)
+    const originalTransaction = pgAdmin.transaction.bind(pgAdmin)
+
+    const queueQueryRow = (values: unknown[]) => {
+        const queue = [...values]
+        pgAdmin.queryRow = (async () => {
+            await Promise.resolve()
+            if (queue.length === 0) throw new Error("Unexpected queryRow call")
+            return queue.shift() as never
+        }) as typeof pgAdmin.queryRow
+    }
+
+    const queueQueryRows = (values: unknown[]) => {
+        const queue = [...values]
+        pgAdmin.queryRows = (async () => {
+            await Promise.resolve()
+            if (queue.length === 0) throw new Error("Unexpected queryRows call")
+            return queue.shift() as never
+        }) as typeof pgAdmin.queryRows
+    }
+
+    const queueTransaction = (rows: unknown[], rowsMany: unknown[]) => {
+        const rowQueue = [...rows]
+        const rowsQueue = [...rowsMany]
+        pgAdmin.transaction = (async callback => {
+            await Promise.resolve()
+            const tx = {
+                queryRow: async () => {
+                    await Promise.resolve()
+                    if (rowQueue.length === 0) throw new Error("Unexpected tx.queryRow call")
+                    return rowQueue.shift() as never
+                },
+                queryRows: async () => {
+                    await Promise.resolve()
+                    if (rowsQueue.length === 0) throw new Error("Unexpected tx.queryRows call")
+                    return rowsQueue.shift() as never
+                }
+            }
+            return callback(tx as never)
+        }) as typeof pgAdmin.transaction
+    }
+
+    beforeEach(() => {
+        pgAdmin.queryRow = originalQueryRow
+        pgAdmin.queryRows = originalQueryRows
+        pgAdmin.transaction = originalTransaction
+    })
+
+    afterAll(() => {
+        pgAdmin.queryRow = originalQueryRow
+        pgAdmin.queryRows = originalQueryRows
+        pgAdmin.transaction = originalTransaction
+    })
+
+    test("upsertDiscordWebhook updates existing active destination", async () => {
+        queueQueryRow([
+            {
+                destinationId: "99",
+                webhookId: "webhook_abc",
+                isActive: true
+            },
+            {
+                destinationId: "99"
+            },
+            {
+                id: "99"
+            }
+        ])
+        queueQueryRows([[]])
+        queueTransaction(
+            [{ destinationId: "99" }, { id: "99" }],
+            [[]]
+        )
+
+        const result = await upsertDiscordWebhook({
+            guildId: "guild_1",
+            channelId: "123456789",
+            filters: {},
+            targets: {}
+        })
+
+        expect(result).toEqual({
+            guildId: "guild_1",
+            channelId: "123456789",
+            webhookId: "webhook_abc",
+            created: false,
+            activated: false,
+            updated: true,
+            rules: {
+                players: { inserted: 0, updated: 0 },
+                clans: { inserted: 0, updated: 0 }
+            }
+        })
+    })
+
+    test("upsertDiscordWebhook reactivates existing inactive destination", async () => {
+        queueQueryRow([
+            {
+                destinationId: "77",
+                webhookId: "webhook_xyz",
+                isActive: false
+            },
+            {
+                destinationId: "77"
+            },
+            {
+                id: "77"
+            }
+        ])
+        queueQueryRows([[], []])
+        queueTransaction(
+            [{ destinationId: "77" }, { id: "77" }],
+            [[]]
+        )
+
+        const result = await upsertDiscordWebhook({
+            guildId: "guild_2",
+            channelId: "channel_2",
+            filters: {},
+            targets: {}
+        })
+
+        expect(result.activated).toBe(true)
+        expect(result.updated).toBe(true)
+        expect(result.created).toBe(false)
+        expect(result.webhookId).toBe("webhook_xyz")
+    })
+
+    test("getDiscordWebhookStatus returns full player/clan rule DTOs", async () => {
+        queueQueryRow([
+            {
+                destinationId: "42",
+                destinationActive: true,
+                consecutiveDeliveryFailures: 3,
+                lastDeliverySuccessAt: new Date("2026-04-22T00:00:00.000Z"),
+                lastDeliveryFailureAt: null,
+                lastDeliveryError: "timeout",
+                guildId: "guild_9",
+                channelId: "channel_9",
+                webhookId: "webhook_9"
+            }
+        ])
+        queueQueryRows([
+            [
+                {
+                    membershipId: "4611686018467831285",
+                    requireFresh: true,
+                    requireCompleted: false
+                }
+            ],
+            [
+                {
+                    groupId: "123456",
+                    requireFresh: false,
+                    requireCompleted: true
+                }
+            ]
+        ])
+
+        const result = await getDiscordWebhookStatus("channel_9")
+
+        expect(result).toEqual({
+            registered: true,
+            guildId: "guild_9",
+            channelId: "channel_9",
+            webhookId: "webhook_9",
+            destinationActive: true,
+            consecutiveDeliveryFailures: 3,
+            lastDeliverySuccessAt: "2026-04-22T00:00:00.000Z",
+            lastDeliveryFailureAt: null,
+            lastDeliveryError: "timeout",
+            players: [
+                {
+                    membershipId: "4611686018467831285",
+                    requireFresh: true,
+                    requireCompleted: false
+                }
+            ],
+            clans: [
+                {
+                    groupId: "123456",
+                    requireFresh: false,
+                    requireCompleted: true
+                }
+            ]
+        })
+    })
+})

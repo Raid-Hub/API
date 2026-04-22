@@ -7,7 +7,9 @@ export const zJWTAuthFormat = z.object({
     destinyMembershipIds: z.array(z.string())
 })
 
-export const generateJWT = (data: z.infer<typeof zJWTAuthFormat>, expiresIn: number) => {
+export type JWTAuthContext = z.infer<typeof zJWTAuthFormat>
+
+export const generateJWT = (data: JWTAuthContext, expiresIn: number) => {
     return jwt.sign(data, process.env.JWT_SECRET, {
         expiresIn
     })

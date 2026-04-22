@@ -15,7 +15,7 @@ describe("authorize 200", () => {
         expectOk(result)
 
         if (result.type === "ok") {
-            jwt.verify(result.parsed.value, process.env.JWT_SECRET!, (err, result) => {
+            jwt.verify(result.parsed.value, process.env.JWT_SECRET, (err, result) => {
                 expect(err).toBeNull()
                 expect(result).toMatchObject({
                     isAdmin: true,

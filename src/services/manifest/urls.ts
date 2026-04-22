@@ -16,7 +16,7 @@ export const generateSplashUrls = async (defs: ActivityDefinition[]) => {
         const processed = processContentUrl(item)
         if (allValidSlugs.has(processed.slug)) {
             const activityId = allValidSlugs.get(processed.slug)!
-            const bucket = result[activityId]!
+            const bucket = result[activityId]
             bucket.push(processed)
         }
     }
