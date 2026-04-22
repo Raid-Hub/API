@@ -29,10 +29,10 @@ const fixtureDb = new Pool({
 })
 
 beforeAll(async () => {
-    await fixtureDb.query(`DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint)`, [
-        publicMembershipId,
-        privateMembershipId
-    ])
+    await fixtureDb.query(
+        `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [publicMembershipId, privateMembershipId]
+    )
 
     await fixtureDb.query(
         `INSERT INTO core.player (
@@ -62,10 +62,10 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await fixtureDb.query(`DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint)`, [
-        publicMembershipId,
-        privateMembershipId
-    ])
+    await fixtureDb.query(
+        `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [publicMembershipId, privateMembershipId]
+    )
     await fixtureDb.end()
 })
 
