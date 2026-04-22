@@ -1,4 +1,5 @@
 import { LogFields, Logger } from "@/lib/utils/logging"
+import type { ClickHouseClient } from "@clickhouse/client"
 import {
     ClickHouseLogLevel,
     ErrorLogParams,
@@ -58,19 +59,27 @@ class ClickhouseLogger implements ClickhouseLoggingInterface {
     }
 }
 
-export const clickhouse = createClient({
-    username: process.env.CLICKHOUSE_USER,
-    password: process.env.CLICKHOUSE_PASSWORD,
-    application: process.env.PROD ? "RaidHub-API-Prod" : "RaidHub-API-Dev",
-    database: process.env.CLICKHOUSE_DATABASE ?? "default",
-    request_timeout: 5000,
-    log: {
-        LoggerClass: ClickhouseLogger,
-        level:
-            process.env.NODE_ENV === "test"
-                ? ClickHouseLogLevel.OFF
-                : process.env.PROD
-                  ? ClickHouseLogLevel.WARN
-                  : ClickHouseLogLevel.DEBUG
+let clickhouseClient: ClickHouseClient | null = null
+
+export const getClickhouseClient = () => {
+    if (!clickhouseClient) {
+        clickhouseClient = createClient({
+            username: process.env.CLICKHOUSE_USER,
+            password: process.env.CLICKHOUSE_PASSWORD,
+            application: process.env.PROD ? "RaidHub-API-Prod" : "RaidHub-API-Dev",
+            database: process.env.CLICKHOUSE_DATABASE ?? "default",
+            request_timeout: 5000,
+            log: {
+                LoggerClass: ClickhouseLogger,
+                level:
+                    process.env.NODE_ENV === "test"
+                        ? ClickHouseLogLevel.OFF
+                        : process.env.PROD
+                          ? ClickHouseLogLevel.WARN
+                          : ClickHouseLogLevel.DEBUG
+            }
+        })
     }
-})
+
+    return clickhouseClient
+}

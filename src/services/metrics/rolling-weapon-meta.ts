@@ -1,4 +1,4 @@
-import { clickhouse } from "@/integrations/clickhouse/client"
+import { getClickhouseClient } from "@/integrations/clickhouse/client"
 import { WeaponMetric } from "@/schema/components/Metrics"
 import { WeaponSlot } from "@/schema/components/Weapon"
 
@@ -11,7 +11,7 @@ export const getRollingWeaponMeta = async ({
 }) => {
     const sortColumn = sort === "usage" ? "totalUsage" : "totalKills"
 
-    const results = await clickhouse.query({
+    const results = await getClickhouseClient().query({
         format: "JSON",
         query_params: {
             sortColumn,
