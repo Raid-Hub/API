@@ -1,8 +1,8 @@
-import { clickhouse } from "@/integrations/clickhouse/client"
+import { getClickhouseClient } from "@/integrations/clickhouse/client"
 import { PopulationByRaidMetric } from "@/schema/components/Metrics"
 
 export const getDailyPlayerPopulation = async () => {
-    const results = await clickhouse.query({
+    const results = await getClickhouseClient().query({
         format: "JSON",
         query: `WITH aggregated AS (
                     SELECT 

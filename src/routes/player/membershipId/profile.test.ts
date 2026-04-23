@@ -1,9 +1,51 @@
-import { describe, test } from "bun:test"
+import { afterAll, beforeAll, describe, test } from "bun:test"
 
 import { generateJWT } from "@/auth/jwt"
+import { getFixturePool } from "@/lib/test-fixture-db"
 import { expectErr, expectOk } from "@/lib/test-utils"
 
 import { playerProfileRoute } from "./profile"
+
+const publicMembershipId = "4611686019000000101"
+const noClearsMembershipId = "4611686019000000102"
+const privateMembershipId = "4611686019000000103"
+
+const fixtureDb = getFixturePool()
+
+beforeAll(async () => {
+    await fixtureDb.query(
+        `DELETE FROM core.player_stats WHERE membership_id IN ($1::bigint, $2::bigint, $3::bigint)`,
+        [publicMembershipId, noClearsMembershipId, privateMembershipId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint, $3::bigint)`,
+        [publicMembershipId, noClearsMembershipId, privateMembershipId]
+    )
+
+    await fixtureDb.query(
+        `INSERT INTO core.player (
+            membership_id, membership_type, icon_path, display_name,
+            bungie_global_display_name, bungie_global_display_name_code, last_seen, first_seen,
+            clears, fresh_clears, sherpas, total_time_played_seconds, sum_of_best, wfr_score,
+            cheat_level, is_private, is_whitelisted, updated_at
+        ) VALUES
+        ($1::bigint, 3, NULL, 'fixture_public_profile', 'fixture_public_profile', '0101', NOW(), NOW(), 5, 2, 1, 3000, 500, 0, 0, false, false, NOW()),
+        ($2::bigint, 3, NULL, 'fixture_no_clears', 'fixture_no_clears', '0102', NOW(), NOW(), 0, 0, 0, 0, NULL, 0, 0, false, false, NOW()),
+        ($3::bigint, 3, NULL, 'fixture_private_profile', 'fixture_private_profile', '0103', NOW(), NOW(), 2, 1, 0, 1200, 400, 0, 0, true, false, NOW())`,
+        [publicMembershipId, noClearsMembershipId, privateMembershipId]
+    )
+})
+
+afterAll(async () => {
+    await fixtureDb.query(
+        `DELETE FROM core.player_stats WHERE membership_id IN ($1::bigint, $2::bigint, $3::bigint)`,
+        [publicMembershipId, noClearsMembershipId, privateMembershipId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint, $3::bigint)`,
+        [publicMembershipId, noClearsMembershipId, privateMembershipId]
+    )
+})
 
 describe("player profile 200", () => {
     const t = async (membershipId: string) => {
@@ -11,9 +53,9 @@ describe("player profile 200", () => {
         expectOk(result)
     }
 
-    test("returns profile for valid player id", () => t("4611686018488107374"))
+    test("returns profile for valid player id", () => t(publicMembershipId))
 
-    test("returns profile for player with no clears", () => t("4611686018497002892"))
+    test("returns profile for player with no clears", () => t(noClearsMembershipId))
 })
 
 describe("player profile 404", () => {
@@ -41,7 +83,7 @@ describe("player profile 403", () => {
         expectErr(result)
     }
 
-    test("returns 403 for private profile without authorization", () => t("4611686018467346804"))
+    test("returns 403 for private profile without authorization", () => t(privateMembershipId))
 })
 
 describe("player profile authorized", () => {
@@ -49,19 +91,20 @@ describe("player profile authorized", () => {
         {
             isAdmin: false,
             bungieMembershipId: "123",
-            destinyMembershipIds: ["4611686018467346804"]
+            destinyMembershipIds: [privateMembershipId]
         },
         600
     )
 
-    playerProfileRoute
-        .$mock({
+    test("returns profile for authorized private profile", async () => {
+        const result = await playerProfileRoute.$mock({
             params: {
-                membershipId: "4611686018467346804"
+                membershipId: privateMembershipId
             },
             headers: {
                 authorization: `Bearer ${token}`
             }
         })
-        .then(result => expectOk(result))
+        expectOk(result)
+    })
 })

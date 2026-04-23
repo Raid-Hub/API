@@ -1,4 +1,10 @@
+import { pgReader } from "@/integrations/postgres"
+import {
+    assertIndividualLeaderboardPage,
+    assertIndividualSearchIncludesMembership
+} from "@/lib/leaderboard-test-assertions"
 import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { describe, expect, test } from "bun:test"
 import { leaderboardIndividualPantheonRoute } from "./pantheon"
 
@@ -11,7 +17,7 @@ describe("pantheon leaderboard 200", () => {
 
         expectOk(result)
         if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThan(0)
+            assertIndividualLeaderboardPage(result.parsed)
         }
     }
 
@@ -39,17 +45,49 @@ describe("pantheon leaderboard 200", () => {
             }
         ))
 
-    test("search", () =>
-        t(
-            {
-                category: "clears",
-                version: "rhulk"
-            },
-            {
-                count: 10,
-                search: "4611686018488107374"
+    test("search", async () => {
+        const existing = await pgReader.queryRow<{ membershipId: bigint }>(
+            `SELECT membership_id AS "membershipId"
+            FROM leaderboard.individual_pantheon_version_leaderboard
+            LIMIT 1`
+        )
+
+        if (existing) {
+            const result = await leaderboardIndividualPantheonRoute.$mock({
+                params: {
+                    category: "clears",
+                    version: "rhulk"
+                },
+                query: {
+                    count: 10,
+                    search: existing.membershipId.toString()
+                }
+            })
+            expectOk(result)
+            if (result.type === "ok" && result.parsed.type === "individual") {
+                assertIndividualLeaderboardPage(result.parsed)
+                assertIndividualSearchIncludesMembership(
+                    result.parsed.entries,
+                    existing.membershipId.toString()
+                )
             }
-        ))
+        } else {
+            const result = await leaderboardIndividualPantheonRoute.$mock({
+                params: {
+                    category: "clears",
+                    version: "rhulk"
+                },
+                query: {
+                    count: 10,
+                    search: "123"
+                }
+            })
+            expectErr(result)
+            if (result.type === "err") {
+                expect(result.code).toBe(ErrorCode.PlayerNotOnLeaderboardError)
+            }
+        }
+    })
 })
 
 describe("pantheon leaderboard 404", () => {

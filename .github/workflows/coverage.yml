@@ -16,39 +16,29 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - uses: oven-sh/setup-bun@v1
+            - uses: actions/setup-go@v5
+              with:
+                  go-version: "1.24"
 
             - name: Bun Install
               run: |
                   bun install --frozen-lockfile
 
-            - name: Install cloudflared
-              run: ./.github/scripts/install-cloudflared.sh
-
-            - name: Load SSH Key
-              uses: shimataro/ssh-key-action@v2
-              with:
-                  key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-                  known_hosts: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
-
-            - name: Tunnel to VPS
-              env:
-                  TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_GHA_CLIENT_ID }}
-                  TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_GHA_CLIENT_SECRET }}
-              run: |
-                  ssh -N -L 5432:localhost:5432 -L 8123:localhost:8123 -L 9090:localhost:9090 -L 15672:localhost:15672 -o ProxyCommand="cloudflared access ssh --hostname %h" root@ssh.raidhub.io &
+            - name: Start pinned local services stack
+              run: bash ./.github/scripts/setup-local-services-ci.sh
 
             - name: Run Tests
               env:
                   CLIENT_SECRET: "secret-token"
                   ADMIN_CLIENT_SECRET: "another-secret-token"
                   JWT_SECRET: "jwt-secret"
-                  POSTGRES_USER: readonly
-                  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_READONLY_PASSWORD }}
-                  CLICKHOUSE_USER: ${{ secrets.CLICKHOUSE_READONLY_USER }}
-                  CLICKHOUSE_PASSWORD: ${{ secrets.CLICKHOUSE_READONLY_PASSWORD }}
+                  POSTGRES_USER: dev
+                  POSTGRES_PASSWORD: password
+                  CLICKHOUSE_USER: default
+                  CLICKHOUSE_PASSWORD: ""
                   BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
-                  RABBIT_API_USER: ${{ secrets.RABBIT_API_USER }}
-                  RABBIT_API_PASSWORD: ${{ secrets.RABBIT_API_PASSWORD }}
+                  RABBIT_API_USER: dev
+                  RABBIT_API_PASSWORD: password
                   R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
                   R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
                   R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
@@ -56,6 +46,16 @@ jobs:
 
               run: bun test --timeout=30000 --coverage
               continue-on-error: true
+
+            - name: Dump services logs on failure
+              if: failure()
+              run: |
+                  docker compose -f RaidHub-Services/docker-compose.yml --env-file RaidHub-Services/.env ps
+                  docker compose -f RaidHub-Services/docker-compose.yml --env-file RaidHub-Services/.env logs --tail=200 postgres rabbitmq clickhouse
+
+            - name: Tear down local services stack
+              if: always()
+              run: docker compose -f RaidHub-Services/docker-compose.yml --env-file RaidHub-Services/.env down -v
 
             - name: Upload coverage reports
               uses: actions/upload-artifact@v4

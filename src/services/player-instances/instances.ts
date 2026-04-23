@@ -139,8 +139,8 @@ export async function getInstances({
             season_id::int AS "season",
             duration::int AS "duration",
             platform_type AS "platformType",
-            CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END AS "isDayOne",
-            CASE WHEN av.is_contest_eligible THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END AS "isContest",
+            date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
+            date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
             date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
             (b.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted",
             "_lateral".players AS "players"

@@ -1,5 +1,6 @@
 import { afterAll, beforeEach, describe, expect, spyOn, test } from "bun:test"
 
+import { getFixturePool } from "@/lib/test-fixture-db"
 import { expectOk } from "@/lib/test-utils"
 import * as AtlasModule from "@/services/atlas"
 import * as FloodgateModule from "@/services/floodgates"
@@ -10,13 +11,18 @@ import { CoreSettingsConfiguration } from "bungie-net-core/models"
 
 import { statusRoute, statusState } from "./status"
 
-describe("status 200", async () => {
+const fixtureInstanceId = 999000000001n
+const fixturePgcrData = Buffer.from("{}")
+
+const fixtureDb = getFixturePool()
+
+describe("status 200", () => {
     const spyGetAtlasStatus = spyOn(AtlasModule, "getAtlasStatus")
     const spyGetCommonSettings = spyOn(BungieCoreEndpoints, "getCommonSettings")
     const spyGetFloodgatesRecentId = spyOn(FloodgateModule, "getFloodgatesRecentId")
     const spyGetFloodgatesStatus = spyOn(FloodgateModule, "getFloodgatesStatus")
 
-    beforeEach(() => {
+    beforeEach(async () => {
         spyGetAtlasStatus.mockReset()
         spyGetCommonSettings.mockReset()
         spyGetFloodgatesRecentId.mockReset()
@@ -31,13 +37,65 @@ describe("status 200", async () => {
                 }
             }
         } as unknown as BungieNetResponse<CoreSettingsConfiguration>)
+
+        await fixtureDb.query("DELETE FROM raw.pgcr WHERE instance_id = $1", [
+            fixtureInstanceId.toString()
+        ])
+        await fixtureDb.query("DELETE FROM core.instance WHERE instance_id = $1", [
+            fixtureInstanceId.toString()
+        ])
+
+        await fixtureDb.query(
+            `INSERT INTO core.instance (
+                instance_id,
+                hash,
+                score,
+                flawless,
+                completed,
+                fresh,
+                player_count,
+                date_started,
+                date_completed,
+                duration,
+                platform_type,
+                is_whitelisted
+            )
+            SELECT
+                $1::bigint,
+                av.hash,
+                0,
+                false,
+                true,
+                true,
+                6,
+                NOW() - INTERVAL '20 minutes',
+                NOW() - INTERVAL '10 minutes',
+                600,
+                3,
+                false
+            FROM definitions.activity_version av
+            ORDER BY av.hash
+            LIMIT 1`,
+            [fixtureInstanceId.toString()]
+        )
+
+        await fixtureDb.query(
+            "INSERT INTO raw.pgcr (instance_id, data, date_crawled) VALUES ($1, $2, NOW())",
+            [fixtureInstanceId.toString(), fixturePgcrData]
+        )
     })
 
-    afterAll(() => {
+    afterAll(async () => {
         spyGetAtlasStatus.mockRestore()
         spyGetCommonSettings.mockRestore()
         spyGetFloodgatesRecentId.mockRestore()
         spyGetFloodgatesStatus.mockRestore()
+        await fixtureDb.query("DELETE FROM raw.pgcr WHERE instance_id = $1", [
+            fixtureInstanceId.toString()
+        ])
+        await fixtureDb.query("DELETE FROM core.instance WHERE instance_id = $1", [
+            fixtureInstanceId.toString()
+        ])
     })
 
     const t = async () => {
@@ -109,7 +167,7 @@ describe("status 200", async () => {
                 estimatedCatchUpTime: 0
             })
 
-            spyGetFloodgatesRecentId.mockResolvedValueOnce("16142032033")
+            spyGetFloodgatesRecentId.mockResolvedValueOnce(fixtureInstanceId.toString())
 
             spyGetFloodgatesStatus.mockResolvedValueOnce({
                 waiting: 1000,
@@ -148,7 +206,7 @@ describe("status 200", async () => {
         })
 
         test("floodgates caught up", async () => {
-            spyGetFloodgatesRecentId.mockResolvedValueOnce("16142032033")
+            spyGetFloodgatesRecentId.mockResolvedValueOnce(fixtureInstanceId.toString())
 
             spyGetFloodgatesStatus.mockResolvedValueOnce({
                 waiting: 2,

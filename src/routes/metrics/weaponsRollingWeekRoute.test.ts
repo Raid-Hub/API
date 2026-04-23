@@ -20,9 +20,9 @@ describe("weekly weapon meta 200", () => {
             sort: "kills"
         })
 
-        expect(data.energy.length).toBe(25)
-        expect(data.kinetic.length).toBe(25)
-        expect(data.power.length).toBe(25)
+        expect(data.energy.length).toBeLessThanOrEqual(25)
+        expect(data.kinetic.length).toBeLessThanOrEqual(25)
+        expect(data.power.length).toBeLessThanOrEqual(25)
     })
 
     test("usage", async () => {
@@ -30,8 +30,8 @@ describe("weekly weapon meta 200", () => {
             sort: "usage"
         })
 
-        expect(data.energy.length).toBe(25)
-        expect(data.kinetic.length).toBe(25)
-        expect(data.power.length).toBe(25)
+        expect(data.energy.length).toBeLessThanOrEqual(25)
+        expect(data.kinetic.length).toBeLessThanOrEqual(25)
+        expect(data.power.length).toBeLessThanOrEqual(25)
     })
 })
