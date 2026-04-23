@@ -63,7 +63,7 @@ describe("authFromHeaders", () => {
         )
         const auth = authFromHeaders({
             authorization: [`Bearer ${token}`, "ignored"]
-        })
+        } as unknown as Parameters<typeof authFromHeaders>[0])
         expect(auth?.bungieMembershipId).toBe("1")
     })
 })
