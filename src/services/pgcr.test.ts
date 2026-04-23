@@ -1,14 +1,35 @@
-import { describe, expect, test } from "bun:test"
+import { getFixturePool } from "@/lib/test-fixture-db"
+import { gzipPgcrJson } from "@/lib/test-minimal-pgcr"
+import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { z } from "zod"
 import { getRawCompressedPGCR } from "./pgcr"
 
+const fixtureDb = getFixturePool()
+const fixturePgcrInstanceId = "999000000703"
+
+beforeAll(async () => {
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        fixturePgcrInstanceId
+    ])
+    await fixtureDb.query(
+        `INSERT INTO raw.pgcr (instance_id, data, date_crawled) VALUES ($1::bigint, $2, NOW())`,
+        [fixturePgcrInstanceId, gzipPgcrJson(fixturePgcrInstanceId)]
+    )
+})
+
+afterAll(async () => {
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        fixturePgcrInstanceId
+    ])
+})
+
 describe("getRawCompressedPGCR", () => {
     test("returns the correct shape", async () => {
-        const data = await getRawCompressedPGCR("12685770593").catch(console.error)
+        const data = await getRawCompressedPGCR(fixturePgcrInstanceId).catch(console.error)
 
         const parsed = z
             .object({
-                data: z.object({})
+                data: z.instanceof(Buffer)
             })
             .strict()
             .safeParse(data)

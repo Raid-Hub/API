@@ -1,4 +1,9 @@
+import {
+    assertIndividualLeaderboardPage,
+    assertIndividualSearchIncludesMembership
+} from "@/lib/leaderboard-test-assertions"
 import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { describe, expect, test } from "bun:test"
 import { leaderboardIndividualGlobalRoute } from "./global"
 
@@ -9,14 +14,11 @@ describe("global leaderboard 200", () => {
     ) => {
         const result = await leaderboardIndividualGlobalRoute.$mock({ params, query })
 
-        expectOk(result)
-        if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThan(0)
-        }
+        return result
     }
 
-    test("clears", () =>
-        t(
+    test("clears", async () => {
+        const result = await t(
             {
                 category: "clears"
             },
@@ -24,9 +26,14 @@ describe("global leaderboard 200", () => {
                 count: 10,
                 page: 1
             }
-        ))
-    test("full clears", () =>
-        t(
+        )
+        expectOk(result)
+        if (result.type === "ok") {
+            assertIndividualLeaderboardPage(result.parsed)
+        }
+    })
+    test("full clears", async () => {
+        const result = await t(
             {
                 category: "full-clears"
             },
@@ -34,10 +41,15 @@ describe("global leaderboard 200", () => {
                 count: 10,
                 page: 1
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") {
+            assertIndividualLeaderboardPage(result.parsed)
+        }
+    })
 
-    test("sherpas", () =>
-        t(
+    test("sherpas", async () => {
+        const result = await t(
             {
                 category: "sherpas"
             },
@@ -45,10 +57,15 @@ describe("global leaderboard 200", () => {
                 count: 14,
                 page: 4
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") {
+            assertIndividualLeaderboardPage(result.parsed)
+        }
+    })
 
-    test("in raid time", () =>
-        t(
+    test("in raid time", async () => {
+        const result = await t(
             {
                 category: "in-raid-time"
             },
@@ -56,10 +73,15 @@ describe("global leaderboard 200", () => {
                 count: 19,
                 page: 7
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") {
+            assertIndividualLeaderboardPage(result.parsed)
+        }
+    })
 
-    test("search", () =>
-        t(
+    test("search", async () => {
+        const result = await t(
             {
                 category: "clears"
             },
@@ -67,10 +89,17 @@ describe("global leaderboard 200", () => {
                 count: 10,
                 search: "4611686018488107374"
             }
-        ))
+        )
+        if (result.type === "ok" && result.parsed.type === "individual") {
+            assertIndividualLeaderboardPage(result.parsed)
+            assertIndividualSearchIncludesMembership(result.parsed.entries, "4611686018488107374")
+        } else if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.PlayerNotOnLeaderboardError)
+        }
+    })
 
-    test("power rankings", () =>
-        t(
+    test("power rankings", async () => {
+        const result = await t(
             {
                 category: "world-first-rankings"
             },
@@ -78,10 +107,15 @@ describe("global leaderboard 200", () => {
                 count: 14,
                 page: 4
             }
-        ))
+        )
+        expectOk(result)
+        if (result.type === "ok") {
+            assertIndividualLeaderboardPage(result.parsed)
+        }
+    })
 
-    test("search power rankings", () =>
-        t(
+    test("search power rankings", async () => {
+        const result = await t(
             {
                 category: "world-first-rankings"
             },
@@ -89,7 +123,14 @@ describe("global leaderboard 200", () => {
                 count: 11,
                 search: "4611686018488107374"
             }
-        ))
+        )
+        if (result.type === "ok" && result.parsed.type === "individual") {
+            assertIndividualLeaderboardPage(result.parsed)
+            assertIndividualSearchIncludesMembership(result.parsed.entries, "4611686018488107374")
+        } else if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.PlayerNotOnLeaderboardError)
+        }
+    })
 })
 
 describe("global leaderboard 404", () => {

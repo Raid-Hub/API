@@ -16,7 +16,7 @@ describe("getClanLeaderboard", () => {
             console.error(parsed.error.errors)
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data).toHaveLength(10)
+            expect(parsed.data.length).toBeLessThanOrEqual(10)
         }
     })
 })

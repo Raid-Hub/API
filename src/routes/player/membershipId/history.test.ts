@@ -1,11 +1,118 @@
-import { describe, expect, test } from "bun:test"
+import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 
+import { getFixturePool } from "@/lib/test-fixture-db"
 import { expectErr, expectOk } from "@/lib/test-utils"
 
 import express from "express"
 import request from "supertest"
 
 import { playerHistoryRoute } from "./history"
+
+const fixtureDb = getFixturePool()
+const historyPublicMembershipId = "4611686019000000120"
+const historyPrivateMembershipId = "4611686019000000121"
+const historyInstanceId = "999000000120"
+
+beforeAll(async () => {
+    await fixtureDb.query(`DELETE FROM core.instance_player WHERE instance_id = $1::bigint`, [
+        historyInstanceId
+    ])
+    await fixtureDb.query(
+        `DELETE FROM flagging.flag_instance_player WHERE instance_id = $1::bigint`,
+        [historyInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM flagging.blacklist_instance_player WHERE instance_id = $1::bigint`,
+        [historyInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM flagging.blacklist_instance WHERE instance_id = $1::bigint`,
+        [historyInstanceId]
+    )
+    await fixtureDb.query(`DELETE FROM flagging.flag_instance WHERE instance_id = $1::bigint`, [
+        historyInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        historyInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.instance WHERE instance_id = $1::bigint`, [
+        historyInstanceId
+    ])
+    await fixtureDb.query(
+        `DELETE FROM core.player_stats WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [historyPublicMembershipId, historyPrivateMembershipId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [historyPublicMembershipId, historyPrivateMembershipId]
+    )
+
+    await fixtureDb.query(
+        `INSERT INTO core.player (
+            membership_id, membership_type, icon_path, display_name,
+            bungie_global_display_name, bungie_global_display_name_code, last_seen, first_seen,
+            clears, fresh_clears, sherpas, total_time_played_seconds, sum_of_best, wfr_score,
+            cheat_level, is_private, is_whitelisted, updated_at
+        ) VALUES
+        ($1::bigint, 3, NULL, 'fixture_history_pub', 'fixture_history_pub', '0120', NOW(), NOW(), 2, 1, 0, 200, 200, 0, 0, false, false, NOW()),
+        ($2::bigint, 3, NULL, 'fixture_history_priv', 'fixture_history_priv', '0121', NOW(), NOW(), 0, 0, 0, 0, NULL, 0, 0, true, false, NOW())`,
+        [historyPublicMembershipId, historyPrivateMembershipId]
+    )
+
+    await fixtureDb.query(
+        `INSERT INTO core.instance (
+            instance_id, hash, score, flawless, completed, fresh, player_count, date_started, date_completed, duration, platform_type, is_whitelisted, skull_hashes
+        )
+        SELECT
+            $1::bigint, av.hash, 0, false, true, true, 1, NOW() - INTERVAL '2 days', NOW() - INTERVAL '1 day', 600, 3, false, ARRAY[]::bigint[]
+        FROM definitions.activity_version av
+        ORDER BY av.hash
+        LIMIT 1`,
+        [historyInstanceId]
+    )
+
+    await fixtureDb.query(
+        `INSERT INTO core.instance_player (
+            instance_id, membership_id, completed, time_played_seconds, sherpas, is_first_clear
+        ) VALUES ($1::bigint, $2::bigint, true, 300, 0, false)`,
+        [historyInstanceId, historyPublicMembershipId]
+    )
+})
+
+afterAll(async () => {
+    await fixtureDb.query(`DELETE FROM core.instance_player WHERE instance_id = $1::bigint`, [
+        historyInstanceId
+    ])
+    await fixtureDb.query(
+        `DELETE FROM flagging.flag_instance_player WHERE instance_id = $1::bigint`,
+        [historyInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM flagging.blacklist_instance_player WHERE instance_id = $1::bigint`,
+        [historyInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM flagging.blacklist_instance WHERE instance_id = $1::bigint`,
+        [historyInstanceId]
+    )
+    await fixtureDb.query(`DELETE FROM flagging.flag_instance WHERE instance_id = $1::bigint`, [
+        historyInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM raw.pgcr WHERE instance_id = $1::bigint`, [
+        historyInstanceId
+    ])
+    await fixtureDb.query(`DELETE FROM core.instance WHERE instance_id = $1::bigint`, [
+        historyInstanceId
+    ])
+    await fixtureDb.query(
+        `DELETE FROM core.player_stats WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [historyPublicMembershipId, historyPrivateMembershipId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM core.player WHERE membership_id IN ($1::bigint, $2::bigint)`,
+        [historyPublicMembershipId, historyPrivateMembershipId]
+    )
+})
 
 describe("player activities 200", () => {
     const t = async (membershipId: string, cursor?: Date) => {
@@ -19,25 +126,37 @@ describe("player activities 200", () => {
         return result
     }
 
-    test("returns activities for valid player id", () => t("4611686018488107374"))
+    test("returns activities for valid player id", async () => {
+        const result = await t(historyPublicMembershipId)
+        if (result.type === "ok") {
+            expect(result.parsed.activities.length).toBeGreaterThan(0)
+        }
+    })
 
-    test("returns activities for another valid player id", () => t("4611686018467831285"))
+    test("returns activities for another valid player id", async () => {
+        const result = await t(historyPublicMembershipId)
+        expect(result.type).toBe("ok")
+    })
 
-    test("returns activities with year cursor", () => t("4611686018501336567"))
+    test("returns activities with year cursor", async () => {
+        const result = await t(historyPublicMembershipId, new Date("2024-01-14T17:00:00Z"))
+        expect(result.type).toBe("ok")
+    })
 
-    test("end of list", async () =>
-        await t("4611686018488107374", new Date("2000-01-01T17:00:00Z")).then(result => {
-            if (result.type === "ok") {
-                expect(result.parsed.activities.length).toBeFalsy()
-            }
-        }))
+    test("end of list", async () => {
+        const result = await t(historyPublicMembershipId, new Date("2000-01-01T17:00:00Z"))
+        if (result.type === "ok") {
+            expect(result.parsed.activities.length).toBeFalsy()
+        }
+    })
 
-    test("final raid", async () =>
-        await t("4611686018488107374", new Date("2019-06-24T17:00:00Z")).then(result => {
-            if (result.type === "ok") {
-                expect(result.parsed.activities.length).toBe(2)
-            }
-        }))
+    test("final raid", async () => {
+        const result = await t(historyPublicMembershipId, new Date("2019-06-24T17:00:00Z"))
+        if (result.type === "ok") {
+            // Fixture completions are recent; a 2019 cursor is past them, so the page is empty.
+            expect(result.parsed.activities.length).toBe(0)
+        }
+    })
 })
 
 describe("player activities 404", () => {
@@ -56,18 +175,16 @@ describe("player activities 404", () => {
 })
 
 describe("player activities 403", () => {
-    const t = async (membershipId: string) => {
+    test("returns 403 for private profile", async () => {
         const result = await playerHistoryRoute.$mock({
             params: {
-                membershipId
+                membershipId: historyPrivateMembershipId
             },
             query: {}
         })
 
         expectErr(result)
-    }
-
-    test("returns 403 for private profile", () => t("4611686018467346804"))
+    })
 })
 
 describe("activities middleware", () => {
@@ -79,7 +196,7 @@ describe("activities middleware", () => {
 
     test("1 day cache on 200 cursor query", async () => {
         const res = await request(app)
-            .get("/test/4611686018488107374")
+            .get(`/test/${historyPublicMembershipId}`)
             .query({ cursor: new Date("2024-01-14T17:00:00Z") })
 
         expect(res.status).toBe(200)
@@ -89,7 +206,7 @@ describe("activities middleware", () => {
     })
 
     test("30s cache on 200", async () => {
-        const res = await request(app).get("/test/4611686018488107374")
+        const res = await request(app).get(`/test/${historyPublicMembershipId}`)
 
         expect(res.status).toBe(200)
         expect(res.headers).toMatchObject({
