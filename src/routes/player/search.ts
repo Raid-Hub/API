@@ -2,7 +2,7 @@ import { RaidHubRoute } from "@/core/RaidHubRoute"
 import { cacheControl } from "@/middleware/cache-control"
 import { zPlayerInfo } from "@/schema/components/PlayerInfo"
 import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
-import { zNaturalNumber } from "@/schema/output"
+import { zNaturalNumber, zWholeNumber } from "@/schema/output"
 import { searchForPlayer } from "@/services/search/player-search"
 import { z } from "zod"
 
@@ -34,7 +34,7 @@ Results are ordered by a combination of the number of raid completions and last 
                 .object({
                     params: z.object({
                         count: zNaturalNumber(),
-                        offset: zNaturalNumber(),
+                        offset: zWholeNumber(),
                         query: z.string()
                     }),
                     results: z.array(zPlayerInfo)
