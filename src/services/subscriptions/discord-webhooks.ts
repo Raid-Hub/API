@@ -118,6 +118,30 @@ const createDiscordWebhook = async (
     }
 }
 
+/** Best-effort cleanup when DB persistence fails after Discord accepted create. */
+const deleteDiscordWebhookApi = async (webhookId: string) => {
+    const token = process.env.DISCORD_BOT_TOKEN
+    if (!token) return
+
+    const response = await fetch(`https://discord.com/api/v10/webhooks/${webhookId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bot ${token}` }
+    })
+
+    if (!response.ok && response.status !== 404) {
+        const detail = await response.text()
+        logger.warn(
+            "DISCORD_WEBHOOK_ORPHAN_CLEANUP_FAILED",
+            null,
+            {
+                webhookId,
+                status: response.status,
+                detail
+            }
+        )
+    }
+}
+
 const validateDiscordWebhookUrl = (raw: string) => {
     const value = raw.trim()
     if (!value) throw new Error("webhookUrl is empty")
@@ -282,6 +306,48 @@ async function upsertDiscordRules(
     }
 }
 
+type PgWrite = Pick<typeof pgAdmin, "queryRow" | "queryRows">
+
+async function updateDiscordWebhookInDb(
+    tx: PgWrite,
+    channelId: string,
+    input: UpdateDiscordWebhookInput,
+    normalized: {
+        requireFresh: boolean
+        requireCompleted: boolean
+        playerMembershipIds?: string[]
+        clanGroupIds?: string[]
+    }
+): Promise<RegisterDiscordWebhookResult["rules"]> {
+    const { requireFresh, requireCompleted, playerMembershipIds, clanGroupIds } = normalized
+    const destinationId = await getDiscordDestinationIdByChannelId(tx, channelId)
+    const existing = await tx.queryRow<{ id: string }>(
+        `SELECT id::text AS "id"
+         FROM subscriptions.destination
+         WHERE id = $1::bigint
+         LIMIT 1`,
+        { params: [destinationId] }
+    )
+    if (!existing) {
+        throw new Error(`Subscription destination ${destinationId} not found`)
+    }
+
+    await tx.queryRows(
+        `UPDATE subscriptions.discord_destination_config
+             SET guild_id = $2,
+                 updated_at = NOW()
+             WHERE destination_id = $1::bigint`,
+        { params: [destinationId, input.guildId] }
+    )
+
+    return upsertDiscordRules(tx, destinationId, {
+        requireFresh,
+        requireCompleted,
+        playerMembershipIds,
+        clanGroupIds
+    })
+}
+
 export async function registerDiscordWebhook(
     input: RegisterDiscordWebhookInput
 ): Promise<RegisterDiscordWebhookResult> {
@@ -292,57 +358,60 @@ export async function registerDiscordWebhook(
         playerTargets: input.targets?.playerMembershipIds?.length ?? 0,
         clanTargets: input.targets?.clanGroupIds?.length ?? 0
     })
-    const webhook = await createDiscordWebhook({
-        channelId: input.channelId,
-        name: input.name
-    })
-    const webhookUrl = validateDiscordWebhookUrl(webhook.url)
-    const requireFresh = input.filters?.requireFresh ?? false
-    const requireCompleted = input.filters?.requireCompleted ?? false
-    const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
-    const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
+    let createdWebhook: { id: string; token: string; url: string } | null = null
+    try {
+        createdWebhook = await createDiscordWebhook({
+            channelId: input.channelId,
+            name: input.name
+        })
+        const webhookUrl = validateDiscordWebhookUrl(createdWebhook.url)
+        const requireFresh = input.filters?.requireFresh ?? false
+        const requireCompleted = input.filters?.requireCompleted ?? false
+        const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
+        const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
-    const { created, activated, rules } = await pgAdmin.transaction(async tx => {
-        const existing = await tx.queryRow<{ id: string; isActive: boolean }>(
-            `SELECT d.id::text AS "id", d.is_active AS "isActive"
+        const { created, activated, rules } = await pgAdmin.transaction(async tx => {
+            const webhook = createdWebhook!
+            const existing = await tx.queryRow<{ id: string; isActive: boolean }>(
+                `SELECT d.id::text AS "id", d.is_active AS "isActive"
              FROM subscriptions.discord_destination_config c
              INNER JOIN subscriptions.destination d ON d.id = c.destination_id
              WHERE c.channel_id = $1
              LIMIT 1`,
-            { params: [input.channelId] }
-        )
+                { params: [input.channelId] }
+            )
 
-        let destinationId: string
-        let created = false
-        let activated = false
-        if (existing) {
-            destinationId = existing.id
-            if (!existing.isActive) {
-                await tx.queryRows(
-                    `UPDATE subscriptions.destination
+            let destinationId: string
+            let created = false
+            let activated = false
+            if (existing) {
+                destinationId = existing.id
+                if (!existing.isActive) {
+                    await tx.queryRows(
+                        `UPDATE subscriptions.destination
                      SET is_active = true,
                          updated_at = NOW(),
                          deactivated_at = NULL,
                          deactivation_reason = NULL
                      WHERE id = $1::bigint`,
-                    { params: [existing.id] }
-                )
-                activated = true
-            }
-        } else {
-            const inserted = await tx.queryRow<{ id: string }>(
-                `INSERT INTO subscriptions.destination (channel_type)
+                        { params: [existing.id] }
+                    )
+                    activated = true
+                }
+            } else {
+                const inserted = await tx.queryRow<{ id: string }>(
+                    `INSERT INTO subscriptions.destination (channel_type)
                  VALUES ($1)
                  RETURNING id::text AS "id"`,
-                { params: ["discord_webhook"] }
-            )
-            if (!inserted) throw new Error("Failed to create subscription destination")
-            destinationId = inserted.id
-            created = true
-        }
+                    { params: ["discord_webhook"] }
+                )
+                if (!inserted) throw new Error("Failed to create subscription destination")
+                destinationId = inserted.id
+                created = true
+            }
 
-        await tx.queryRows(
-            `INSERT INTO subscriptions.discord_destination_config
+            await tx.queryRows(
+                `INSERT INTO subscriptions.discord_destination_config
                 (destination_id, guild_id, channel_id, webhook_id, webhook_token, updated_at)
              VALUES ($1::bigint, $2, $3, $4, $5, NOW())
              ON CONFLICT (destination_id)
@@ -352,41 +421,49 @@ export async function registerDiscordWebhook(
                 webhook_id = EXCLUDED.webhook_id,
                 webhook_token = EXCLUDED.webhook_token,
                 updated_at = NOW()`,
-            {
-                params: [destinationId, input.guildId, input.channelId, webhook.id, webhook.token]
-            }
-        )
+                {
+                    params: [destinationId, input.guildId, input.channelId, webhook.id, webhook.token]
+                }
+            )
 
-        const rules = await upsertDiscordRules(tx, destinationId, {
-            requireFresh,
-            requireCompleted,
-            playerMembershipIds,
-            clanGroupIds
+            const rules = await upsertDiscordRules(tx, destinationId, {
+                requireFresh,
+                requireCompleted,
+                playerMembershipIds,
+                clanGroupIds
+            })
+
+            return { created, activated, rules }
         })
 
-        return { created, activated, rules }
-    })
+        const webhook = createdWebhook
 
-    logger.info("DISCORD_WEBHOOK_REGISTER_COMPLETED", {
-        guildId: input.guildId,
-        channelId: input.channelId,
-        webhookId: webhook.id,
-        created,
-        activated,
-        playerRulesInserted: rules.players.inserted,
-        playerRulesUpdated: rules.players.updated,
-        clanRulesInserted: rules.clans.inserted,
-        clanRulesUpdated: rules.clans.updated
-    })
+        logger.info("DISCORD_WEBHOOK_REGISTER_COMPLETED", {
+            guildId: input.guildId,
+            channelId: input.channelId,
+            webhookId: webhook.id,
+            created,
+            activated,
+            playerRulesInserted: rules.players.inserted,
+            playerRulesUpdated: rules.players.updated,
+            clanRulesInserted: rules.clans.inserted,
+            clanRulesUpdated: rules.clans.updated
+        })
 
-    return {
-        guildId: input.guildId,
-        channelId: input.channelId,
-        webhookId: webhook.id,
-        webhookUrl,
-        created,
-        activated,
-        rules
+        return {
+            guildId: input.guildId,
+            channelId: input.channelId,
+            webhookId: webhook.id,
+            webhookUrl,
+            created,
+            activated,
+            rules
+        }
+    } catch (error) {
+        if (createdWebhook !== null) {
+            await deleteDiscordWebhookApi(createdWebhook.id).catch(() => undefined)
+        }
+        throw error
     }
 }
 
@@ -407,34 +484,14 @@ export async function updateDiscordWebhook(
     const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
     const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
-    const rules = await pgAdmin.transaction(async tx => {
-        const destinationId = await getDiscordDestinationIdByChannelId(tx, channelId)
-        const existing = await tx.queryRow<{ id: string }>(
-            `SELECT id::text AS "id"
-             FROM subscriptions.destination
-             WHERE id = $1::bigint
-             LIMIT 1`,
-            { params: [destinationId] }
-        )
-        if (!existing) {
-            throw new Error(`Subscription destination ${destinationId} not found`)
-        }
-
-        await tx.queryRows(
-            `UPDATE subscriptions.discord_destination_config
-             SET guild_id = $2,
-                 updated_at = NOW()
-             WHERE destination_id = $1::bigint`,
-            { params: [destinationId, input.guildId] }
-        )
-
-        return upsertDiscordRules(tx, destinationId, {
+    const rules = await pgAdmin.transaction(async tx =>
+        updateDiscordWebhookInDb(tx, channelId, input, {
             requireFresh,
             requireCompleted,
             playerMembershipIds,
             clanGroupIds
         })
-    })
+    )
 
     logger.info("DISCORD_WEBHOOK_UPDATE_COMPLETED", {
         guildId: input.guildId,
@@ -492,38 +549,57 @@ export async function upsertDiscordWebhook(
         }
     }
 
-    let activated = false
-    if (!existing.isActive) {
-        await pgAdmin.queryRows(
-            `UPDATE subscriptions.destination
+    const requireFresh = input.filters?.requireFresh ?? false
+    const requireCompleted = input.filters?.requireCompleted ?? false
+    const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
+    const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
+
+    const { rules, activated } = await pgAdmin.transaction(async tx => {
+        let activatedInner = false
+        if (!existing.isActive) {
+            await tx.queryRows(
+                `UPDATE subscriptions.destination
              SET is_active = true,
                  updated_at = NOW(),
                  deactivated_at = NULL,
                  deactivation_reason = NULL
              WHERE id = $1::bigint`,
-            { params: [existing.destinationId] }
-        )
-        activated = true
-        logger.info("DISCORD_WEBHOOK_REACTIVATED", {
-            destinationId: existing.destinationId,
-            channelId: input.channelId
-        })
-    }
+                { params: [existing.destinationId] }
+            )
+            activatedInner = true
+            logger.info("DISCORD_WEBHOOK_REACTIVATED", {
+                destinationId: existing.destinationId,
+                channelId: input.channelId
+            })
+        }
 
-    const upd = await updateDiscordWebhook(input.channelId, {
-        guildId: input.guildId,
-        filters: input.filters,
-        targets: input.targets
+        const rulesInner = await updateDiscordWebhookInDb(
+            tx,
+            input.channelId,
+            {
+                guildId: input.guildId,
+                filters: input.filters,
+                targets: input.targets
+            },
+            {
+                requireFresh,
+                requireCompleted,
+                playerMembershipIds,
+                clanGroupIds
+            }
+        )
+
+        return { rules: rulesInner, activated: activatedInner }
     })
 
     return {
-        guildId: upd.guildId,
-        channelId: upd.channelId,
+        guildId: input.guildId,
+        channelId: input.channelId,
         webhookId: existing.webhookId,
         created: false,
         activated,
         updated: true,
-        rules: upd.rules
+        rules
     }
 }
 
