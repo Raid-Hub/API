@@ -154,6 +154,19 @@ const toBigIntString = (value: string) => BigInt(value).toString()
 const normalizeTargetIds = (values?: string[]) =>
     values === undefined ? undefined : [...new Set(values.map(toBigIntString))]
 
+/** Prior Discord webhook id for this channel, if any (used before replacing on re-register). */
+async function getExistingDiscordWebhookIdForChannel(channelId: string): Promise<string | null> {
+    const row = await pgAdmin.queryRow<{ webhookId: string | null }>(
+        `SELECT webhook_id::text AS "webhookId"
+         FROM subscriptions.discord_destination_config
+         WHERE channel_id = $1
+         LIMIT 1`,
+        { params: [channelId] }
+    )
+    const id = row?.webhookId
+    return id && id.length > 0 ? id : null
+}
+
 async function getDiscordDestinationIdByChannelId(
     db: Pick<typeof pgAdmin, "queryRow" | "queryRows">,
     channelId: string
@@ -356,6 +369,11 @@ export async function registerDiscordWebhook(
     })
     let createdWebhook: { id: string; token: string; url: string } | null = null
     try {
+        const priorWebhookId = await getExistingDiscordWebhookIdForChannel(input.channelId)
+        if (priorWebhookId) {
+            await deleteDiscordWebhookApi(priorWebhookId)
+        }
+
         createdWebhook = await createDiscordWebhook({
             channelId: input.channelId,
             name: input.name

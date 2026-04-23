@@ -253,6 +253,7 @@ describe("discord webhook subscriptions service", () => {
 
     test("registerDiscordWebhook throws when DISCORD_BOT_TOKEN is unset", () => {
         delete process.env.DISCORD_BOT_TOKEN
+        queueQueryRow([null])
 
         return expect(
             registerDiscordWebhook({
@@ -267,6 +268,7 @@ describe("discord webhook subscriptions service", () => {
 
     test("registerDiscordWebhook throws when Discord returns error", () => {
         process.env.DISCORD_BOT_TOKEN = "fake-token"
+        queueQueryRow([null])
         globalThis.fetch = async () =>
             new Response("rate limited", {
                 status: 429,
@@ -285,6 +287,7 @@ describe("discord webhook subscriptions service", () => {
 
     test("registerDiscordWebhook deletes Discord webhook when DB transaction fails", async () => {
         process.env.DISCORD_BOT_TOKEN = "fake-token"
+        queueQueryRow([null])
         const requests: { method: string; url: string }[] = []
         globalThis.fetch = async (input, init) => {
             const url =
@@ -324,6 +327,7 @@ describe("discord webhook subscriptions service", () => {
 
     test("registerDiscordWebhook logs when orphan DELETE returns error", async () => {
         process.env.DISCORD_BOT_TOKEN = "fake-token"
+        queueQueryRow([null])
         globalThis.fetch = async (input, init) => {
             if (init?.method === "DELETE") {
                 return new Response("discord says no", { status: 500 })
@@ -358,7 +362,7 @@ describe("discord webhook subscriptions service", () => {
                 headers: { "Content-Type": "application/json" }
             })
 
-        queueQueryRow([null])
+        queueQueryRow([null, null])
         queueTransaction([null, { id: "200" }], [[]])
 
         const result = await upsertDiscordWebhook({
@@ -376,6 +380,43 @@ describe("discord webhook subscriptions service", () => {
         expect(result.rules.players.inserted).toBe(0)
     })
 
+    test("registerDiscordWebhook deletes prior Discord webhook before replacing stored credentials", async () => {
+        process.env.DISCORD_BOT_TOKEN = "fake-token"
+        queueQueryRow([{ webhookId: "wh_prior" }])
+        const requests: { method: string; url: string }[] = []
+        globalThis.fetch = async (input, init) => {
+            const url =
+                typeof input === "string"
+                    ? input
+                    : input instanceof Request
+                      ? input.url
+                      : input.href
+            requests.push({ method: init?.method ?? "GET", url })
+            if (init?.method === "DELETE") {
+                return new Response(null, { status: 204 })
+            }
+            return new Response(JSON.stringify({ id: "wh_next", token: "tok_next" }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+            })
+        }
+
+        queueTransaction([{ id: "5", isActive: true }], [[]])
+
+        const result = await registerDiscordWebhook({
+            guildId: "guild_r",
+            channelId: "chan_r",
+            filters: {},
+            targets: {}
+        })
+
+        expect(requests.map(r => r.method)).toEqual(["DELETE", "POST"])
+        expect(requests[0].url).toBe("https://discord.com/api/v10/webhooks/wh_prior")
+        expect(result.webhookId).toBe("wh_next")
+        expect(result.created).toBe(false)
+        expect(result.activated).toBe(false)
+    })
+
     test("registerDiscordWebhook creates new destination when channel is new", async () => {
         process.env.DISCORD_BOT_TOKEN = "fake-token"
         globalThis.fetch = async () =>
@@ -384,6 +425,7 @@ describe("discord webhook subscriptions service", () => {
                 headers: { "Content-Type": "application/json" }
             })
 
+        queueQueryRow([null])
         queueTransaction([null, { id: "100" }], [[]])
 
         const result = await registerDiscordWebhook({
