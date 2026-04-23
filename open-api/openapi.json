@@ -1800,14 +1800,16 @@
                 "items": {
                   "type": "string",
                   "pattern": "^\\d+$"
-                }
+                },
+                "maxItems": 250
               },
               "clanGroupIds": {
                 "type": "array",
                 "items": {
                   "type": "string",
                   "pattern": "^\\d+$"
-                }
+                },
+                "maxItems": 250
               }
             }
           }
@@ -1997,6 +1999,16 @@
             ]
           }
         ]
+      },
+      "InvalidDiscordAuthError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": ["Invalid Discord context token"]
+          }
+        },
+        "required": ["message"]
       },
       "ManifestResponse": {
         "type": "object",
@@ -8505,25 +8517,50 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["InvalidDiscordAuthError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/InvalidDiscordAuthError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["ApiKeyError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/ApiKeyError"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["ApiKeyError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/ApiKeyError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     }
-                  },
-                  "required": ["minted", "success", "code", "error"]
+                  ]
                 }
               }
             }
@@ -8731,25 +8768,50 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["InvalidDiscordAuthError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/InvalidDiscordAuthError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["ApiKeyError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/ApiKeyError"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["ApiKeyError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/ApiKeyError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     }
-                  },
-                  "required": ["minted", "success", "code", "error"]
+                  ]
                 }
               }
             }
@@ -8858,25 +8920,50 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "minted": {
-                      "type": "string",
-                      "format": "date-time"
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["InvalidDiscordAuthError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/InvalidDiscordAuthError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     },
-                    "success": {
-                      "type": "boolean",
-                      "enum": [false]
-                    },
-                    "code": {
-                      "type": "string",
-                      "enum": ["ApiKeyError"]
-                    },
-                    "error": {
-                      "$ref": "#/components/schemas/ApiKeyError"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["ApiKeyError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/ApiKeyError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
                     }
-                  },
-                  "required": ["minted", "success", "code", "error"]
+                  ]
                 }
               }
             }
