@@ -8,15 +8,15 @@ describe("attachDiscordContext", () => {
             headers: {
                 authorization: ["Bearer token"]
             }
-        } as never
-        const res = {} as never
+        } as unknown as Parameters<typeof attachDiscordContext>[0]
+        const res = {} as Parameters<typeof attachDiscordContext>[1]
 
         attachDiscordContext(req, res, () => {
             nextCalled = true
         })
 
         expect(nextCalled).toBe(true)
-        expect(req.discord).toBeUndefined()
+        expect((req as { discord?: unknown }).discord).toBeUndefined()
     })
 
     test("returns InvalidDiscordAuthError for invalid Discord token in header array", () => {
@@ -26,7 +26,7 @@ describe("attachDiscordContext", () => {
             headers: {
                 authorization: ["Discord invalid-token"]
             }
-        } as never
+        } as unknown as Parameters<typeof attachDiscordContext>[0]
         const res = {
             status: (code: number) => {
                 statusCode = code
@@ -36,7 +36,7 @@ describe("attachDiscordContext", () => {
                     }
                 }
             }
-        } as never
+        } as Parameters<typeof attachDiscordContext>[1]
 
         attachDiscordContext(req, res, () => {})
 
