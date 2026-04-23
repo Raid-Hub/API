@@ -77,7 +77,7 @@ beforeAll(async () => {
         RETURNING hash::text AS "hash"`,
         [fixtureInstanceId]
     )
-    fixtureHashForMetadata = ins.rows[0]!.hash
+    fixtureHashForMetadata = ins.rows[0].hash
 
     await fixtureDb.query(
         `INSERT INTO core.instance_player (

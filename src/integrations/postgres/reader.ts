@@ -5,7 +5,7 @@ export const readerMethods = (pool: Pool) => {
     return {
         async queryRow<T>(sql: string, options: QueryOptions = {}): Promise<T | null> {
             const rows = await executeQuery<T>(pool, sql, "query_row", options)
-            return (rows[0]) || null
+            return rows[0] || null
         },
 
         async queryRows<T>(sql: string, options: QueryOptions = {}): Promise<T[]> {

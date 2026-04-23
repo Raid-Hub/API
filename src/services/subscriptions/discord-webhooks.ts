@@ -89,9 +89,7 @@ const createDiscordWebhook = async (
     const defaultWebhookName = "RaidHub"
     const requestedName = body.name?.trim()
     const webhookName =
-        requestedName && requestedName.length > 0
-            ? requestedName.slice(0, 80)
-            : defaultWebhookName
+        requestedName && requestedName.length > 0 ? requestedName.slice(0, 80) : defaultWebhookName
 
     const response = await fetch(
         `https://discord.com/api/v10/channels/${body.channelId}/webhooks`,
@@ -536,7 +534,9 @@ export type DiscordWebhookStatusResult =
           }[]
       }
 
-export async function getDiscordWebhookStatus(channelId: string): Promise<DiscordWebhookStatusResult> {
+export async function getDiscordWebhookStatus(
+    channelId: string
+): Promise<DiscordWebhookStatusResult> {
     logger.debug("DISCORD_WEBHOOK_STATUS_REQUESTED", { channelId })
     const row = await pgAdmin.queryRow<{
         destinationId: string
@@ -572,7 +572,11 @@ export async function getDiscordWebhookStatus(channelId: string): Promise<Discor
     }
 
     const [playerRows, clanRows] = await Promise.all([
-        pgAdmin.queryRows<{ membershipId: string; requireFresh: boolean; requireCompleted: boolean }>(
+        pgAdmin.queryRows<{
+            membershipId: string
+            requireFresh: boolean
+            requireCompleted: boolean
+        }>(
             `SELECT
                 membership_id::text AS "membershipId",
                 require_fresh AS "requireFresh",

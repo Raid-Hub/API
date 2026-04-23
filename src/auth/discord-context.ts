@@ -33,4 +33,3 @@ export const attachDiscordContext: RequestHandler = (req, res, next) => {
         })
     }
 }
-

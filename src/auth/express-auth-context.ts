@@ -9,4 +9,3 @@ declare global {
 }
 
 export {}
-

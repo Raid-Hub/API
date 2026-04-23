@@ -74,10 +74,7 @@ describe("discord webhook subscriptions service", () => {
             }
         ])
         queueQueryRows([[]])
-        queueTransaction(
-            [{ destinationId: "99" }, { id: "99" }],
-            [[]]
-        )
+        queueTransaction([{ destinationId: "99" }, { id: "99" }], [[]])
 
         const result = await upsertDiscordWebhook({
             guildId: "guild_1",
@@ -115,10 +112,7 @@ describe("discord webhook subscriptions service", () => {
             }
         ])
         queueQueryRows([[], []])
-        queueTransaction(
-            [{ destinationId: "77" }, { id: "77" }],
-            [[]]
-        )
+        queueTransaction([{ destinationId: "77" }, { id: "77" }], [[]])
 
         const result = await upsertDiscordWebhook({
             guildId: "guild_2",

@@ -1,11 +1,11 @@
 import { RaidHubRoute } from "@/core/RaidHubRoute"
-import { ErrorCode } from "@/schema/errors/ErrorCode"
 import {
-    zDiscordWebhookDeleteResponse,
     zDiscordWebhookBody,
+    zDiscordWebhookDeleteResponse,
     zDiscordWebhookPutResponse,
     zDiscordWebhookStatusResponse
 } from "@/schema/components/DiscordSubscriptionWebhook"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import {
     deleteDiscordWebhook,
     getDiscordWebhookStatus,
@@ -95,4 +95,3 @@ export const getDiscordWebhookStatusRoute = new RaidHubRoute({
         return RaidHubRoute.ok(await getDiscordWebhookStatus(req.discord.channelId))
     }
 })
-

@@ -14,7 +14,8 @@ Results are ordered by a combination of the number of raid completions and last 
     query: z.object({
         count: z.coerce.number().int().min(1).max(50).default(20),
         offset: z.coerce.number().int().min(0).max(5000).default(0).openapi({
-            description: "Number of leading search hits to skip (for pagination). Must be 0 when count is the full result window."
+            description:
+                "Number of leading search hits to skip (for pagination). Must be 0 when count is the full result window."
         }),
         query: z.string().min(1).max(40),
         membershipType: zDestinyMembershipType.default(-1).openapi({

@@ -55,7 +55,7 @@ describe("searchForPlayer", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.results.length).toBeGreaterThan(0)
-            expect(parsed.data.results[0]!.membershipId).toBe(BigInt(svcSearchMembershipId))
+            expect(parsed.data.results[0].membershipId).toBe(BigInt(svcSearchMembershipId))
             expect(parsed.success).toBe(true)
         }
     })
@@ -79,7 +79,7 @@ describe("searchForPlayer", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.results.length).toBeGreaterThan(0)
-            expect(parsed.data.results[0]!.membershipId).toBe(BigInt(svcSearchMembershipId))
+            expect(parsed.data.results[0].membershipId).toBe(BigInt(svcSearchMembershipId))
             expect(parsed.success).toBe(true)
         }
     })
