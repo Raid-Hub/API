@@ -249,4 +249,36 @@ describe("discord webhook subscriptions service", () => {
             })
         ).rejects.toThrow("Discord webhook create failed with status 429")
     })
+
+    test("registerDiscordWebhook creates new destination when channel is new", async () => {
+        process.env.DISCORD_BOT_TOKEN = "fake-token"
+        globalThis.fetch = async () =>
+            new Response(JSON.stringify({ id: "wh_new", token: "tok_new" }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+            })
+
+        queueTransaction([null, { id: "100" }], [[]])
+
+        const result = await registerDiscordWebhook({
+            guildId: "guild_reg",
+            channelId: "chan_reg",
+            name: "  CustomName  ",
+            filters: { requireFresh: true, requireCompleted: false },
+            targets: {}
+        })
+
+        expect(result).toEqual({
+            guildId: "guild_reg",
+            channelId: "chan_reg",
+            webhookId: "wh_new",
+            webhookUrl: "https://discord.com/api/webhooks/wh_new/tok_new",
+            created: true,
+            activated: false,
+            rules: {
+                players: { inserted: 0, updated: 0 },
+                clans: { inserted: 0, updated: 0 }
+            }
+        })
+    })
 })
