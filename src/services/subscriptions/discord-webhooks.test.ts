@@ -5,6 +5,7 @@ import {
     deleteDiscordWebhook,
     getDiscordWebhookStatus,
     registerDiscordWebhook,
+    updateDiscordWebhook,
     upsertDiscordWebhook
 } from "./discord-webhooks"
 
@@ -68,6 +69,26 @@ describe("discord webhook subscriptions service", () => {
         pgAdmin.transaction = originalTransaction
         globalThis.fetch = originalFetch
         process.env.DISCORD_BOT_TOKEN = originalBotToken
+    })
+
+    test("updateDiscordWebhook updates guild and rules in one transaction", async () => {
+        queueTransaction([{ destinationId: "42" }, { id: "42" }], [[]])
+
+        const result = await updateDiscordWebhook("channel_x", {
+            guildId: "guild_x",
+            filters: { requireFresh: true, requireCompleted: false },
+            targets: {}
+        })
+
+        expect(result).toEqual({
+            guildId: "guild_x",
+            channelId: "channel_x",
+            updated: true,
+            rules: {
+                players: { inserted: 0, updated: 0 },
+                clans: { inserted: 0, updated: 0 }
+            }
+        })
     })
 
     test("upsertDiscordWebhook updates existing active destination", async () => {
@@ -299,6 +320,34 @@ describe("discord webhook subscriptions service", () => {
 
         expect(requests.map(r => r.method)).toEqual(["POST", "DELETE"])
         expect(requests[1].url).toBe("https://discord.com/api/v10/webhooks/wh_orphan")
+    })
+
+    test("registerDiscordWebhook logs when orphan DELETE returns error", async () => {
+        process.env.DISCORD_BOT_TOKEN = "fake-token"
+        globalThis.fetch = async (input, init) => {
+            if (init?.method === "DELETE") {
+                return new Response("discord says no", { status: 500 })
+            }
+            return new Response(JSON.stringify({ id: "wh_bad_del", token: "tok_bd" }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+            })
+        }
+
+        queueTransaction([], [])
+
+        try {
+            await registerDiscordWebhook({
+                guildId: "g",
+                channelId: "c",
+                filters: {},
+                targets: {}
+            })
+            expect.unreachable("registerDiscordWebhook should have thrown")
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(Error)
+            expect((error as Error).message).toContain("Unexpected tx.queryRow call")
+        }
     })
 
     test("upsertDiscordWebhook registers when channel has no destination yet", async () => {
