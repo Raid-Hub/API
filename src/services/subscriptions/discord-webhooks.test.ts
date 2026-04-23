@@ -1,12 +1,19 @@
 import { afterAll, beforeEach, describe, expect, test } from "bun:test"
 
 import { pgAdmin } from "@/integrations/postgres"
-import { getDiscordWebhookStatus, upsertDiscordWebhook } from "./discord-webhooks"
+import {
+    deleteDiscordWebhook,
+    getDiscordWebhookStatus,
+    registerDiscordWebhook,
+    upsertDiscordWebhook
+} from "./discord-webhooks"
 
 describe("discord webhook subscriptions service", () => {
     const originalQueryRow = pgAdmin.queryRow.bind(pgAdmin)
     const originalQueryRows = pgAdmin.queryRows.bind(pgAdmin)
     const originalTransaction = pgAdmin.transaction.bind(pgAdmin)
+    const originalFetch = globalThis.fetch
+    const originalBotToken = process.env.DISCORD_BOT_TOKEN
 
     const queueQueryRow = (values: unknown[]) => {
         const queue = [...values]
@@ -51,12 +58,16 @@ describe("discord webhook subscriptions service", () => {
         pgAdmin.queryRow = originalQueryRow
         pgAdmin.queryRows = originalQueryRows
         pgAdmin.transaction = originalTransaction
+        globalThis.fetch = originalFetch
+        process.env.DISCORD_BOT_TOKEN = originalBotToken
     })
 
     afterAll(() => {
         pgAdmin.queryRow = originalQueryRow
         pgAdmin.queryRows = originalQueryRows
         pgAdmin.transaction = originalTransaction
+        globalThis.fetch = originalFetch
+        process.env.DISCORD_BOT_TOKEN = originalBotToken
     })
 
     test("upsertDiscordWebhook updates existing active destination", async () => {
@@ -185,5 +196,57 @@ describe("discord webhook subscriptions service", () => {
                 }
             ]
         })
+    })
+
+    test("getDiscordWebhookStatus returns registered false when channel is unknown", async () => {
+        queueQueryRow([null])
+
+        const result = await getDiscordWebhookStatus("no_such_channel")
+
+        expect(result).toEqual({ registered: false })
+    })
+
+    test("deleteDiscordWebhook deactivates destination", async () => {
+        pgAdmin.transaction = (async callback => {
+            const tx = {
+                queryRow: async () => ({ destinationId: "55" }),
+                queryRows: async () => []
+            }
+            return callback(tx as never)
+        }) as typeof pgAdmin.transaction
+
+        await deleteDiscordWebhook("channel_to_delete")
+    })
+
+    test("registerDiscordWebhook throws when DISCORD_BOT_TOKEN is unset", () => {
+        delete process.env.DISCORD_BOT_TOKEN
+
+        return expect(
+            registerDiscordWebhook({
+                guildId: "g",
+                channelId: "c",
+                name: "Test",
+                filters: {},
+                targets: {}
+            })
+        ).rejects.toThrow("DISCORD_BOT_TOKEN")
+    })
+
+    test("registerDiscordWebhook throws when Discord returns error", () => {
+        process.env.DISCORD_BOT_TOKEN = "fake-token"
+        globalThis.fetch = async () =>
+            new Response("rate limited", {
+                status: 429,
+                statusText: "Too Many Requests"
+            })
+
+        return expect(
+            registerDiscordWebhook({
+                guildId: "g",
+                channelId: "c",
+                filters: {},
+                targets: {}
+            })
+        ).rejects.toThrow("Discord webhook create failed with status 429")
     })
 })
