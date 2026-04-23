@@ -131,6 +131,8 @@ const validateDiscordWebhookUrl = (raw: string) => {
 }
 
 const toBigIntString = (value: string) => BigInt(value).toString()
+const normalizeTargetIds = (values?: string[]) =>
+    values === undefined ? undefined : [...new Set(values.map(toBigIntString))]
 
 async function getDiscordDestinationIdByChannelId(
     db: Pick<typeof pgAdmin, "queryRow" | "queryRows">,
@@ -155,82 +157,118 @@ async function upsertDiscordRules(
     options: {
         requireFresh: boolean
         requireCompleted: boolean
-        playerMembershipIds: string[]
-        clanGroupIds: string[]
+        playerMembershipIds?: string[]
+        clanGroupIds?: string[]
     }
 ) {
     const { requireFresh, requireCompleted, playerMembershipIds, clanGroupIds } = options
-    const playerInsertResults = await Promise.all(
-        playerMembershipIds.map(async membershipId => {
-            const insertedRows = await db.queryRows<{ rowCount: number }>(
-                `INSERT INTO subscriptions.rule (destination_id, scope, membership_id, require_fresh, require_completed)
-                 SELECT $1::bigint, 'player', $2::bigint, $3, $4
-                 WHERE NOT EXISTS (
-                     SELECT 1 FROM subscriptions.rule r
-                     WHERE r.destination_id = $1::bigint
-                       AND r.scope = 'player'
-                       AND r.membership_id = $2::bigint
-                       AND r.is_active
-                 )
-                 RETURNING 1 AS "rowCount"`,
-                {
-                    params: [destinationId, membershipId, requireFresh, requireCompleted]
-                }
-            )
+    const playerInsertResults: { inserted: number; updated: number }[] = []
+    for (const membershipId of playerMembershipIds ?? []) {
+        const insertedRows = await db.queryRows<{ rowCount: number }>(
+            `INSERT INTO subscriptions.rule (destination_id, scope, membership_id, require_fresh, require_completed)
+             SELECT $1::bigint, 'player', $2::bigint, $3, $4
+             WHERE NOT EXISTS (
+                 SELECT 1 FROM subscriptions.rule r
+                 WHERE r.destination_id = $1::bigint
+                   AND r.scope = 'player'
+                   AND r.membership_id = $2::bigint
+                   AND r.is_active
+             )
+             RETURNING 1 AS "rowCount"`,
+            {
+                params: [destinationId, membershipId, requireFresh, requireCompleted]
+            }
+        )
 
-            if (insertedRows.length > 0) return { inserted: 1, updated: 0 }
+        if (insertedRows.length > 0) {
+            playerInsertResults.push({ inserted: 1, updated: 0 })
+            continue
+        }
 
-            await db.queryRows(
-                `UPDATE subscriptions.rule
-                 SET require_fresh = $3,
-                     require_completed = $4
-                 WHERE destination_id = $1::bigint
-                   AND scope = 'player'
-                   AND membership_id = $2::bigint
-                   AND is_active`,
-                {
-                    params: [destinationId, membershipId, requireFresh, requireCompleted]
-                }
-            )
-            return { inserted: 0, updated: 1 }
-        })
-    )
+        await db.queryRows(
+            `UPDATE subscriptions.rule
+             SET require_fresh = $3,
+                 require_completed = $4
+             WHERE destination_id = $1::bigint
+               AND scope = 'player'
+               AND membership_id = $2::bigint
+               AND is_active`,
+            {
+                params: [destinationId, membershipId, requireFresh, requireCompleted]
+            }
+        )
+        playerInsertResults.push({ inserted: 0, updated: 1 })
+    }
 
-    const clanInsertResults = await Promise.all(
-        clanGroupIds.map(async groupId => {
-            const insertedRows = await db.queryRows<{ rowCount: number }>(
-                `INSERT INTO subscriptions.rule (destination_id, scope, group_id, require_fresh, require_completed)
-                 SELECT $1::bigint, 'clan', $2::bigint, $3, $4
-                 WHERE NOT EXISTS (
-                     SELECT 1 FROM subscriptions.rule r
-                     WHERE r.destination_id = $1::bigint
-                       AND r.scope = 'clan'
-                       AND r.group_id = $2::bigint
-                       AND r.is_active
-                 )
-                 RETURNING 1 AS "rowCount"`,
-                {
-                    params: [destinationId, groupId, requireFresh, requireCompleted]
-                }
-            )
+    if (playerMembershipIds !== undefined) {
+        await db.queryRows(
+            `UPDATE subscriptions.rule
+             SET is_active = false,
+                 updated_at = NOW()
+             WHERE destination_id = $1::bigint
+               AND scope = 'player'
+               AND is_active
+               AND (
+                    array_length($2::bigint[], 1) IS NULL
+                    OR membership_id <> ALL($2::bigint[])
+               )`,
+            { params: [destinationId, playerMembershipIds] }
+        )
+    }
 
-            if (insertedRows.length > 0) return { inserted: 1, updated: 0 }
+    const clanInsertResults: { inserted: number; updated: number }[] = []
+    for (const groupId of clanGroupIds ?? []) {
+        const insertedRows = await db.queryRows<{ rowCount: number }>(
+            `INSERT INTO subscriptions.rule (destination_id, scope, group_id, require_fresh, require_completed)
+             SELECT $1::bigint, 'clan', $2::bigint, $3, $4
+             WHERE NOT EXISTS (
+                 SELECT 1 FROM subscriptions.rule r
+                 WHERE r.destination_id = $1::bigint
+                   AND r.scope = 'clan'
+                   AND r.group_id = $2::bigint
+                   AND r.is_active
+             )
+             RETURNING 1 AS "rowCount"`,
+            {
+                params: [destinationId, groupId, requireFresh, requireCompleted]
+            }
+        )
 
-            await db.queryRows(
-                `UPDATE subscriptions.rule
-                 SET require_fresh = $3,
-                     require_completed = $4
-                 WHERE destination_id = $1::bigint
-                   AND scope = 'clan'
-                   AND group_id = $2::bigint
-                   AND is_active`,
-                {
-                    params: [destinationId, groupId, requireFresh, requireCompleted]
-                }
-            )
-            return { inserted: 0, updated: 1 }
-        })
-    )
+        if (insertedRows.length > 0) {
+            clanInsertResults.push({ inserted: 1, updated: 0 })
+            continue
+        }
+
+        await db.queryRows(
+            `UPDATE subscriptions.rule
+             SET require_fresh = $3,
+                 require_completed = $4
+             WHERE destination_id = $1::bigint
+               AND scope = 'clan'
+               AND group_id = $2::bigint
+               AND is_active`,
+            {
+                params: [destinationId, groupId, requireFresh, requireCompleted]
+            }
+        )
+        clanInsertResults.push({ inserted: 0, updated: 1 })
+    }
+
+    if (clanGroupIds !== undefined) {
+        await db.queryRows(
+            `UPDATE subscriptions.rule
+             SET is_active = false,
+                 updated_at = NOW()
+             WHERE destination_id = $1::bigint
+               AND scope = 'clan'
+               AND is_active
+               AND (
+                    array_length($2::bigint[], 1) IS NULL
+                    OR group_id <> ALL($2::bigint[])
+               )`,
+            { params: [destinationId, clanGroupIds] }
+        )
+    }
 
     return {
         players: {
@@ -261,8 +299,8 @@ export async function registerDiscordWebhook(
     const webhookUrl = validateDiscordWebhookUrl(webhook.url)
     const requireFresh = input.filters?.requireFresh ?? false
     const requireCompleted = input.filters?.requireCompleted ?? false
-    const playerMembershipIds = (input.targets?.playerMembershipIds ?? []).map(toBigIntString)
-    const clanGroupIds = (input.targets?.clanGroupIds ?? []).map(toBigIntString)
+    const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
+    const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
     const { created, activated, rules } = await pgAdmin.transaction(async tx => {
         const existing = await tx.queryRow<{ id: string; isActive: boolean }>(
@@ -282,7 +320,10 @@ export async function registerDiscordWebhook(
             if (!existing.isActive) {
                 await tx.queryRows(
                     `UPDATE subscriptions.destination
-                     SET is_active = true, updated_at = NOW()
+                     SET is_active = true,
+                         updated_at = NOW(),
+                         deactivated_at = NULL,
+                         deactivation_reason = NULL
                      WHERE id = $1::bigint`,
                     { params: [existing.id] }
                 )
@@ -363,8 +404,8 @@ export async function updateDiscordWebhook(
     })
     const requireFresh = input.filters?.requireFresh ?? false
     const requireCompleted = input.filters?.requireCompleted ?? false
-    const playerMembershipIds = (input.targets?.playerMembershipIds ?? []).map(toBigIntString)
-    const clanGroupIds = (input.targets?.clanGroupIds ?? []).map(toBigIntString)
+    const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
+    const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
     const rules = await pgAdmin.transaction(async tx => {
         const destinationId = await getDiscordDestinationIdByChannelId(tx, channelId)

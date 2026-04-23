@@ -138,6 +138,32 @@ describe("discord webhook subscriptions service", () => {
         expect(result.webhookId).toBe("webhook_xyz")
     })
 
+    test("upsertDiscordWebhook reconciles rules when explicit empty targets are provided", async () => {
+        queueQueryRow([
+            {
+                destinationId: "99",
+                webhookId: "webhook_abc",
+                isActive: true
+            }
+        ])
+        queueTransaction([{ destinationId: "99" }, { id: "99" }], [[], [], []])
+
+        const result = await upsertDiscordWebhook({
+            guildId: "guild_1",
+            channelId: "123456789",
+            filters: {},
+            targets: {
+                playerMembershipIds: [],
+                clanGroupIds: []
+            }
+        })
+
+        expect(result.rules).toEqual({
+            players: { inserted: 0, updated: 0 },
+            clans: { inserted: 0, updated: 0 }
+        })
+    })
+
     test("getDiscordWebhookStatus returns full player/clan rule DTOs", async () => {
         queueQueryRow([
             {

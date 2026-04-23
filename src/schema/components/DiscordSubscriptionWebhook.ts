@@ -2,6 +2,8 @@ import { zWholeNumber } from "@/schema/output"
 import { registry } from "@/schema/registry"
 import { z } from "zod"
 
+const MAX_DISCORD_WEBHOOK_TARGETS = 250
+
 export type DiscordWebhookBody = z.input<typeof zDiscordWebhookBody>
 export const zDiscordWebhookBody = registry.register(
     "DiscordWebhookBody",
@@ -16,8 +18,14 @@ export const zDiscordWebhookBody = registry.register(
                 .optional(),
             targets: z
                 .object({
-                    playerMembershipIds: z.array(z.string().regex(/^\d+$/)).optional(),
-                    clanGroupIds: z.array(z.string().regex(/^\d+$/)).optional()
+                    playerMembershipIds: z
+                        .array(z.string().regex(/^\d+$/))
+                        .max(MAX_DISCORD_WEBHOOK_TARGETS)
+                        .optional(),
+                    clanGroupIds: z
+                        .array(z.string().regex(/^\d+$/))
+                        .max(MAX_DISCORD_WEBHOOK_TARGETS)
+                        .optional()
                 })
                 .optional()
         })

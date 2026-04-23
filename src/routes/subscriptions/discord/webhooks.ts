@@ -6,20 +6,24 @@ import {
     zDiscordWebhookStatusResponse
 } from "@/schema/components/DiscordSubscriptionWebhook"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { zInsufficientPermissionsError } from "@/schema/errors/InsufficientPermissionsError"
+import { zInvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
 import {
     deleteDiscordWebhook,
     getDiscordWebhookStatus,
     upsertDiscordWebhook
 } from "@/services/subscriptions/discord-webhooks"
-import { z } from "zod"
 
 const discordGuildChannelAuthErrors = [
     {
+        statusCode: 401 as const,
+        code: ErrorCode.InvalidDiscordAuthError,
+        schema: zInvalidDiscordAuthError.shape.error
+    },
+    {
         statusCode: 403 as const,
         code: ErrorCode.InsufficientPermissionsError,
-        schema: z.object({
-            message: z.literal("Forbidden")
-        })
+        schema: zInsufficientPermissionsError.shape.error
     }
 ]
 
