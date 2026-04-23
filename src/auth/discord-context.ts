@@ -1,6 +1,6 @@
 import { verifyDiscordInvocationContext } from "@/integrations/discord/context-jwt"
-import { InvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
+import { InvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
 import { RequestHandler } from "express"
 import { IncomingHttpHeaders } from "http"
 
