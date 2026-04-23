@@ -250,6 +250,32 @@ describe("discord webhook subscriptions service", () => {
         ).rejects.toThrow("Discord webhook create failed with status 429")
     })
 
+    test("upsertDiscordWebhook registers when channel has no destination yet", async () => {
+        process.env.DISCORD_BOT_TOKEN = "fake-token"
+        globalThis.fetch = async () =>
+            new Response(JSON.stringify({ id: "wh_ups", token: "tok_ups" }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+            })
+
+        queueQueryRow([null])
+        queueTransaction([null, { id: "200" }], [[]])
+
+        const result = await upsertDiscordWebhook({
+            guildId: "guild_u",
+            channelId: "chan_u",
+            filters: {},
+            targets: {}
+        })
+
+        expect(result.created).toBe(true)
+        expect(result.updated).toBe(false)
+        expect(result.activated).toBe(false)
+        expect(result.webhookId).toBe("wh_ups")
+        expect(result.webhookUrl).toBe("https://discord.com/api/webhooks/wh_ups/tok_ups")
+        expect(result.rules.players.inserted).toBe(0)
+    })
+
     test("registerDiscordWebhook creates new destination when channel is new", async () => {
         process.env.DISCORD_BOT_TOKEN = "fake-token"
         globalThis.fetch = async () =>
