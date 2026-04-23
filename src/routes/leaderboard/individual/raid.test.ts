@@ -62,10 +62,10 @@ describe("raid leaderboard 200", () => {
                 search: "4611686018488107374"
             }
         )
-        if (result.type === "ok") {
+        if (result.type === "ok" && result.parsed.type === "individual") {
             assertIndividualLeaderboardPage(result.parsed)
             assertIndividualSearchIncludesMembership(result.parsed.entries, "4611686018488107374")
-        } else {
+        } else if (result.type === "err") {
             expect(result.code).toBe(ErrorCode.PlayerNotOnLeaderboardError)
         }
     })

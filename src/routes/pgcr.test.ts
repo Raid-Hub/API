@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, test } from "bun:test"
 
 import { getFixturePool } from "@/lib/test-fixture-db"
+import { gzipPgcrJson } from "@/lib/test-minimal-pgcr"
 import { expectErr, expectOk } from "@/lib/test-utils"
 
 import { pgcrRoute } from "./pgcr"
@@ -14,7 +15,7 @@ beforeAll(async () => {
     ])
     await fixtureDb.query(
         `INSERT INTO raw.pgcr (instance_id, data, date_crawled) VALUES ($1::bigint, $2, NOW())`,
-        [fixturePgcrInstanceId, Buffer.from("{}")]
+        [fixturePgcrInstanceId, gzipPgcrJson(fixturePgcrInstanceId)]
     )
 })
 

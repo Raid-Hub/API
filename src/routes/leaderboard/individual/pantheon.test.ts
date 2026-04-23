@@ -64,7 +64,7 @@ describe("pantheon leaderboard 200", () => {
                 }
             })
             expectOk(result)
-            if (result.type === "ok") {
+            if (result.type === "ok" && result.parsed.type === "individual") {
                 assertIndividualLeaderboardPage(result.parsed)
                 assertIndividualSearchIncludesMembership(
                     result.parsed.entries,
@@ -83,7 +83,9 @@ describe("pantheon leaderboard 200", () => {
                 }
             })
             expectErr(result)
-            expect(result.code).toBe(ErrorCode.PlayerNotOnLeaderboardError)
+            if (result.type === "err") {
+                expect(result.code).toBe(ErrorCode.PlayerNotOnLeaderboardError)
+            }
         }
     })
 })

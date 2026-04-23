@@ -14,9 +14,18 @@ import {
 const fixtureDb = getFixturePool()
 const fixtureInstanceId = "999000000701"
 const fixtureMembershipId = "4611686019000000701"
+const fixtureCharacterId = "999070199901"
 let fixtureHashForMetadata: string
 
 beforeAll(async () => {
+    await fixtureDb.query(
+        `DELETE FROM extended.instance_character_weapon WHERE instance_id = $1::bigint`,
+        [fixtureInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM extended.instance_character WHERE instance_id = $1::bigint`,
+        [fixtureInstanceId]
+    )
     await fixtureDb.query(`DELETE FROM core.instance_player WHERE instance_id = $1::bigint`, [
         fixtureInstanceId
     ])
@@ -76,9 +85,26 @@ beforeAll(async () => {
         ) VALUES ($1::bigint, $2::bigint, true, 300, 0, false)`,
         [fixtureInstanceId, fixtureMembershipId]
     )
+
+    await fixtureDb.query(
+        `INSERT INTO extended.instance_character (
+            instance_id, membership_id, character_id, class_hash, emblem_hash, completed,
+            score, kills, assists, deaths, precision_kills, super_kills, grenade_kills, melee_kills,
+            time_played_seconds, start_seconds
+        ) VALUES ($1::bigint, $2::bigint, $3::bigint, 1, 1, true, 0, 0, 0, 0, 0, 0, 0, 0, 300, 0)`,
+        [fixtureInstanceId, fixtureMembershipId, fixtureCharacterId]
+    )
 })
 
 afterAll(async () => {
+    await fixtureDb.query(
+        `DELETE FROM extended.instance_character_weapon WHERE instance_id = $1::bigint`,
+        [fixtureInstanceId]
+    )
+    await fixtureDb.query(
+        `DELETE FROM extended.instance_character WHERE instance_id = $1::bigint`,
+        [fixtureInstanceId]
+    )
     await fixtureDb.query(`DELETE FROM core.instance_player WHERE instance_id = $1::bigint`, [
         fixtureInstanceId
     ])
