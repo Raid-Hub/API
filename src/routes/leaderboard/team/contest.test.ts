@@ -1,4 +1,9 @@
+import {
+    assertTeamLeaderboardPage,
+    assertTeamSearchIncludesMembership
+} from "@/lib/leaderboard-test-assertions"
 import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { describe, expect, test } from "bun:test"
 import { leaderboardTeamContestRoute } from "./contest"
 
@@ -23,7 +28,9 @@ describe("contest leaderboard 200", () => {
             }
         )
         expectOk(result)
-        if (result.type === "ok") expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+        if (result.type === "ok") {
+            assertTeamLeaderboardPage(result.parsed)
+        }
     })
 
     test("levi", async () => {
@@ -37,7 +44,9 @@ describe("contest leaderboard 200", () => {
             }
         )
         expectOk(result)
-        if (result.type === "ok") expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+        if (result.type === "ok") {
+            assertTeamLeaderboardPage(result.parsed)
+        }
     })
 
     test("search", async () => {
@@ -51,9 +60,10 @@ describe("contest leaderboard 200", () => {
             }
         )
         if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+            assertTeamLeaderboardPage(result.parsed)
+            assertTeamSearchIncludesMembership(result.parsed.entries, "4611686018488107374")
         } else {
-            expectErr(result)
+            expect(result.code).toBe(ErrorCode.PlayerNotOnLeaderboardError)
         }
     })
 })

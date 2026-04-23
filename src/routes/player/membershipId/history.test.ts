@@ -153,7 +153,7 @@ describe("player activities 200", () => {
     test("final raid", async () => {
         const result = await t(historyPublicMembershipId, new Date("2019-06-24T17:00:00Z"))
         if (result.type === "ok") {
-            expect(result.parsed.activities.length).toBeGreaterThanOrEqual(0)
+            expect(result.parsed.activities.length).toBeGreaterThan(0)
         }
     })
 })

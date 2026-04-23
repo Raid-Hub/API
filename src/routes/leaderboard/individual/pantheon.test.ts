@@ -1,5 +1,10 @@
 import { pgReader } from "@/integrations/postgres"
+import {
+    assertIndividualLeaderboardPage,
+    assertIndividualSearchIncludesMembership
+} from "@/lib/leaderboard-test-assertions"
 import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { describe, expect, test } from "bun:test"
 import { leaderboardIndividualPantheonRoute } from "./pantheon"
 
@@ -12,7 +17,7 @@ describe("pantheon leaderboard 200", () => {
 
         expectOk(result)
         if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
+            assertIndividualLeaderboardPage(result.parsed)
         }
     }
 
@@ -47,21 +52,38 @@ describe("pantheon leaderboard 200", () => {
             LIMIT 1`
         )
 
-        const result = await leaderboardIndividualPantheonRoute.$mock({
-            params: {
-                category: "clears",
-                version: "rhulk"
-            },
-            query: {
-                count: 10,
-                search: existing?.membershipId?.toString() ?? "1"
+        if (existing) {
+            const result = await leaderboardIndividualPantheonRoute.$mock({
+                params: {
+                    category: "clears",
+                    version: "rhulk"
+                },
+                query: {
+                    count: 10,
+                    search: existing.membershipId.toString()
+                }
+            })
+            expectOk(result)
+            if (result.type === "ok") {
+                assertIndividualLeaderboardPage(result.parsed)
+                assertIndividualSearchIncludesMembership(
+                    result.parsed.entries,
+                    existing.membershipId.toString()
+                )
             }
-        })
-
-        if (result.type === "ok") {
-            expect(result.parsed.entries.length).toBeGreaterThanOrEqual(0)
         } else {
+            const result = await leaderboardIndividualPantheonRoute.$mock({
+                params: {
+                    category: "clears",
+                    version: "rhulk"
+                },
+                query: {
+                    count: 10,
+                    search: "123"
+                }
+            })
             expectErr(result)
+            expect(result.code).toBe(ErrorCode.PlayerNotOnLeaderboardError)
         }
     })
 })

@@ -1,5 +1,6 @@
+import { assertClanLeaderboardPage } from "@/lib/leaderboard-test-assertions"
 import { expectOk } from "@/lib/test-utils"
-import { describe, expect, test } from "bun:test"
+import { describe, test } from "bun:test"
 import { clanLeaderboardRoute } from "./clan"
 
 describe("clan leaderboard 200", () => {
@@ -7,7 +8,10 @@ describe("clan leaderboard 200", () => {
         const result = await clanLeaderboardRoute.$mock({ query })
 
         expectOk(result)
-        expect(result.parsed.length).toBeGreaterThanOrEqual(0)
+        if (result.type === "ok") {
+            const count = Number(query?.count ?? 50)
+            assertClanLeaderboardPage(result.parsed, count)
+        }
     }
 
     test("weighted contest ranking", () =>

@@ -75,6 +75,13 @@ beforeAll(async () => {
     )
 
     await fixtureDb.query(
+        `INSERT INTO flagging.flag_instance_player (
+            instance_id, membership_id, cheat_check_version, cheat_check_bitmask, cheat_probability
+        ) VALUES ($1::bigint, $2::bigint, 'fixture-fip', 0, 0.2)`,
+        [standingInstanceId, standingMembershipId]
+    )
+
+    await fixtureDb.query(
         `INSERT INTO flagging.flag_instance (
             instance_id, cheat_check_version, cheat_check_bitmask, cheat_probability
         ) VALUES ($1::bigint, 'test-version', 0, 0.1)`,
@@ -126,14 +133,7 @@ describe("getInstanceFlags", () => {
     test("returns the correct shape", async () => {
         const flags = await getInstanceFlags(standingInstanceId)
         expect(flags.length).toBeGreaterThan(0)
-
-        const parsed = z.array(zInstanceFlag).safeParse(flags)
-        if (!parsed.success) {
-            console.error(parsed.error.errors)
-            expect(parsed.error.errors).toEqual([])
-        } else {
-            expect(parsed.success).toBe(true)
-        }
+        z.array(zInstanceFlag).parse(flags)
     })
 })
 
@@ -143,43 +143,18 @@ describe("getInstanceBlacklist", () => {
 
         expect(blacklist).not.toBeNull()
 
-        const parsed = zInstanceBlacklist.safeParse(blacklist)
-        if (!parsed.success) {
-            console.error(parsed.error.errors)
-            expect(parsed.error.errors).toEqual([])
-        } else {
-            expect(parsed.success).toBe(true)
-        }
+        zInstanceBlacklist.parse(blacklist)
     })
 })
 
 describe("getInstancePlayersStanding", () => {
-    test("returns the correct shape", async () => {
+    test("returns player standing with instance flags and no other-instance blacklist rows", async () => {
         const standing = await getInstancePlayersStanding(standingInstanceId)
         expect(standing.length).toBe(1)
         expect(standing[0]!.playerInfo.membershipId).toBe(BigInt(standingMembershipId))
-        expect(standing[0]!.flags.length).toBeGreaterThanOrEqual(0)
+        expect(standing[0]!.flags.length).toBeGreaterThan(0)
+        expect(standing[0]!.blacklistedInstances.length).toBe(0)
 
-        const parsed = z.array(zInstancePlayerStanding).safeParse(standing)
-        if (!parsed.success) {
-            console.error(parsed.error.errors)
-            expect(parsed.error.errors).toEqual([])
-        } else {
-            expect(parsed.success).toBe(true)
-        }
-    })
-
-    test("returns the correct shape #2", async () => {
-        const standing = await getInstancePlayersStanding(standingInstanceId)
-        expect(standing.length).toBe(1)
-        expect(standing[0]!.blacklistedInstances.length).toBeGreaterThanOrEqual(0)
-
-        const parsed = z.array(zInstancePlayerStanding).safeParse(standing)
-        if (!parsed.success) {
-            console.error(parsed.error.errors)
-            expect(parsed.error.errors).toEqual([])
-        } else {
-            expect(parsed.success).toBe(true)
-        }
+        z.array(zInstancePlayerStanding).parse(standing)
     })
 })

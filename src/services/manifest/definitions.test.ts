@@ -64,7 +64,7 @@ describe("listActivityDefinitions", () => {
             console.error(parsed.error.errors)
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
         }
     })
@@ -78,7 +78,7 @@ describe("listVersionDefinitions", () => {
         if (!parsed.success) {
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
         }
     })
@@ -102,7 +102,7 @@ describe("listHashes", () => {
         if (!parsed.success) {
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
         }
     })
@@ -116,7 +116,7 @@ describe("listFeatDefinitions", () => {
         if (!parsed.success) {
             expect(parsed.error.errors).toEqual([])
         } else {
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
+            expect(parsed.data.length).toBeGreaterThan(0)
             expect(parsed.success).toBe(true)
         }
     })

@@ -1,3 +1,7 @@
+import {
+    assertIndividualLeaderboardSlice,
+    assertIndividualSearchIncludesMembership
+} from "@/lib/leaderboard-test-assertions"
 import { zIndividualLeaderboardEntry } from "@/schema/components/LeaderboardData"
 import { zNaturalNumber } from "@/schema/output"
 import {
@@ -9,47 +13,42 @@ import { z } from "zod"
 
 describe("getIndividualRaidLeaderboard", () => {
     test("returns the correct shape", async () => {
+        const skip = 904
+        const take = 34
         const data = await getIndividualRaidLeaderboard({
             raidId: 3,
-            skip: 904,
-            take: 34,
+            skip,
+            take,
             column: "clears"
-        }).catch(console.error)
-
-        const parsed = z.array(zIndividualLeaderboardEntry).safeParse(data)
-        if (!parsed.success) {
-            console.error(parsed.error.errors)
-            expect(parsed.error.errors).toEqual([])
-        } else {
-            expect(parsed.data.length).toBeGreaterThanOrEqual(0)
-            expect(parsed.success).toBe(true)
-        }
+        })
+        const parsed = z.array(zIndividualLeaderboardEntry).parse(data)
+        assertIndividualLeaderboardSlice(parsed, skip, take)
     })
 })
 
 describe("searchIndividualRaidLeaderboard", () => {
     test("returns the correct shape", async () => {
+        const take = 10
         const data = await searchIndividualRaidLeaderboard({
             raidId: 9,
-            take: 10,
+            take,
             column: "clears",
             membershipId: "4611686018488107374"
-        }).catch(console.error)
-
+        })
         const parsed = z
             .object({
                 page: zNaturalNumber(),
                 entries: z.array(zIndividualLeaderboardEntry)
             })
             .nullable()
-            .safeParse(data)
-        if (!parsed.success) {
-            expect(parsed.error.errors).toEqual([])
+            .parse(data)
+
+        if (parsed) {
+            const skip = (parsed.page - 1) * take
+            assertIndividualLeaderboardSlice(parsed.entries, skip, take)
+            assertIndividualSearchIncludesMembership(parsed.entries, "4611686018488107374")
         } else {
-            if (parsed.data) {
-                expect(parsed.data.entries.length).toBeGreaterThanOrEqual(0)
-            }
-            expect(parsed.success).toBe(true)
+            expect(data).toBeNull()
         }
     })
 })
