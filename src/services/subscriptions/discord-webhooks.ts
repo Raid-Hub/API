@@ -130,15 +130,11 @@ const deleteDiscordWebhookApi = async (webhookId: string) => {
 
     if (!response.ok && response.status !== 404) {
         const detail = await response.text()
-        logger.warn(
-            "DISCORD_WEBHOOK_ORPHAN_CLEANUP_FAILED",
-            null,
-            {
-                webhookId,
-                status: response.status,
-                detail
-            }
-        )
+        logger.warn("DISCORD_WEBHOOK_ORPHAN_CLEANUP_FAILED", null, {
+            webhookId,
+            status: response.status,
+            detail
+        })
     }
 }
 
@@ -422,7 +418,13 @@ export async function registerDiscordWebhook(
                 webhook_token = EXCLUDED.webhook_token,
                 updated_at = NOW()`,
                 {
-                    params: [destinationId, input.guildId, input.channelId, webhook.id, webhook.token]
+                    params: [
+                        destinationId,
+                        input.guildId,
+                        input.channelId,
+                        webhook.id,
+                        webhook.token
+                    ]
                 }
             )
 
