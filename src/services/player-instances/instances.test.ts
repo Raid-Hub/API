@@ -88,7 +88,7 @@ beforeAll(async () => {
         WHERE i.instance_id = $1::bigint`,
         [svcInstInstanceId]
     )
-    const row = meta.rows[0]!
+    const row = meta.rows[0]
     fixtureActivityId = row.activityId
     fixtureVersionId = row.versionId
     fixtureSeason = row.season
@@ -342,11 +342,17 @@ describe("getInstances", () => {
     })
 
     test("whitelisted instance is not blacklisted", async () => {
-        const players = await getInstancePlayerInfo(svcInstInstanceId).catch(console.error)
+        let players: Awaited<ReturnType<typeof getInstancePlayerInfo>>
+        try {
+            players = await getInstancePlayerInfo(svcInstInstanceId)
+        } catch (err) {
+            console.error(err)
+            throw err
+        }
         expect(players).not.toBeNull()
-        expect(players!.length).toBeGreaterThan(0)
+        expect(players.length).toBeGreaterThan(0)
 
-        const membershipIds = players!.map(p => p.membershipId.toString())
+        const membershipIds = players.map(p => p.membershipId.toString())
         const data = await getInstances({
             membershipIds,
             count: 100
