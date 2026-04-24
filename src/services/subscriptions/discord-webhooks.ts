@@ -209,6 +209,30 @@ const resolveActivityRaidBitmap = async (raidIds?: number[]): Promise<number> =>
     return rows.reduce((bitmap, row) => bitmap + subscriptionRaidBitForActivityID(row.id), 0)
 }
 
+/** Dedupes identical raid lists across many targets in one PUT (one DB round-trip per unique list). */
+type RaidBitmapResolutionCache = Map<string, Promise<number>>
+
+const RAID_BITMAP_CACHE_EMPTY = "__empty__"
+
+const raidBitmapCacheKey = (raidIds?: number[]): string => {
+    if (!raidIds || raidIds.length === 0) return RAID_BITMAP_CACHE_EMPTY
+    return [...new Set(raidIds)].sort((a, b) => a - b).join(",")
+}
+
+const resolveActivityRaidBitmapCached = async (
+    raidIds: number[] | undefined,
+    cache: RaidBitmapResolutionCache
+): Promise<number> => {
+    const key = raidBitmapCacheKey(raidIds)
+    if (key === RAID_BITMAP_CACHE_EMPTY) return 0
+    let pending = cache.get(key)
+    if (!pending) {
+        pending = resolveActivityRaidBitmap(raidIds)
+        cache.set(key, pending)
+    }
+    return pending
+}
+
 const dedupePlayerTargets = (
     players: DiscordWebhookPlayerTargetInput[]
 ): DiscordWebhookPlayerTargetInput[] => {
@@ -234,7 +258,8 @@ const dedupeClanTargets = (
 }
 
 const resolvePlayerRuleRows = async (
-    players: DiscordWebhookPlayerTargetInput[] | undefined
+    players: DiscordWebhookPlayerTargetInput[] | undefined,
+    raidBitmapCache: RaidBitmapResolutionCache
 ): Promise<ResolvedPlayerRuleRow[] | undefined> => {
     if (players === undefined) return undefined
     const deduped = dedupePlayerTargets(players)
@@ -244,14 +269,15 @@ const resolvePlayerRuleRows = async (
             membershipId: p.membershipId,
             requireFresh: p.requireFresh ?? false,
             requireCompleted: p.requireCompleted ?? false,
-            activityRaidBitmap: await resolveActivityRaidBitmap(p.raids)
+            activityRaidBitmap: await resolveActivityRaidBitmapCached(p.raids, raidBitmapCache)
         })
     }
     return out
 }
 
 const resolveClanRuleRows = async (
-    clans: DiscordWebhookClanTargetInput[] | undefined
+    clans: DiscordWebhookClanTargetInput[] | undefined,
+    raidBitmapCache: RaidBitmapResolutionCache
 ): Promise<ResolvedClanRuleRow[] | undefined> => {
     if (clans === undefined) return undefined
     const deduped = dedupeClanTargets(clans)
@@ -261,7 +287,7 @@ const resolveClanRuleRows = async (
             groupId: c.groupId,
             requireFresh: c.requireFresh ?? false,
             requireCompleted: c.requireCompleted ?? false,
-            activityRaidBitmap: await resolveActivityRaidBitmap(c.raids)
+            activityRaidBitmap: await resolveActivityRaidBitmapCached(c.raids, raidBitmapCache)
         })
     }
     return out
@@ -518,8 +544,9 @@ export async function registerDiscordWebhook(
             name: input.name
         })
         const webhookUrl = validateDiscordWebhookUrl(createdWebhook.url)
-        const players = await resolvePlayerRuleRows(input.targets?.players)
-        const clans = await resolveClanRuleRows(input.targets?.clans)
+        const raidBitmapCache: RaidBitmapResolutionCache = new Map()
+        const players = await resolvePlayerRuleRows(input.targets?.players, raidBitmapCache)
+        const clans = await resolveClanRuleRows(input.targets?.clans, raidBitmapCache)
 
         const { created, activated, rules } = await pgAdmin.transaction(async tx => {
             const webhook = createdWebhook!
@@ -629,8 +656,9 @@ export async function updateDiscordWebhook(
         playerTargets: input.targets?.players?.length ?? 0,
         clanTargets: input.targets?.clans?.length ?? 0
     })
-    const players = await resolvePlayerRuleRows(input.targets?.players)
-    const clans = await resolveClanRuleRows(input.targets?.clans)
+    const raidBitmapCache: RaidBitmapResolutionCache = new Map()
+    const players = await resolvePlayerRuleRows(input.targets?.players, raidBitmapCache)
+    const clans = await resolveClanRuleRows(input.targets?.clans, raidBitmapCache)
 
     const rules = await pgAdmin.transaction(async tx =>
         updateDiscordWebhookInDb(tx, channelId, input, { players, clans })
@@ -692,8 +720,9 @@ export async function upsertDiscordWebhook(
         }
     }
 
-    const players = await resolvePlayerRuleRows(input.targets?.players)
-    const clans = await resolveClanRuleRows(input.targets?.clans)
+    const raidBitmapCache: RaidBitmapResolutionCache = new Map()
+    const players = await resolvePlayerRuleRows(input.targets?.players, raidBitmapCache)
+    const clans = await resolveClanRuleRows(input.targets?.clans, raidBitmapCache)
 
     const { rules, activated } = await pgAdmin.transaction(async tx => {
         let activatedInner = false
