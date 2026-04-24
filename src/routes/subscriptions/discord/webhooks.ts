@@ -5,17 +5,14 @@ import {
     zDiscordWebhookPutResponse,
     zDiscordWebhookStatusResponse
 } from "@/schema/components/DiscordSubscriptionWebhook"
-import { zBodyValidationError } from "@/schema/errors/BodyValidationError"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zInsufficientPermissionsError } from "@/schema/errors/InsufficientPermissionsError"
 import { zInvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
 import {
-    InvalidRaidFilterError,
     deleteDiscordWebhook,
     getDiscordWebhookStatus,
     upsertDiscordWebhook
 } from "@/services/subscriptions/discord-webhooks"
-import { ZodIssueCode } from "zod"
 
 const discordGuildChannelAuthErrors = [
     {
@@ -40,14 +37,7 @@ export const putDiscordWebhookRoute = new RaidHubRoute({
             statusCode: 200,
             schema: zDiscordWebhookPutResponse
         },
-        errors: [
-            ...discordGuildChannelAuthErrors,
-            {
-                statusCode: 400 as const,
-                code: ErrorCode.BodyValidationError,
-                schema: zBodyValidationError.shape.error
-            }
-        ]
+        errors: [...discordGuildChannelAuthErrors]
     },
     async handler(req) {
         const guildId = req.discord?.guildId
@@ -57,28 +47,13 @@ export const putDiscordWebhookRoute = new RaidHubRoute({
                 message: "Forbidden" as const
             })
         }
-        try {
-            return RaidHubRoute.ok(
-                await upsertDiscordWebhook({
-                    ...req.body,
-                    guildId,
-                    channelId
-                })
-            )
-        } catch (error) {
-            if (error instanceof InvalidRaidFilterError) {
-                return RaidHubRoute.fail(ErrorCode.BodyValidationError, {
-                    issues: [
-                        {
-                            code: ZodIssueCode.custom,
-                            path: ["filters", "raid"],
-                            message: error.message
-                        }
-                    ]
-                })
-            }
-            throw error
-        }
+        return RaidHubRoute.ok(
+            await upsertDiscordWebhook({
+                ...req.body,
+                guildId,
+                channelId
+            })
+        )
     }
 })
 
