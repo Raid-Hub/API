@@ -13,7 +13,8 @@ export const zDiscordWebhookBody = registry.register(
             filters: z
                 .object({
                     requireFresh: z.boolean().optional(),
-                    requireCompleted: z.boolean().optional()
+                    requireCompleted: z.boolean().optional(),
+                    raid: zWholeNumber().optional()
                 })
                 .optional(),
             targets: z
@@ -46,13 +47,17 @@ const zDiscordWebhookRulesUpsertSummary = z.object({
 const zDiscordPlayerRule = z.object({
     membershipId: z.string().regex(/^\d+$/),
     requireFresh: z.boolean(),
-    requireCompleted: z.boolean()
+    requireCompleted: z.boolean(),
+    activityRaidBitmap: zWholeNumber(),
+    raidId: zWholeNumber().nullable()
 })
 
 const zDiscordClanRule = z.object({
     groupId: z.string().regex(/^\d+$/),
     requireFresh: z.boolean(),
-    requireCompleted: z.boolean()
+    requireCompleted: z.boolean(),
+    activityRaidBitmap: zWholeNumber(),
+    raidId: zWholeNumber().nullable()
 })
 
 export type DiscordWebhookPutResponse = z.input<typeof zDiscordWebhookPutResponse>

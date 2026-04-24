@@ -190,14 +190,16 @@ describe("discord webhook subscriptions service", () => {
                 {
                     membershipId: "4611686018467831285",
                     requireFresh: true,
-                    requireCompleted: false
+                    requireCompleted: false,
+                    activityRaidBitmap: 0
                 }
             ],
             [
                 {
                     groupId: "123456",
                     requireFresh: false,
-                    requireCompleted: true
+                    requireCompleted: true,
+                    activityRaidBitmap: 0
                 }
             ]
         ])
@@ -218,17 +220,54 @@ describe("discord webhook subscriptions service", () => {
                 {
                     membershipId: "4611686018467831285",
                     requireFresh: true,
-                    requireCompleted: false
+                    requireCompleted: false,
+                    activityRaidBitmap: 0,
+                    raidId: null
                 }
             ],
             clans: [
                 {
                     groupId: "123456",
                     requireFresh: false,
-                    requireCompleted: true
+                    requireCompleted: true,
+                    activityRaidBitmap: 0,
+                    raidId: null
                 }
             ]
         })
+    })
+
+    test("getDiscordWebhookStatus resolves raidId from activityRaidBitmap", async () => {
+        queueQueryRow([
+            {
+                destinationId: "42",
+                destinationActive: true,
+                consecutiveDeliveryFailures: 0,
+                lastDeliverySuccessAt: null,
+                lastDeliveryFailureAt: null,
+                lastDeliveryError: null,
+                guildId: "guild_9",
+                channelId: "channel_9",
+                webhookId: "webhook_9"
+            }
+        ])
+        queueQueryRows([
+            [
+                {
+                    membershipId: "4611686018467831285",
+                    requireFresh: true,
+                    requireCompleted: false,
+                    activityRaidBitmap: 512
+                }
+            ],
+            []
+        ])
+
+        const result = await getDiscordWebhookStatus("channel_9")
+        if (!result.registered) expect.unreachable("Expected registered status")
+
+        expect(result.players[0].raidId).toBe(9)
+        expect(result.players[0].activityRaidBitmap).toBe(512)
     })
 
     test("getDiscordWebhookStatus returns registered false when channel is unknown", async () => {
