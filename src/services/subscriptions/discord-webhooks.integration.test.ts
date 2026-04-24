@@ -18,6 +18,7 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
     const guildIdA = "999888777666555002"
     const guildIdB = "999888777666555003"
     const membershipId = "4611686019000990990"
+    const membershipIdB = "4611686019000990991"
 
     let webhookSeq = 0
     const nextWebhookId = () => `wh_int_${Date.now()}_${webhookSeq++}`
@@ -64,12 +65,12 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
         await deleteFixtureRows()
     })
 
-    test("updateDiscordWebhook deactivates all player rules when targets.playerMembershipIds is empty", async () => {
+    test("updateDiscordWebhook deactivates all player rules when targets.players is empty", async () => {
         await seedActiveDestination()
 
         await updateDiscordWebhook(channelId, {
             guildId: guildIdA,
-            targets: { playerMembershipIds: [] }
+            targets: { players: [] }
         })
 
         const row = await fixtureDb.query<{ n: string }>(
@@ -82,13 +83,20 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
         expect(row.rows[0].n).toBe("0")
     })
 
-    test("updateDiscordWebhook persists guild_id and rule updates touch updated_at when column exists", async () => {
+    test("updateDiscordWebhook persists guild_id and per-player rule filters", async () => {
         await seedActiveDestination()
 
         await updateDiscordWebhook(channelId, {
             guildId: guildIdB,
-            filters: { requireFresh: true, requireCompleted: true },
-            targets: { playerMembershipIds: [membershipId] }
+            targets: {
+                players: [
+                    {
+                        membershipId,
+                        requireFresh: true,
+                        requireCompleted: true
+                    }
+                ]
+            }
         })
 
         const cfg = await fixtureDb.query<{ guild_id: string }>(
@@ -114,6 +122,34 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
         expect(rule.rows[0].updated_at).not.toBeNull()
     })
 
+    test("updateDiscordWebhook applies different filters per player in one request", async () => {
+        await seedActiveDestination()
+
+        await updateDiscordWebhook(channelId, {
+            guildId: guildIdA,
+            targets: {
+                players: [
+                    { membershipId, requireFresh: false, requireCompleted: false },
+                    { membershipId: membershipIdB, requireFresh: true, requireCompleted: false }
+                ]
+            }
+        })
+
+        const rows = await fixtureDb.query<{ membership_id: string; require_fresh: boolean }>(
+            `SELECT membership_id::text AS membership_id, require_fresh
+             FROM subscriptions.rule r
+             INNER JOIN subscriptions.discord_destination_config c ON c.destination_id = r.destination_id
+             WHERE c.channel_id = $1 AND r.scope = 'player' AND r.is_active
+             ORDER BY membership_id`,
+            [channelId]
+        )
+        expect(rows.rows).toHaveLength(2)
+        const a = rows.rows.find(r => r.membership_id === membershipId)
+        const b = rows.rows.find(r => r.membership_id === membershipIdB)
+        expect(a?.require_fresh).toBe(false)
+        expect(b?.require_fresh).toBe(true)
+    })
+
     test("getDiscordWebhookStatus returns active player rules for seeded destination", async () => {
         await seedActiveDestination()
 
@@ -130,8 +166,9 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
 
         await updateDiscordWebhook(channelId, {
             guildId: guildIdA,
-            filters: { raids: [9] },
-            targets: { playerMembershipIds: [membershipId] }
+            targets: {
+                players: [{ membershipId, raids: [9] }]
+            }
         })
 
         const rule = await fixtureDb.query<{ activity_raid_bitmap: string }>(
@@ -158,7 +195,6 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
         const out = await upsertDiscordWebhook({
             guildId: guildIdB,
             channelId,
-            filters: { requireFresh: false, requireCompleted: false },
             targets: {}
         })
 

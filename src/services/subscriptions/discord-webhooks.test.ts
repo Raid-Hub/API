@@ -75,9 +75,7 @@ describe("discord webhook subscriptions service", () => {
         queueTransaction([{ destinationId: "42" }, { id: "42" }], [[]])
 
         const result = await updateDiscordWebhook("channel_x", {
-            guildId: "guild_x",
-            filters: { requireFresh: true, requireCompleted: false },
-            targets: {}
+            guildId: "guild_x"
         })
 
         expect(result).toEqual({
@@ -103,9 +101,7 @@ describe("discord webhook subscriptions service", () => {
 
         const result = await upsertDiscordWebhook({
             guildId: "guild_1",
-            channelId: "123456789",
-            filters: {},
-            targets: {}
+            channelId: "123456789"
         })
 
         expect(result).toEqual({
@@ -134,9 +130,7 @@ describe("discord webhook subscriptions service", () => {
 
         const result = await upsertDiscordWebhook({
             guildId: "guild_2",
-            channelId: "channel_2",
-            filters: {},
-            targets: {}
+            channelId: "channel_2"
         })
 
         expect(result.activated).toBe(true)
@@ -158,10 +152,9 @@ describe("discord webhook subscriptions service", () => {
         const result = await upsertDiscordWebhook({
             guildId: "guild_1",
             channelId: "123456789",
-            filters: {},
             targets: {
-                playerMembershipIds: [],
-                clanGroupIds: []
+                players: [],
+                clans: []
             }
         })
 
@@ -335,9 +328,7 @@ describe("discord webhook subscriptions service", () => {
             registerDiscordWebhook({
                 guildId: "g",
                 channelId: "c",
-                name: "Test",
-                filters: {},
-                targets: {}
+                name: "Test"
             })
         ).rejects.toThrow("DISCORD_BOT_TOKEN")
     })
@@ -354,9 +345,7 @@ describe("discord webhook subscriptions service", () => {
         return expect(
             registerDiscordWebhook({
                 guildId: "g",
-                channelId: "c",
-                filters: {},
-                targets: {}
+                channelId: "c"
             })
         ).rejects.toThrow("Discord webhook create failed with status 429")
     })
@@ -387,9 +376,7 @@ describe("discord webhook subscriptions service", () => {
         try {
             await registerDiscordWebhook({
                 guildId: "g",
-                channelId: "c",
-                filters: {},
-                targets: {}
+                channelId: "c"
             })
             expect.unreachable("registerDiscordWebhook should have thrown")
         } catch (error: unknown) {
@@ -419,9 +406,7 @@ describe("discord webhook subscriptions service", () => {
         try {
             await registerDiscordWebhook({
                 guildId: "g",
-                channelId: "c",
-                filters: {},
-                targets: {}
+                channelId: "c"
             })
             expect.unreachable("registerDiscordWebhook should have thrown")
         } catch (error: unknown) {
@@ -443,9 +428,7 @@ describe("discord webhook subscriptions service", () => {
 
         const result = await upsertDiscordWebhook({
             guildId: "guild_u",
-            channelId: "chan_u",
-            filters: {},
-            targets: {}
+            channelId: "chan_u"
         })
 
         expect(result.created).toBe(true)
@@ -481,9 +464,7 @@ describe("discord webhook subscriptions service", () => {
 
         const result = await registerDiscordWebhook({
             guildId: "guild_r",
-            channelId: "chan_r",
-            filters: {},
-            targets: {}
+            channelId: "chan_r"
         })
 
         expect(requests.map(r => r.method)).toEqual(["DELETE", "POST"])
@@ -507,9 +488,7 @@ describe("discord webhook subscriptions service", () => {
         const result = await registerDiscordWebhook({
             guildId: "guild_reg",
             channelId: "chan_reg",
-            name: "  CustomName  ",
-            filters: { requireFresh: true, requireCompleted: false },
-            targets: {}
+            name: "  CustomName  "
         })
 
         expect(result).toEqual({

@@ -4,27 +4,34 @@ import { z } from "zod"
 
 const MAX_DISCORD_WEBHOOK_TARGETS = 250
 
+const zDiscordWebhookPlayerTarget = z.object({
+    membershipId: z.string().regex(/^\d+$/),
+    requireFresh: z.boolean().optional(),
+    requireCompleted: z.boolean().optional(),
+    raids: z.array(zNaturalNumber()).optional()
+})
+
+const zDiscordWebhookClanTarget = z.object({
+    groupId: z.string().regex(/^\d+$/),
+    requireFresh: z.boolean().optional(),
+    requireCompleted: z.boolean().optional(),
+    raids: z.array(zNaturalNumber()).optional()
+})
+
 export type DiscordWebhookBody = z.input<typeof zDiscordWebhookBody>
 export const zDiscordWebhookBody = registry.register(
     "DiscordWebhookBody",
     z
         .object({
             name: z.string().min(1).max(80).optional(),
-            filters: z
-                .object({
-                    requireFresh: z.boolean().optional(),
-                    requireCompleted: z.boolean().optional(),
-                    raids: z.array(zNaturalNumber()).optional()
-                })
-                .optional(),
             targets: z
                 .object({
-                    playerMembershipIds: z
-                        .array(z.string().regex(/^\d+$/))
+                    players: z
+                        .array(zDiscordWebhookPlayerTarget)
                         .max(MAX_DISCORD_WEBHOOK_TARGETS)
                         .optional(),
-                    clanGroupIds: z
-                        .array(z.string().regex(/^\d+$/))
+                    clans: z
+                        .array(zDiscordWebhookClanTarget)
                         .max(MAX_DISCORD_WEBHOOK_TARGETS)
                         .optional()
                 })
