@@ -12,7 +12,8 @@ const KeySchema = z.object({
     key: z.string()
 })
 
-const apiKeys = file(process.env.API_KEYS_PATH!, { type: "application/json" })
+const apiKeysPath = process.env.API_KEYS_PATH ?? "./api-keys.json"
+const apiKeys = file(apiKeysPath, { type: "application/json" })
     .json()
     .then(
         (

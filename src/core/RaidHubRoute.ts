@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any */
+import { authFromHeaders } from "@/auth/user-context"
 import { Logger } from "@/lib/utils/logging"
 import { durationMetrics } from "@/middleware/duration-metrics"
 import { regionMetrics } from "@/middleware/region-metrics"
@@ -413,12 +414,14 @@ export class RaidHubRoute<
           }
     > {
         let after: () => Promise<void> = () => Promise.resolve()
+        const headers = req.headers ?? {}
         const res = await this.handler(
             {
                 params: this.paramsSchema?.parse(req.params) ?? {},
                 query: this.querySchema?.parse(req.query ?? {}) ?? {},
                 body: this.bodySchema?.parse(req.body) ?? {},
-                headers: req.headers ?? {}
+                headers,
+                auth: authFromHeaders(headers)
             },
             afterCallback => (after = afterCallback)
         ).then(this.buildResponse)

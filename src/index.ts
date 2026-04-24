@@ -5,6 +5,8 @@ import compression from "compression"
 import express, { Router, static as expressStatic, json } from "express"
 import path from "path"
 import { verifyApiKey } from "./auth/api-keys"
+import { attachDiscordContext } from "./auth/discord-context"
+import { attachUserAuth } from "./auth/user-context"
 import { servePrometheus } from "./integrations/prometheus/server"
 import { Logger } from "./lib/utils/logging"
 import { errorHandler } from "./middleware/error-handler"
@@ -44,7 +46,15 @@ app.options("*", (req, res) => {
 })
 
 // parse incoming request body with json, apply the router, handle any uncaught errors
-app.use(verifyApiKey, json(), compression(), router.mountable, errorHandler)
+app.use(
+    verifyApiKey,
+    attachUserAuth,
+    attachDiscordContext,
+    json(),
+    compression(),
+    router.mountable,
+    errorHandler
+)
 
 // Start the server
 app.listen(port, () => {

@@ -33,6 +33,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.test.ts",
+    "scripts/**/*.ts",
     "open-api/generate.ts",
     "api-keys.json"
   ]

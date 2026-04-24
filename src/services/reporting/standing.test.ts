@@ -151,9 +151,9 @@ describe("getInstancePlayersStanding", () => {
     test("returns player standing with instance flags and no other-instance blacklist rows", async () => {
         const standing = await getInstancePlayersStanding(standingInstanceId)
         expect(standing.length).toBe(1)
-        expect(standing[0]!.playerInfo.membershipId).toBe(BigInt(standingMembershipId))
-        expect(standing[0]!.flags.length).toBeGreaterThan(0)
-        expect(standing[0]!.blacklistedInstances.length).toBe(0)
+        expect(standing[0].playerInfo.membershipId).toBe(BigInt(standingMembershipId))
+        expect(standing[0].flags.length).toBeGreaterThan(0)
+        expect(standing[0].blacklistedInstances.length).toBe(0)
 
         z.array(zInstancePlayerStanding).parse(standing)
     })

@@ -95,7 +95,7 @@ describe("player search 200", () => {
 
         if (data.type === "ok") {
             expect(data.parsed.results.length).toBeGreaterThan(0)
-            expect(data.parsed.results[0]!.membershipId).toBe(BigInt(searchFixtureMembershipId))
+            expect(data.parsed.results[0].membershipId).toBe(BigInt(searchFixtureMembershipId))
         }
     })
 
@@ -118,7 +118,7 @@ describe("player search 200", () => {
 
         if (data.type === "ok") {
             expect(data.parsed.results.length).toBeGreaterThan(0)
-            expect(data.parsed.results[0]!.membershipId).toBe(BigInt(searchFixtureMembershipId))
+            expect(data.parsed.results[0].membershipId).toBe(BigInt(searchFixtureMembershipId))
         }
     })
 })

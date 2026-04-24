@@ -69,10 +69,7 @@ export const playerInstancesRoute = new RaidHubRoute({
     async handler(req) {
         const targetMembershipId = req.params.membershipId
         const player = getPlayer(targetMembershipId)
-        const canAccess = canAccessProtectedResource(
-            targetMembershipId,
-            req.headers.authorization ?? ""
-        )
+        const canAccess = canAccessProtectedResource(targetMembershipId, req.auth)
 
         if (!(await player)) {
             return RaidHubRoute.fail(ErrorCode.PlayerNotFoundError, {

@@ -33,37 +33,33 @@ export const instanceRoute = new RaidHubRoute({
     },
     async handler(req, after) {
         const instanceId = req.params.instanceId
-
         const data = await getInstanceExtended(instanceId)
-
         if (!data) {
             return RaidHubRoute.fail(ErrorCode.InstanceNotFoundError, {
-                instanceId: instanceId
+                instanceId
             })
-        } else {
-            after(async () => {
-                await Promise.allSettled([
-                    Promise.allSettled(
-                        data.players.flatMap(player =>
-                            player.characters
-                                .filter(c => !c.classHash || !c.emblemHash)
-                                .map(c =>
-                                    instanceCharacterQueue.sendJson({
-                                        instanceId,
-                                        membershipId: player.playerInfo.membershipId,
-                                        characterId: c.characterId
-                                    })
-                                )
-                        )
-                    ),
-                    Promise.allSettled(
-                        data.players
-                            .slice(0, 12)
-                            .map(p => playersQueue.send(p.playerInfo.membershipId))
-                    )
-                ])
-            })
-            return RaidHubRoute.ok(data)
         }
+
+        after(async () => {
+            await Promise.allSettled([
+                Promise.allSettled(
+                    data.players.flatMap(player =>
+                        player.characters
+                            .filter(c => !c.classHash || !c.emblemHash)
+                            .map(c =>
+                                instanceCharacterQueue.sendJson({
+                                    instanceId,
+                                    membershipId: player.playerInfo.membershipId,
+                                    characterId: c.characterId
+                                })
+                            )
+                    )
+                ),
+                Promise.allSettled(
+                    data.players.slice(0, 12).map(p => playersQueue.send(p.playerInfo.membershipId))
+                )
+            ])
+        })
+        return RaidHubRoute.ok(data)
     }
 })

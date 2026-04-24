@@ -3,10 +3,13 @@ import express from "express"
 import request from "supertest"
 import { adminProtected } from "./admin"
 import { generateJWT } from "./jwt"
+import { attachUserAuth } from "./user-context"
+
+process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret"
 
 const app = express()
 
-app.use("/admin", adminProtected, (req, res) => {
+app.use("/admin", attachUserAuth, adminProtected, (req, res) => {
     res.status(200).json({
         message: "Hello World"
     })

@@ -39,6 +39,7 @@ describe("searchForPlayer", () => {
     test("returns the correct shape", async () => {
         const data = await searchForPlayer("RhSvcSearchFixture", {
             count: 10,
+            offset: 0,
             global: true
         }).catch(console.error)
 
@@ -54,7 +55,7 @@ describe("searchForPlayer", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.results.length).toBeGreaterThan(0)
-            expect(parsed.data.results[0]!.membershipId).toBe(BigInt(svcSearchMembershipId))
+            expect(parsed.data.results[0].membershipId).toBe(BigInt(svcSearchMembershipId))
             expect(parsed.success).toBe(true)
         }
     })
@@ -62,6 +63,7 @@ describe("searchForPlayer", () => {
     test("returns the correct shape with platform", async () => {
         const data = await searchForPlayer(" RhSvcSearchFixture", {
             count: 10,
+            offset: 0,
             global: false,
             membershipType: 3
         }).catch(console.error)
@@ -77,7 +79,7 @@ describe("searchForPlayer", () => {
             expect(parsed.error.errors).toEqual([])
         } else {
             expect(parsed.data.results.length).toBeGreaterThan(0)
-            expect(parsed.data.results[0]!.membershipId).toBe(BigInt(svcSearchMembershipId))
+            expect(parsed.data.results[0].membershipId).toBe(BigInt(svcSearchMembershipId))
             expect(parsed.success).toBe(true)
         }
     })

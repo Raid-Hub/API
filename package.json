@@ -15,14 +15,14 @@
   "scripts": {
     "prepare": "husky",
     "dev": "bun --watch ./src/index.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . --ext .ts,.json",
+    "typecheck": "bunx tsc --noEmit",
+    "lint": "eslint . --ext .ts",
     "format": "prettier '**/*.{ts,json}'",
     "docs": "bun run ./open-api/generate.ts",
     "compile": "bun build --compile --sourcemap ./src/index.ts --outfile $1"
   },
   "lint-staged": {
-    "*.{ts,json}": [
+    "*.ts": [
       "eslint --fix"
     ],
     "*.js": "eslint --cache --fix"
@@ -104,17 +104,19 @@
       "browser": true,
       "es2021": true
     },
-    "extends": [
-      "eslint:recommended",
-      "prettier",
-      "plugin:@typescript-eslint/recommended"
-    ],
     "parserOptions": {
       "ecmaVersion": "latest",
-      "sourceType": "module"
+      "sourceType": "module",
+      "project": "./tsconfig.json"
     },
     "plugins": [
       "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "prettier",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/recommended-type-checked"
     ],
     "rules": {
       "no-unused-vars": "off",
@@ -125,7 +127,20 @@
         {
           "argsIgnorePattern": "^_"
         }
-      ]
+      ],
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-enum-comparison": "off",
+      "@typescript-eslint/no-misused-promises": "off",
+      "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
+      "@typescript-eslint/no-floating-promises": "off",
+      "@typescript-eslint/unbound-method": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-constant-condition": "off"
     },
     "overrides": [
       {

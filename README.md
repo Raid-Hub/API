@@ -21,8 +21,11 @@ Note: you will need to clone the [RaidHub-Services](https://github.com/Raid-Hub/
 ### Turning the API On
 
 1. Run `cp example.env .env` and make any changes
-2. Run `bun dev`
-3. By default the API is available at `http://localhost:8000`
+2. Copy `api-keys.example.json` to `api-keys.json` and set at least one `key` (use `origin` `"*"` for local tools such as **raidhub-discord**). Point `API_KEYS_PATH` in `.env` at that file (defaults to `./api-keys.json`).
+3. Run `bun dev`
+4. By default the API is available at `http://localhost:8000`
+
+With `PROD=true`, every request must include a valid `x-api-key` header matching an entry in `api-keys.json`.
 
 ### Open API
 
