@@ -221,7 +221,8 @@ async function upsertDiscordRules(
         await db.queryRows(
             `UPDATE subscriptions.rule
              SET require_fresh = $3,
-                 require_completed = $4
+                 require_completed = $4,
+                 updated_at = NOW()
              WHERE destination_id = $1::bigint
                AND scope = 'player'
                AND membership_id = $2::bigint
@@ -275,7 +276,8 @@ async function upsertDiscordRules(
         await db.queryRows(
             `UPDATE subscriptions.rule
              SET require_fresh = $3,
-                 require_completed = $4
+                 require_completed = $4,
+                 updated_at = NOW()
              WHERE destination_id = $1::bigint
                AND scope = 'clan'
                AND group_id = $2::bigint

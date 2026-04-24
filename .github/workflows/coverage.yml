@@ -34,6 +34,8 @@ jobs:
                   JWT_SECRET: "jwt-secret"
                   POSTGRES_USER: dev
                   POSTGRES_PASSWORD: password
+                  POSTGRES_WRITABLE_USER: dev
+                  POSTGRES_WRITABLE_PASSWORD: password
                   CLICKHOUSE_USER: default
                   CLICKHOUSE_PASSWORD: ""
                   BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
