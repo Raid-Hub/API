@@ -1813,6 +1813,14 @@
               },
               "requireCompleted": {
                 "type": "boolean"
+              },
+              "raids": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "exclusiveMinimum": true
+                }
               }
             }
           },
@@ -1979,12 +1987,20 @@
                     },
                     "requireCompleted": {
                       "type": "boolean"
+                    },
+                    "raidIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
                     }
                   },
                   "required": [
                     "membershipId",
                     "requireFresh",
-                    "requireCompleted"
+                    "requireCompleted",
+                    "raidIds"
                   ]
                 }
               },
@@ -2002,9 +2018,21 @@
                     },
                     "requireCompleted": {
                       "type": "boolean"
+                    },
+                    "raidIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
                     }
                   },
-                  "required": ["groupId", "requireFresh", "requireCompleted"]
+                  "required": [
+                    "groupId",
+                    "requireFresh",
+                    "requireCompleted",
+                    "raidIds"
+                  ]
                 }
               }
             },
@@ -3482,12 +3510,20 @@
                     },
                     "requireCompleted": {
                       "type": "boolean"
+                    },
+                    "raidIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
                     }
                   },
                   "required": [
                     "membershipId",
                     "requireFresh",
-                    "requireCompleted"
+                    "requireCompleted",
+                    "raidIds"
                   ]
                 }
               },
@@ -3505,9 +3541,21 @@
                     },
                     "requireCompleted": {
                       "type": "boolean"
+                    },
+                    "raidIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
                     }
                   },
-                  "required": ["groupId", "requireFresh", "requireCompleted"]
+                  "required": [
+                    "groupId",
+                    "requireFresh",
+                    "requireCompleted",
+                    "raidIds"
+                  ]
                 }
               }
             },

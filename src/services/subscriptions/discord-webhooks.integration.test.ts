@@ -125,6 +125,33 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
         expect(status.players.some(p => p.membershipId === membershipId)).toBe(true)
     })
 
+    test("updateDiscordWebhook persists raid filter bitmap and status raidIds", async () => {
+        await seedActiveDestination()
+
+        await updateDiscordWebhook(channelId, {
+            guildId: guildIdA,
+            filters: { raids: [9] },
+            targets: { playerMembershipIds: [membershipId] }
+        })
+
+        const rule = await fixtureDb.query<{ activity_raid_bitmap: string }>(
+            `SELECT activity_raid_bitmap::text
+             FROM subscriptions.rule r
+             INNER JOIN subscriptions.discord_destination_config c ON c.destination_id = r.destination_id
+             WHERE c.channel_id = $1 AND r.scope = 'player' AND r.membership_id = $2::bigint AND r.is_active
+             LIMIT 1`,
+            [channelId, membershipId]
+        )
+        expect(rule.rows[0].activity_raid_bitmap).toBe("512")
+
+        const status = await getDiscordWebhookStatus(channelId)
+        expect(status.registered).toBe(true)
+        if (!status.registered) return
+        const player = status.players.find(p => p.membershipId === membershipId)
+        expect(player).toBeDefined()
+        expect(player?.raidIds).toEqual([9])
+    })
+
     test("upsertDiscordWebhook updates existing row without Discord register path", async () => {
         await seedActiveDestination()
 

@@ -10,6 +10,7 @@ export type RegisterDiscordWebhookInput = {
     filters?: {
         requireFresh?: boolean
         requireCompleted?: boolean
+        raids?: number[]
     }
     targets?: {
         playerMembershipIds?: string[]
@@ -41,6 +42,7 @@ export type UpdateDiscordWebhookInput = {
     filters?: {
         requireFresh?: boolean
         requireCompleted?: boolean
+        raids?: number[]
     }
     targets?: {
         playerMembershipIds?: string[]
@@ -154,6 +156,43 @@ const toBigIntString = (value: string) => BigInt(value).toString()
 const normalizeTargetIds = (values?: string[]) =>
     values === undefined ? undefined : [...new Set(values.map(toBigIntString))]
 
+const subscriptionRaidBitForActivityID = (activityId: number): number => {
+    if (activityId === 101) return 2 ** 33
+    return 2 ** activityId
+}
+
+const raidIdsFromBitmap = (bitmap: number): number[] => {
+    if (!Number.isFinite(bitmap) || bitmap <= 0) return []
+    const b = BigInt(Math.trunc(bitmap))
+    const ids: number[] = []
+    let idx = 0n
+    let v = b
+    while (v > 0n) {
+        if ((v & 1n) === 1n) {
+            if (idx >= 1n && idx <= 32n) ids.push(Number(idx))
+            else if (idx === 33n) ids.push(101)
+        }
+        v >>= 1n
+        idx += 1n
+    }
+    return ids
+}
+
+const resolveActivityRaidBitmap = async (raidIds?: number[]): Promise<number> => {
+    if (!raidIds || raidIds.length === 0) return 0
+    const ids = [...new Set(raidIds)]
+    const rows = await pgAdmin.queryRows<{ id: number }>(
+        `SELECT id::int AS id
+         FROM definitions.activity_definition
+         WHERE id = ANY($1::int[])
+           AND is_raid`,
+        { params: [ids] }
+    )
+    if (rows.length === 0) return 0
+    // Use numeric addition, not `|`: bitwise OR coerces operands to int32 and corrupts bits past 2**31.
+    return rows.reduce((bitmap, row) => bitmap + subscriptionRaidBitForActivityID(row.id), 0)
+}
+
 /** Prior Discord webhook id for this channel, if any (used before replacing on re-register). */
 async function getExistingDiscordWebhookIdForChannel(channelId: string): Promise<string | null> {
     const row = await pgAdmin.queryRow<{ webhookId: string | null }>(
@@ -190,16 +229,30 @@ async function upsertDiscordRules(
     options: {
         requireFresh: boolean
         requireCompleted: boolean
+        activityRaidBitmap: number
         playerMembershipIds?: string[]
         clanGroupIds?: string[]
     }
 ) {
-    const { requireFresh, requireCompleted, playerMembershipIds, clanGroupIds } = options
+    const {
+        requireFresh,
+        requireCompleted,
+        activityRaidBitmap,
+        playerMembershipIds,
+        clanGroupIds
+    } = options
     const playerInsertResults: { inserted: number; updated: number }[] = []
     for (const membershipId of playerMembershipIds ?? []) {
         const insertedRows = await db.queryRows<{ rowCount: number }>(
-            `INSERT INTO subscriptions.rule (destination_id, scope, membership_id, require_fresh, require_completed)
-             SELECT $1::bigint, 'player', $2::bigint, $3, $4
+            `INSERT INTO subscriptions.rule (
+                destination_id,
+                scope,
+                membership_id,
+                require_fresh,
+                require_completed,
+                activity_raid_bitmap
+            )
+             SELECT $1::bigint, 'player', $2::bigint, $3, $4, $5::bigint
              WHERE NOT EXISTS (
                  SELECT 1 FROM subscriptions.rule r
                  WHERE r.destination_id = $1::bigint
@@ -209,7 +262,13 @@ async function upsertDiscordRules(
              )
              RETURNING 1 AS "rowCount"`,
             {
-                params: [destinationId, membershipId, requireFresh, requireCompleted]
+                params: [
+                    destinationId,
+                    membershipId,
+                    requireFresh,
+                    requireCompleted,
+                    activityRaidBitmap
+                ]
             }
         )
 
@@ -222,13 +281,20 @@ async function upsertDiscordRules(
             `UPDATE subscriptions.rule
              SET require_fresh = $3,
                  require_completed = $4,
+                 activity_raid_bitmap = $5::bigint,
                  updated_at = NOW()
              WHERE destination_id = $1::bigint
                AND scope = 'player'
                AND membership_id = $2::bigint
                AND is_active`,
             {
-                params: [destinationId, membershipId, requireFresh, requireCompleted]
+                params: [
+                    destinationId,
+                    membershipId,
+                    requireFresh,
+                    requireCompleted,
+                    activityRaidBitmap
+                ]
             }
         )
         playerInsertResults.push({ inserted: 0, updated: 1 })
@@ -253,8 +319,15 @@ async function upsertDiscordRules(
     const clanInsertResults: { inserted: number; updated: number }[] = []
     for (const groupId of clanGroupIds ?? []) {
         const insertedRows = await db.queryRows<{ rowCount: number }>(
-            `INSERT INTO subscriptions.rule (destination_id, scope, group_id, require_fresh, require_completed)
-             SELECT $1::bigint, 'clan', $2::bigint, $3, $4
+            `INSERT INTO subscriptions.rule (
+                destination_id,
+                scope,
+                group_id,
+                require_fresh,
+                require_completed,
+                activity_raid_bitmap
+            )
+             SELECT $1::bigint, 'clan', $2::bigint, $3, $4, $5::bigint
              WHERE NOT EXISTS (
                  SELECT 1 FROM subscriptions.rule r
                  WHERE r.destination_id = $1::bigint
@@ -264,7 +337,7 @@ async function upsertDiscordRules(
              )
              RETURNING 1 AS "rowCount"`,
             {
-                params: [destinationId, groupId, requireFresh, requireCompleted]
+                params: [destinationId, groupId, requireFresh, requireCompleted, activityRaidBitmap]
             }
         )
 
@@ -277,13 +350,14 @@ async function upsertDiscordRules(
             `UPDATE subscriptions.rule
              SET require_fresh = $3,
                  require_completed = $4,
+                 activity_raid_bitmap = $5::bigint,
                  updated_at = NOW()
              WHERE destination_id = $1::bigint
                AND scope = 'clan'
                AND group_id = $2::bigint
                AND is_active`,
             {
-                params: [destinationId, groupId, requireFresh, requireCompleted]
+                params: [destinationId, groupId, requireFresh, requireCompleted, activityRaidBitmap]
             }
         )
         clanInsertResults.push({ inserted: 0, updated: 1 })
@@ -326,11 +400,18 @@ async function updateDiscordWebhookInDb(
     normalized: {
         requireFresh: boolean
         requireCompleted: boolean
+        activityRaidBitmap: number
         playerMembershipIds?: string[]
         clanGroupIds?: string[]
     }
 ): Promise<RegisterDiscordWebhookResult["rules"]> {
-    const { requireFresh, requireCompleted, playerMembershipIds, clanGroupIds } = normalized
+    const {
+        requireFresh,
+        requireCompleted,
+        activityRaidBitmap,
+        playerMembershipIds,
+        clanGroupIds
+    } = normalized
     const destinationId = await getDiscordDestinationIdByChannelId(tx, channelId)
     const existing = await tx.queryRow<{ id: string }>(
         `SELECT id::text AS "id"
@@ -354,6 +435,7 @@ async function updateDiscordWebhookInDb(
     return upsertDiscordRules(tx, destinationId, {
         requireFresh,
         requireCompleted,
+        activityRaidBitmap,
         playerMembershipIds,
         clanGroupIds
     })
@@ -383,6 +465,7 @@ export async function registerDiscordWebhook(
         const webhookUrl = validateDiscordWebhookUrl(createdWebhook.url)
         const requireFresh = input.filters?.requireFresh ?? false
         const requireCompleted = input.filters?.requireCompleted ?? false
+        const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
         const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
         const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
@@ -451,6 +534,7 @@ export async function registerDiscordWebhook(
             const rules = await upsertDiscordRules(tx, destinationId, {
                 requireFresh,
                 requireCompleted,
+                activityRaidBitmap,
                 playerMembershipIds,
                 clanGroupIds
             })
@@ -499,10 +583,12 @@ export async function updateDiscordWebhook(
         playerTargets: input.targets?.playerMembershipIds?.length ?? 0,
         clanTargets: input.targets?.clanGroupIds?.length ?? 0,
         requireFresh: input.filters?.requireFresh ?? false,
-        requireCompleted: input.filters?.requireCompleted ?? false
+        requireCompleted: input.filters?.requireCompleted ?? false,
+        raidFiltersCount: input.filters?.raids?.length ?? 0
     })
     const requireFresh = input.filters?.requireFresh ?? false
     const requireCompleted = input.filters?.requireCompleted ?? false
+    const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
     const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
     const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
@@ -510,6 +596,7 @@ export async function updateDiscordWebhook(
         updateDiscordWebhookInDb(tx, channelId, input, {
             requireFresh,
             requireCompleted,
+            activityRaidBitmap,
             playerMembershipIds,
             clanGroupIds
         })
@@ -573,6 +660,7 @@ export async function upsertDiscordWebhook(
 
     const requireFresh = input.filters?.requireFresh ?? false
     const requireCompleted = input.filters?.requireCompleted ?? false
+    const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
     const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
     const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
@@ -606,6 +694,7 @@ export async function upsertDiscordWebhook(
             {
                 requireFresh,
                 requireCompleted,
+                activityRaidBitmap,
                 playerMembershipIds,
                 clanGroupIds
             }
@@ -665,11 +754,13 @@ export type DiscordWebhookStatusResult =
               membershipId: string
               requireFresh: boolean
               requireCompleted: boolean
+              raidIds: number[]
           }[]
           clans: {
               groupId: string
               requireFresh: boolean
               requireCompleted: boolean
+              raidIds: number[]
           }[]
       }
 
@@ -715,27 +806,37 @@ export async function getDiscordWebhookStatus(
             membershipId: string
             requireFresh: boolean
             requireCompleted: boolean
+            activityRaidBitmap: number
         }>(
             `SELECT
                 membership_id::text AS "membershipId",
                 require_fresh AS "requireFresh",
-                require_completed AS "requireCompleted"
+                require_completed AS "requireCompleted",
+                activity_raid_bitmap::bigint AS "activityRaidBitmap"
              FROM subscriptions.rule
              WHERE destination_id = $1::bigint AND scope = 'player' AND is_active
              ORDER BY membership_id`,
             { params: [row.destinationId] }
         ),
-        pgAdmin.queryRows<{ groupId: string; requireFresh: boolean; requireCompleted: boolean }>(
+        pgAdmin.queryRows<{
+            groupId: string
+            requireFresh: boolean
+            requireCompleted: boolean
+            activityRaidBitmap: number
+        }>(
             `SELECT
                 group_id::text AS "groupId",
                 require_fresh AS "requireFresh",
-                require_completed AS "requireCompleted"
+                require_completed AS "requireCompleted",
+                activity_raid_bitmap::bigint AS "activityRaidBitmap"
              FROM subscriptions.rule
              WHERE destination_id = $1::bigint AND scope = 'clan' AND is_active
              ORDER BY group_id`,
             { params: [row.destinationId] }
         )
     ])
+
+    const mapRaidIds = (bitmap: number): number[] => raidIdsFromBitmap(Number(bitmap ?? 0))
 
     const status = {
         registered: true,
@@ -747,8 +848,18 @@ export async function getDiscordWebhookStatus(
         lastDeliverySuccessAt: toIsoString(row.lastDeliverySuccessAt),
         lastDeliveryFailureAt: toIsoString(row.lastDeliveryFailureAt),
         lastDeliveryError: row.lastDeliveryError,
-        players: playerRows,
-        clans: clanRows
+        players: playerRows.map(r => ({
+            membershipId: r.membershipId,
+            requireFresh: r.requireFresh,
+            requireCompleted: r.requireCompleted,
+            raidIds: mapRaidIds(Number(r.activityRaidBitmap ?? 0))
+        })),
+        clans: clanRows.map(r => ({
+            groupId: r.groupId,
+            requireFresh: r.requireFresh,
+            requireCompleted: r.requireCompleted,
+            raidIds: mapRaidIds(Number(r.activityRaidBitmap ?? 0))
+        }))
     }
     logger.info("DISCORD_WEBHOOK_STATUS_FETCHED", {
         channelId,

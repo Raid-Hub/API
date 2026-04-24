@@ -1,6 +1,9 @@
 import * as bungie from "@/integrations/bungie"
-import { expectOk } from "@/lib/test-utils"
+import { BungieApiError } from "@/integrations/bungie"
+import { expectErr, expectOk } from "@/lib/test-utils"
+import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { afterAll, describe, expect, spyOn, test } from "bun:test"
+import { PlatformErrorCodes } from "bungie-net-core/enums"
 import { clanBasicRoute } from "./basic"
 
 describe("clan basic", () => {
@@ -54,6 +57,39 @@ describe("clan basic", () => {
             expect(result.parsed.callSign).toBe("EXM")
             expect(result.parsed.avatarPath).toBe("/img/clan.jpg")
             expect(String(result.parsed.groupId)).toBe("49271161")
+        }
+    })
+
+    test("returns ClanNotFound when clan is missing", async () => {
+        spyGetClan.mockResolvedValue(null as never)
+
+        const result = await clanBasicRoute.$mock({ params: { groupId: "49271161" } })
+        expectErr(result)
+        if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.ClanNotFound)
+        }
+    })
+
+    test("maps SystemDisabled to BungieServiceOffline", async () => {
+        spyGetClan.mockRejectedValue(
+            new BungieApiError({
+                cause: {
+                    ErrorCode: PlatformErrorCodes.SystemDisabled,
+                    Message: "System Disabled",
+                    ThrottleSeconds: 0,
+                    Response: undefined,
+                    ErrorStatus: "",
+                    MessageData: {},
+                    DetailedErrorTrace: ""
+                },
+                url: new URL("http://localhost/mocked")
+            })
+        )
+
+        const result = await clanBasicRoute.$mock({ params: { groupId: "49271161" } })
+        expectErr(result)
+        if (result.type === "err") {
+            expect(result.code).toBe(ErrorCode.BungieServiceOffline)
         }
     })
 })

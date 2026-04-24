@@ -1,4 +1,4 @@
-import { zWholeNumber } from "@/schema/output"
+import { zNaturalNumber, zWholeNumber } from "@/schema/output"
 import { registry } from "@/schema/registry"
 import { z } from "zod"
 
@@ -13,7 +13,8 @@ export const zDiscordWebhookBody = registry.register(
             filters: z
                 .object({
                     requireFresh: z.boolean().optional(),
-                    requireCompleted: z.boolean().optional()
+                    requireCompleted: z.boolean().optional(),
+                    raids: z.array(zNaturalNumber()).optional()
                 })
                 .optional(),
             targets: z
@@ -46,13 +47,15 @@ const zDiscordWebhookRulesUpsertSummary = z.object({
 const zDiscordPlayerRule = z.object({
     membershipId: z.string().regex(/^\d+$/),
     requireFresh: z.boolean(),
-    requireCompleted: z.boolean()
+    requireCompleted: z.boolean(),
+    raidIds: z.array(zWholeNumber())
 })
 
 const zDiscordClanRule = z.object({
     groupId: z.string().regex(/^\d+$/),
     requireFresh: z.boolean(),
-    requireCompleted: z.boolean()
+    requireCompleted: z.boolean(),
+    raidIds: z.array(zWholeNumber())
 })
 
 export type DiscordWebhookPutResponse = z.input<typeof zDiscordWebhookPutResponse>

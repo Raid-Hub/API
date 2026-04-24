@@ -37,7 +37,7 @@ export const putDiscordWebhookRoute = new RaidHubRoute({
             statusCode: 200,
             schema: zDiscordWebhookPutResponse
         },
-        errors: discordGuildChannelAuthErrors
+        errors: [...discordGuildChannelAuthErrors]
     },
     async handler(req) {
         const guildId = req.discord?.guildId
