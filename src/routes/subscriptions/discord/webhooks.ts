@@ -8,9 +8,11 @@ import {
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zInsufficientPermissionsError } from "@/schema/errors/InsufficientPermissionsError"
 import { zInvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
+import { ZodIssueCode } from "zod"
 import {
     deleteDiscordWebhook,
     getDiscordWebhookStatus,
+    InvalidRaidFilterError,
     upsertDiscordWebhook
 } from "@/services/subscriptions/discord-webhooks"
 
@@ -47,13 +49,28 @@ export const putDiscordWebhookRoute = new RaidHubRoute({
                 message: "Forbidden" as const
             })
         }
-        return RaidHubRoute.ok(
-            await upsertDiscordWebhook({
-                ...req.body,
-                guildId,
-                channelId
-            })
-        )
+        try {
+            return RaidHubRoute.ok(
+                await upsertDiscordWebhook({
+                    ...req.body,
+                    guildId,
+                    channelId
+                })
+            )
+        } catch (error) {
+            if (error instanceof InvalidRaidFilterError) {
+                return RaidHubRoute.fail(ErrorCode.BodyValidationError, {
+                    issues: [
+                        {
+                            code: ZodIssueCode.custom,
+                            path: ["filters", "raid"],
+                            message: error.message
+                        }
+                    ]
+                })
+            }
+            throw error
+        }
     }
 })
 

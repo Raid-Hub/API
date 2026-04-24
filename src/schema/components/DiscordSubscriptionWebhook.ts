@@ -1,4 +1,4 @@
-import { zWholeNumber } from "@/schema/output"
+import { zNaturalNumber, zWholeNumber } from "@/schema/output"
 import { registry } from "@/schema/registry"
 import { z } from "zod"
 
@@ -14,7 +14,7 @@ export const zDiscordWebhookBody = registry.register(
                 .object({
                     requireFresh: z.boolean().optional(),
                     requireCompleted: z.boolean().optional(),
-                    raid: zWholeNumber().optional()
+                    raid: zNaturalNumber().optional()
                 })
                 .optional(),
             targets: z

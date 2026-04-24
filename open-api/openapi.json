@@ -1813,6 +1813,11 @@
               },
               "requireCompleted": {
                 "type": "boolean"
+              },
+              "raid": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
               }
             }
           },
@@ -1979,12 +1984,23 @@
                     },
                     "requireCompleted": {
                       "type": "boolean"
+                    },
+                    "activityRaidBitmap": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "raidId": {
+                      "type": "integer",
+                      "nullable": true,
+                      "minimum": 0
                     }
                   },
                   "required": [
                     "membershipId",
                     "requireFresh",
-                    "requireCompleted"
+                    "requireCompleted",
+                    "activityRaidBitmap",
+                    "raidId"
                   ]
                 }
               },
@@ -2002,9 +2018,24 @@
                     },
                     "requireCompleted": {
                       "type": "boolean"
+                    },
+                    "activityRaidBitmap": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "raidId": {
+                      "type": "integer",
+                      "nullable": true,
+                      "minimum": 0
                     }
                   },
-                  "required": ["groupId", "requireFresh", "requireCompleted"]
+                  "required": [
+                    "groupId",
+                    "requireFresh",
+                    "requireCompleted",
+                    "activityRaidBitmap",
+                    "raidId"
+                  ]
                 }
               }
             },
@@ -3482,12 +3513,23 @@
                     },
                     "requireCompleted": {
                       "type": "boolean"
+                    },
+                    "activityRaidBitmap": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "raidId": {
+                      "type": "integer",
+                      "nullable": true,
+                      "minimum": 0
                     }
                   },
                   "required": [
                     "membershipId",
                     "requireFresh",
-                    "requireCompleted"
+                    "requireCompleted",
+                    "activityRaidBitmap",
+                    "raidId"
                   ]
                 }
               },
@@ -3505,9 +3547,24 @@
                     },
                     "requireCompleted": {
                       "type": "boolean"
+                    },
+                    "activityRaidBitmap": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "raidId": {
+                      "type": "integer",
+                      "nullable": true,
+                      "minimum": 0
                     }
                   },
-                  "required": ["groupId", "requireFresh", "requireCompleted"]
+                  "required": [
+                    "groupId",
+                    "requireFresh",
+                    "requireCompleted",
+                    "activityRaidBitmap",
+                    "raidId"
+                  ]
                 }
               }
             },

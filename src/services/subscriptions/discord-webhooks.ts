@@ -3,6 +3,8 @@ import { Logger } from "@/lib/utils/logging"
 
 const logger = new Logger("DISCORD_SUBSCRIPTIONS_SERVICE")
 
+export class InvalidRaidFilterError extends Error {}
+
 export type RegisterDiscordWebhookInput = {
     guildId: string
     channelId: string
@@ -159,7 +161,9 @@ const normalizeTargetIds = (values?: string[]) =>
 const subscriptionRaidBitForActivityID = (activityId: number): number => {
     if (activityId >= 1 && activityId <= 32) return 2 ** activityId
     if (activityId === 101) return 2 ** 33
-    throw new Error(`Unsupported raid activity id for subscription filter: ${activityId}`)
+    throw new InvalidRaidFilterError(
+        `Unsupported raid activity id for subscription filter: ${activityId}`
+    )
 }
 
 const singleActivityIdFromBitmap = (bitmap: number): number | null => {
@@ -180,7 +184,7 @@ const singleActivityIdFromBitmap = (bitmap: number): number | null => {
 const resolveActivityRaidBitmap = async (raidId?: number): Promise<number> => {
     if (raidId === undefined || raidId === null) return 0
     if (!Number.isInteger(raidId) || raidId <= 0) {
-        throw new Error(`Invalid raid filter id: ${raidId}`)
+        throw new InvalidRaidFilterError(`Invalid raid filter id: ${raidId}`)
     }
     const row = await pgAdmin.queryRow<{ id: number }>(
         `SELECT id
@@ -191,7 +195,7 @@ const resolveActivityRaidBitmap = async (raidId?: number): Promise<number> => {
         { params: [raidId] }
     )
     if (!row) {
-        throw new Error(`Unknown raid filter id: ${raidId}`)
+        throw new InvalidRaidFilterError(`Unknown raid filter id: ${raidId}`)
     }
     return subscriptionRaidBitForActivityID(row.id)
 }
