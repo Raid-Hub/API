@@ -125,12 +125,12 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
         expect(status.players.some(p => p.membershipId === membershipId)).toBe(true)
     })
 
-    test("updateDiscordWebhook persists raid filter bitmap and status raidId", async () => {
+    test("updateDiscordWebhook persists raid filter bitmap and status raidIds", async () => {
         await seedActiveDestination()
 
         await updateDiscordWebhook(channelId, {
             guildId: guildIdA,
-            filters: { raid: 9 },
+            filters: { raids: [9] },
             targets: { playerMembershipIds: [membershipId] }
         })
 
@@ -149,8 +149,7 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
         if (!status.registered) return
         const player = status.players.find(p => p.membershipId === membershipId)
         expect(player).toBeDefined()
-        expect(player?.raidId).toBe(9)
-        expect(player?.activityRaidBitmap).toBe(512)
+        expect(player?.raidIds).toEqual([9])
     })
 
     test("upsertDiscordWebhook updates existing row without Discord register path", async () => {

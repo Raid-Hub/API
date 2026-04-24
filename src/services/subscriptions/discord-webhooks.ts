@@ -10,7 +10,7 @@ export type RegisterDiscordWebhookInput = {
     filters?: {
         requireFresh?: boolean
         requireCompleted?: boolean
-        raid?: number
+        raids?: number[]
     }
     targets?: {
         playerMembershipIds?: string[]
@@ -42,7 +42,7 @@ export type UpdateDiscordWebhookInput = {
     filters?: {
         requireFresh?: boolean
         requireCompleted?: boolean
-        raid?: number
+        raids?: number[]
     }
     targets?: {
         playerMembershipIds?: string[]
@@ -161,33 +161,35 @@ const subscriptionRaidBitForActivityID = (activityId: number): number => {
     return 2 ** activityId
 }
 
-const singleActivityIdFromBitmap = (bitmap: number): number | null => {
-    if (!Number.isFinite(bitmap) || bitmap <= 0) return null
+const raidIdsFromBitmap = (bitmap: number): number[] => {
+    if (!Number.isFinite(bitmap) || bitmap <= 0) return []
     const b = BigInt(Math.trunc(bitmap))
-    if ((b & (b - 1n)) !== 0n) return null
-    let idx = 0
+    const ids: number[] = []
+    let idx = 0n
     let v = b
-    while (v > 1n) {
+    while (v > 0n) {
+        if ((v & 1n) === 1n) {
+            if (idx >= 1n && idx <= 32n) ids.push(Number(idx))
+            else if (idx === 33n) ids.push(101)
+        }
         v >>= 1n
-        idx += 1
+        idx += 1n
     }
-    if (idx >= 1 && idx <= 32) return idx
-    if (idx === 33) return 101
-    return null
+    return ids
 }
 
-const resolveActivityRaidBitmap = async (raidId?: number): Promise<number> => {
-    if (raidId === undefined || raidId === null) return 0
-    const row = await pgAdmin.queryRow<{ id: number }>(
+const resolveActivityRaidBitmap = async (raidIds?: number[]): Promise<number> => {
+    if (!raidIds || raidIds.length === 0) return 0
+    const ids = [...new Set(raidIds)]
+    const rows = await pgAdmin.queryRows<{ id: number }>(
         `SELECT id::int AS id
          FROM definitions.activity_definition
-         WHERE id = $1
-           AND is_raid
-         LIMIT 1`,
-        { params: [raidId] }
+         WHERE id = ANY($1::int[])
+           AND is_raid`,
+        { params: [ids] }
     )
-    if (!row) return 0
-    return subscriptionRaidBitForActivityID(row.id)
+    if (rows.length === 0) return 0
+    return rows.reduce((bitmap, row) => bitmap | subscriptionRaidBitForActivityID(row.id), 0)
 }
 
 /** Prior Discord webhook id for this channel, if any (used before replacing on re-register). */
@@ -462,7 +464,7 @@ export async function registerDiscordWebhook(
         const webhookUrl = validateDiscordWebhookUrl(createdWebhook.url)
         const requireFresh = input.filters?.requireFresh ?? false
         const requireCompleted = input.filters?.requireCompleted ?? false
-        const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raid)
+        const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
         const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
         const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
@@ -581,11 +583,11 @@ export async function updateDiscordWebhook(
         clanTargets: input.targets?.clanGroupIds?.length ?? 0,
         requireFresh: input.filters?.requireFresh ?? false,
         requireCompleted: input.filters?.requireCompleted ?? false,
-        raidFilter: input.filters?.raid ?? null
+        raidFiltersCount: input.filters?.raids?.length ?? 0
     })
     const requireFresh = input.filters?.requireFresh ?? false
     const requireCompleted = input.filters?.requireCompleted ?? false
-    const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raid)
+    const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
     const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
     const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
@@ -657,7 +659,7 @@ export async function upsertDiscordWebhook(
 
     const requireFresh = input.filters?.requireFresh ?? false
     const requireCompleted = input.filters?.requireCompleted ?? false
-    const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raid)
+    const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
     const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
     const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
 
@@ -751,15 +753,13 @@ export type DiscordWebhookStatusResult =
               membershipId: string
               requireFresh: boolean
               requireCompleted: boolean
-              activityRaidBitmap: number
-              raidId: number | null
+              raidIds: number[]
           }[]
           clans: {
               groupId: string
               requireFresh: boolean
               requireCompleted: boolean
-              activityRaidBitmap: number
-              raidId: number | null
+              raidIds: number[]
           }[]
       }
 
@@ -835,8 +835,7 @@ export async function getDiscordWebhookStatus(
         )
     ])
 
-    const mapRaidId = (bitmap: number): number | null =>
-        singleActivityIdFromBitmap(Number(bitmap ?? 0))
+    const mapRaidIds = (bitmap: number): number[] => raidIdsFromBitmap(Number(bitmap ?? 0))
 
     const status = {
         registered: true,
@@ -849,14 +848,16 @@ export async function getDiscordWebhookStatus(
         lastDeliveryFailureAt: toIsoString(row.lastDeliveryFailureAt),
         lastDeliveryError: row.lastDeliveryError,
         players: playerRows.map(r => ({
-            ...r,
-            activityRaidBitmap: Number(r.activityRaidBitmap ?? 0),
-            raidId: mapRaidId(Number(r.activityRaidBitmap ?? 0))
+            membershipId: r.membershipId,
+            requireFresh: r.requireFresh,
+            requireCompleted: r.requireCompleted,
+            raidIds: mapRaidIds(Number(r.activityRaidBitmap ?? 0))
         })),
         clans: clanRows.map(r => ({
-            ...r,
-            activityRaidBitmap: Number(r.activityRaidBitmap ?? 0),
-            raidId: mapRaidId(Number(r.activityRaidBitmap ?? 0))
+            groupId: r.groupId,
+            requireFresh: r.requireFresh,
+            requireCompleted: r.requireCompleted,
+            raidIds: mapRaidIds(Number(r.activityRaidBitmap ?? 0))
         }))
     }
     logger.info("DISCORD_WEBHOOK_STATUS_FETCHED", {
