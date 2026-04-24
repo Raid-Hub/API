@@ -725,6 +725,30 @@
           "createdAt"
         ]
       },
+      "ClanBasic": {
+        "type": "object",
+        "properties": {
+          "groupId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "callSign": {
+            "type": "string"
+          },
+          "motto": {
+            "type": "string"
+          },
+          "avatarPath": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["groupId", "name", "callSign", "motto", "avatarPath"],
+        "additionalProperties": false
+      },
       "ClanBannerData": {
         "type": "object",
         "properties": {
@@ -1009,30 +1033,6 @@
           "totalTimePlayedSeconds",
           "contestScore"
         ]
-      },
-      "ClanBasic": {
-        "type": "object",
-        "properties": {
-          "groupId": {
-            "type": "string",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "callSign": {
-            "type": "string"
-          },
-          "motto": {
-            "type": "string"
-          },
-          "avatarPath": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": ["groupId", "name", "callSign", "motto", "avatarPath"],
-        "additionalProperties": false
       },
       "InstanceMetadata": {
         "type": "object",
@@ -6686,10 +6686,10 @@
         }
       }
     },
-    "/clan/{groupId}/": {
+    "/clan/{groupId}": {
       "get": {
         "description": "Get the stats for a clan. Data updates weekly.",
-        "summary": "/clan/{groupId}/",
+        "summary": "/clan/{groupId}",
         "parameters": [
           {
             "schema": {

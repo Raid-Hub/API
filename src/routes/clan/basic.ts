@@ -75,7 +75,7 @@ const handleErr = (err: unknown, groupId: bigint) => {
         if (err.cause.ErrorCode === PlatformErrorCodes.SystemDisabled) {
             return RaidHubRoute.fail(ErrorCode.BungieServiceOffline, {
                 message: err.message,
-                route: err.url.pathname + err.url.searchParams.toString()
+                route: err.url.pathname + err.url.search
             })
         }
     }
