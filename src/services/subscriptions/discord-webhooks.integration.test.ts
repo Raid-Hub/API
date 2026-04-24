@@ -102,7 +102,7 @@ describe("discord webhook subscriptions service (postgres integration)", () => {
             require_completed: boolean
             updated_at: Date | null
         }>(
-            `SELECT require_fresh, require_completed, updated_at
+            `SELECT require_fresh, require_completed, r.updated_at AS updated_at
              FROM subscriptions.rule r
              INNER JOIN subscriptions.discord_destination_config c ON c.destination_id = r.destination_id
              WHERE c.channel_id = $1 AND r.scope = 'player' AND r.is_active
