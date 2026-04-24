@@ -183,11 +183,8 @@ const singleActivityIdFromBitmap = (bitmap: number): number | null => {
 
 const resolveActivityRaidBitmap = async (raidId?: number): Promise<number> => {
     if (raidId === undefined || raidId === null) return 0
-    if (!Number.isInteger(raidId) || raidId <= 0) {
-        throw new InvalidRaidFilterError(`Invalid raid filter id: ${raidId}`)
-    }
     const row = await pgAdmin.queryRow<{ id: number }>(
-        `SELECT id
+        `SELECT id::int AS id
          FROM definitions.activity_definition
          WHERE id = $1
            AND is_raid
@@ -344,13 +341,7 @@ async function upsertDiscordRules(
              )
              RETURNING 1 AS "rowCount"`,
             {
-                params: [
-                    destinationId,
-                    groupId,
-                    requireFresh,
-                    requireCompleted,
-                    activityRaidBitmap
-                ]
+                params: [destinationId, groupId, requireFresh, requireCompleted, activityRaidBitmap]
             }
         )
 
@@ -370,13 +361,7 @@ async function upsertDiscordRules(
                AND group_id = $2::bigint
                AND is_active`,
             {
-                params: [
-                    destinationId,
-                    groupId,
-                    requireFresh,
-                    requireCompleted,
-                    activityRaidBitmap
-                ]
+                params: [destinationId, groupId, requireFresh, requireCompleted, activityRaidBitmap]
             }
         )
         clanInsertResults.push({ inserted: 0, updated: 1 })

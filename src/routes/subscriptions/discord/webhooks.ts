@@ -5,16 +5,17 @@ import {
     zDiscordWebhookPutResponse,
     zDiscordWebhookStatusResponse
 } from "@/schema/components/DiscordSubscriptionWebhook"
+import { zBodyValidationError } from "@/schema/errors/BodyValidationError"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zInsufficientPermissionsError } from "@/schema/errors/InsufficientPermissionsError"
 import { zInvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
-import { ZodIssueCode } from "zod"
 import {
+    InvalidRaidFilterError,
     deleteDiscordWebhook,
     getDiscordWebhookStatus,
-    InvalidRaidFilterError,
     upsertDiscordWebhook
 } from "@/services/subscriptions/discord-webhooks"
+import { ZodIssueCode } from "zod"
 
 const discordGuildChannelAuthErrors = [
     {
@@ -39,7 +40,14 @@ export const putDiscordWebhookRoute = new RaidHubRoute({
             statusCode: 200,
             schema: zDiscordWebhookPutResponse
         },
-        errors: discordGuildChannelAuthErrors
+        errors: [
+            ...discordGuildChannelAuthErrors,
+            {
+                statusCode: 400 as const,
+                code: ErrorCode.BodyValidationError,
+                schema: zBodyValidationError.shape.error
+            }
+        ]
     },
     async handler(req) {
         const guildId = req.discord?.guildId
