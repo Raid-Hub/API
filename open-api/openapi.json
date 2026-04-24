@@ -1805,41 +1805,62 @@
             "minLength": 1,
             "maxLength": 80
           },
-          "filters": {
-            "type": "object",
-            "properties": {
-              "requireFresh": {
-                "type": "boolean"
-              },
-              "requireCompleted": {
-                "type": "boolean"
-              },
-              "raids": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "exclusiveMinimum": true
-                }
-              }
-            }
-          },
           "targets": {
             "type": "object",
             "properties": {
-              "playerMembershipIds": {
+              "players": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "pattern": "^\\d+$"
+                  "type": "object",
+                  "properties": {
+                    "membershipId": {
+                      "type": "string",
+                      "pattern": "^\\d+$"
+                    },
+                    "requireFresh": {
+                      "type": "boolean"
+                    },
+                    "requireCompleted": {
+                      "type": "boolean"
+                    },
+                    "raids": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    }
+                  },
+                  "required": ["membershipId"]
                 },
                 "maxItems": 250
               },
-              "clanGroupIds": {
+              "clans": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "pattern": "^\\d+$"
+                  "type": "object",
+                  "properties": {
+                    "groupId": {
+                      "type": "string",
+                      "pattern": "^\\d+$"
+                    },
+                    "requireFresh": {
+                      "type": "boolean"
+                    },
+                    "requireCompleted": {
+                      "type": "boolean"
+                    },
+                    "raids": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    }
+                  },
+                  "required": ["groupId"]
                 },
                 "maxItems": 250
               }

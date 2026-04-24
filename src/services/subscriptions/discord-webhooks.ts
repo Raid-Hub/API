@@ -3,18 +3,27 @@ import { Logger } from "@/lib/utils/logging"
 
 const logger = new Logger("DISCORD_SUBSCRIPTIONS_SERVICE")
 
+export type DiscordWebhookPlayerTargetInput = {
+    membershipId: string
+    requireFresh?: boolean
+    requireCompleted?: boolean
+    raids?: number[]
+}
+
+export type DiscordWebhookClanTargetInput = {
+    groupId: string
+    requireFresh?: boolean
+    requireCompleted?: boolean
+    raids?: number[]
+}
+
 export type RegisterDiscordWebhookInput = {
     guildId: string
     channelId: string
     name?: string
-    filters?: {
-        requireFresh?: boolean
-        requireCompleted?: boolean
-        raids?: number[]
-    }
     targets?: {
-        playerMembershipIds?: string[]
-        clanGroupIds?: string[]
+        players?: DiscordWebhookPlayerTargetInput[]
+        clans?: DiscordWebhookClanTargetInput[]
     }
 }
 
@@ -39,14 +48,9 @@ export type RegisterDiscordWebhookResult = {
 
 export type UpdateDiscordWebhookInput = {
     guildId: string
-    filters?: {
-        requireFresh?: boolean
-        requireCompleted?: boolean
-        raids?: number[]
-    }
     targets?: {
-        playerMembershipIds?: string[]
-        clanGroupIds?: string[]
+        players?: DiscordWebhookPlayerTargetInput[]
+        clans?: DiscordWebhookClanTargetInput[]
     }
 }
 
@@ -153,8 +157,20 @@ const validateDiscordWebhookUrl = (raw: string) => {
 }
 
 const toBigIntString = (value: string) => BigInt(value).toString()
-const normalizeTargetIds = (values?: string[]) =>
-    values === undefined ? undefined : [...new Set(values.map(toBigIntString))]
+
+type ResolvedPlayerRuleRow = {
+    membershipId: string
+    requireFresh: boolean
+    requireCompleted: boolean
+    activityRaidBitmap: number
+}
+
+type ResolvedClanRuleRow = {
+    groupId: string
+    requireFresh: boolean
+    requireCompleted: boolean
+    activityRaidBitmap: number
+}
 
 const subscriptionRaidBitForActivityID = (activityId: number): number => {
     if (activityId === 101) return 2 ** 33
@@ -193,6 +209,58 @@ const resolveActivityRaidBitmap = async (raidIds?: number[]): Promise<number> =>
     return rows.reduce((bitmap, row) => bitmap + subscriptionRaidBitForActivityID(row.id), 0)
 }
 
+const dedupePlayerTargets = (players: DiscordWebhookPlayerTargetInput[]): DiscordWebhookPlayerTargetInput[] => {
+    const map = new Map<string, DiscordWebhookPlayerTargetInput>()
+    for (const raw of players) {
+        const id = toBigIntString(String(raw.membershipId).trim())
+        map.set(id, { ...raw, membershipId: id })
+    }
+    return [...map.values()].sort((a, b) => (BigInt(a.membershipId) < BigInt(b.membershipId) ? -1 : 1))
+}
+
+const dedupeClanTargets = (clans: DiscordWebhookClanTargetInput[]): DiscordWebhookClanTargetInput[] => {
+    const map = new Map<string, DiscordWebhookClanTargetInput>()
+    for (const raw of clans) {
+        const id = toBigIntString(String(raw.groupId).trim())
+        map.set(id, { ...raw, groupId: id })
+    }
+    return [...map.values()].sort((a, b) => (BigInt(a.groupId) < BigInt(b.groupId) ? -1 : 1))
+}
+
+const resolvePlayerRuleRows = async (
+    players: DiscordWebhookPlayerTargetInput[] | undefined
+): Promise<ResolvedPlayerRuleRow[] | undefined> => {
+    if (players === undefined) return undefined
+    const deduped = dedupePlayerTargets(players)
+    const out: ResolvedPlayerRuleRow[] = []
+    for (const p of deduped) {
+        out.push({
+            membershipId: p.membershipId,
+            requireFresh: p.requireFresh ?? false,
+            requireCompleted: p.requireCompleted ?? false,
+            activityRaidBitmap: await resolveActivityRaidBitmap(p.raids)
+        })
+    }
+    return out
+}
+
+const resolveClanRuleRows = async (
+    clans: DiscordWebhookClanTargetInput[] | undefined
+): Promise<ResolvedClanRuleRow[] | undefined> => {
+    if (clans === undefined) return undefined
+    const deduped = dedupeClanTargets(clans)
+    const out: ResolvedClanRuleRow[] = []
+    for (const c of deduped) {
+        out.push({
+            groupId: c.groupId,
+            requireFresh: c.requireFresh ?? false,
+            requireCompleted: c.requireCompleted ?? false,
+            activityRaidBitmap: await resolveActivityRaidBitmap(c.raids)
+        })
+    }
+    return out
+}
+
 /** Prior Discord webhook id for this channel, if any (used before replacing on re-register). */
 async function getExistingDiscordWebhookIdForChannel(channelId: string): Promise<string | null> {
     const row = await pgAdmin.queryRow<{ webhookId: string | null }>(
@@ -227,22 +295,15 @@ async function upsertDiscordRules(
     db: Pick<typeof pgAdmin, "queryRow" | "queryRows">,
     destinationId: string,
     options: {
-        requireFresh: boolean
-        requireCompleted: boolean
-        activityRaidBitmap: number
-        playerMembershipIds?: string[]
-        clanGroupIds?: string[]
+        players?: ResolvedPlayerRuleRow[]
+        clans?: ResolvedClanRuleRow[]
     }
 ) {
-    const {
-        requireFresh,
-        requireCompleted,
-        activityRaidBitmap,
-        playerMembershipIds,
-        clanGroupIds
-    } = options
+    const { players, clans } = options
     const playerInsertResults: { inserted: number; updated: number }[] = []
-    for (const membershipId of playerMembershipIds ?? []) {
+
+    for (const row of players ?? []) {
+        const { membershipId, requireFresh, requireCompleted, activityRaidBitmap } = row
         const insertedRows = await db.queryRows<{ rowCount: number }>(
             `INSERT INTO subscriptions.rule (
                 destination_id,
@@ -300,7 +361,8 @@ async function upsertDiscordRules(
         playerInsertResults.push({ inserted: 0, updated: 1 })
     }
 
-    if (playerMembershipIds !== undefined) {
+    if (players !== undefined) {
+        const playerIds = players.map(p => p.membershipId)
         await db.queryRows(
             `UPDATE subscriptions.rule
              SET is_active = false,
@@ -312,12 +374,13 @@ async function upsertDiscordRules(
                     array_length($2::bigint[], 1) IS NULL
                     OR membership_id <> ALL($2::bigint[])
                )`,
-            { params: [destinationId, playerMembershipIds] }
+            { params: [destinationId, playerIds] }
         )
     }
 
     const clanInsertResults: { inserted: number; updated: number }[] = []
-    for (const groupId of clanGroupIds ?? []) {
+    for (const row of clans ?? []) {
+        const { groupId, requireFresh, requireCompleted, activityRaidBitmap } = row
         const insertedRows = await db.queryRows<{ rowCount: number }>(
             `INSERT INTO subscriptions.rule (
                 destination_id,
@@ -363,7 +426,8 @@ async function upsertDiscordRules(
         clanInsertResults.push({ inserted: 0, updated: 1 })
     }
 
-    if (clanGroupIds !== undefined) {
+    if (clans !== undefined) {
+        const groupIds = clans.map(c => c.groupId)
         await db.queryRows(
             `UPDATE subscriptions.rule
              SET is_active = false,
@@ -375,7 +439,7 @@ async function upsertDiscordRules(
                     array_length($2::bigint[], 1) IS NULL
                     OR group_id <> ALL($2::bigint[])
                )`,
-            { params: [destinationId, clanGroupIds] }
+            { params: [destinationId, groupIds] }
         )
     }
 
@@ -398,20 +462,11 @@ async function updateDiscordWebhookInDb(
     channelId: string,
     input: UpdateDiscordWebhookInput,
     normalized: {
-        requireFresh: boolean
-        requireCompleted: boolean
-        activityRaidBitmap: number
-        playerMembershipIds?: string[]
-        clanGroupIds?: string[]
+        players?: ResolvedPlayerRuleRow[]
+        clans?: ResolvedClanRuleRow[]
     }
 ): Promise<RegisterDiscordWebhookResult["rules"]> {
-    const {
-        requireFresh,
-        requireCompleted,
-        activityRaidBitmap,
-        playerMembershipIds,
-        clanGroupIds
-    } = normalized
+    const { players, clans } = normalized
     const destinationId = await getDiscordDestinationIdByChannelId(tx, channelId)
     const existing = await tx.queryRow<{ id: string }>(
         `SELECT id::text AS "id"
@@ -432,13 +487,7 @@ async function updateDiscordWebhookInDb(
         { params: [destinationId, input.guildId] }
     )
 
-    return upsertDiscordRules(tx, destinationId, {
-        requireFresh,
-        requireCompleted,
-        activityRaidBitmap,
-        playerMembershipIds,
-        clanGroupIds
-    })
+    return upsertDiscordRules(tx, destinationId, { players, clans })
 }
 
 export async function registerDiscordWebhook(
@@ -448,8 +497,8 @@ export async function registerDiscordWebhook(
         guildId: input.guildId,
         channelId: input.channelId,
         hasName: Boolean(input.name),
-        playerTargets: input.targets?.playerMembershipIds?.length ?? 0,
-        clanTargets: input.targets?.clanGroupIds?.length ?? 0
+        playerTargets: input.targets?.players?.length ?? 0,
+        clanTargets: input.targets?.clans?.length ?? 0
     })
     let createdWebhook: { id: string; token: string; url: string } | null = null
     try {
@@ -463,11 +512,8 @@ export async function registerDiscordWebhook(
             name: input.name
         })
         const webhookUrl = validateDiscordWebhookUrl(createdWebhook.url)
-        const requireFresh = input.filters?.requireFresh ?? false
-        const requireCompleted = input.filters?.requireCompleted ?? false
-        const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
-        const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
-        const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
+        const players = await resolvePlayerRuleRows(input.targets?.players)
+        const clans = await resolveClanRuleRows(input.targets?.clans)
 
         const { created, activated, rules } = await pgAdmin.transaction(async tx => {
             const webhook = createdWebhook!
@@ -531,13 +577,7 @@ export async function registerDiscordWebhook(
                 }
             )
 
-            const rules = await upsertDiscordRules(tx, destinationId, {
-                requireFresh,
-                requireCompleted,
-                activityRaidBitmap,
-                playerMembershipIds,
-                clanGroupIds
-            })
+            const rules = await upsertDiscordRules(tx, destinationId, { players, clans })
 
             return { created, activated, rules }
         })
@@ -580,26 +620,14 @@ export async function updateDiscordWebhook(
     logger.info("DISCORD_WEBHOOK_UPDATE_REQUESTED", {
         guildId: input.guildId,
         channelId,
-        playerTargets: input.targets?.playerMembershipIds?.length ?? 0,
-        clanTargets: input.targets?.clanGroupIds?.length ?? 0,
-        requireFresh: input.filters?.requireFresh ?? false,
-        requireCompleted: input.filters?.requireCompleted ?? false,
-        raidFiltersCount: input.filters?.raids?.length ?? 0
+        playerTargets: input.targets?.players?.length ?? 0,
+        clanTargets: input.targets?.clans?.length ?? 0
     })
-    const requireFresh = input.filters?.requireFresh ?? false
-    const requireCompleted = input.filters?.requireCompleted ?? false
-    const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
-    const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
-    const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
+    const players = await resolvePlayerRuleRows(input.targets?.players)
+    const clans = await resolveClanRuleRows(input.targets?.clans)
 
     const rules = await pgAdmin.transaction(async tx =>
-        updateDiscordWebhookInDb(tx, channelId, input, {
-            requireFresh,
-            requireCompleted,
-            activityRaidBitmap,
-            playerMembershipIds,
-            clanGroupIds
-        })
+        updateDiscordWebhookInDb(tx, channelId, input, { players, clans })
     )
 
     logger.info("DISCORD_WEBHOOK_UPDATE_COMPLETED", {
@@ -658,11 +686,8 @@ export async function upsertDiscordWebhook(
         }
     }
 
-    const requireFresh = input.filters?.requireFresh ?? false
-    const requireCompleted = input.filters?.requireCompleted ?? false
-    const activityRaidBitmap = await resolveActivityRaidBitmap(input.filters?.raids)
-    const playerMembershipIds = normalizeTargetIds(input.targets?.playerMembershipIds)
-    const clanGroupIds = normalizeTargetIds(input.targets?.clanGroupIds)
+    const players = await resolvePlayerRuleRows(input.targets?.players)
+    const clans = await resolveClanRuleRows(input.targets?.clans)
 
     const { rules, activated } = await pgAdmin.transaction(async tx => {
         let activatedInner = false
@@ -683,22 +708,10 @@ export async function upsertDiscordWebhook(
             })
         }
 
-        const rulesInner = await updateDiscordWebhookInDb(
-            tx,
-            input.channelId,
-            {
-                guildId: input.guildId,
-                filters: input.filters,
-                targets: input.targets
-            },
-            {
-                requireFresh,
-                requireCompleted,
-                activityRaidBitmap,
-                playerMembershipIds,
-                clanGroupIds
-            }
-        )
+        const rulesInner = await updateDiscordWebhookInDb(tx, input.channelId, input, {
+            players,
+            clans
+        })
 
         return { rules: rulesInner, activated: activatedInner }
     })
