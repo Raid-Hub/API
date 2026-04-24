@@ -209,16 +209,22 @@ const resolveActivityRaidBitmap = async (raidIds?: number[]): Promise<number> =>
     return rows.reduce((bitmap, row) => bitmap + subscriptionRaidBitForActivityID(row.id), 0)
 }
 
-const dedupePlayerTargets = (players: DiscordWebhookPlayerTargetInput[]): DiscordWebhookPlayerTargetInput[] => {
+const dedupePlayerTargets = (
+    players: DiscordWebhookPlayerTargetInput[]
+): DiscordWebhookPlayerTargetInput[] => {
     const map = new Map<string, DiscordWebhookPlayerTargetInput>()
     for (const raw of players) {
         const id = toBigIntString(String(raw.membershipId).trim())
         map.set(id, { ...raw, membershipId: id })
     }
-    return [...map.values()].sort((a, b) => (BigInt(a.membershipId) < BigInt(b.membershipId) ? -1 : 1))
+    return [...map.values()].sort((a, b) =>
+        BigInt(a.membershipId) < BigInt(b.membershipId) ? -1 : 1
+    )
 }
 
-const dedupeClanTargets = (clans: DiscordWebhookClanTargetInput[]): DiscordWebhookClanTargetInput[] => {
+const dedupeClanTargets = (
+    clans: DiscordWebhookClanTargetInput[]
+): DiscordWebhookClanTargetInput[] => {
     const map = new Map<string, DiscordWebhookClanTargetInput>()
     for (const raw of clans) {
         const id = toBigIntString(String(raw.groupId).trim())
