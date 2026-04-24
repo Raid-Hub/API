@@ -3,8 +3,6 @@ import { Logger } from "@/lib/utils/logging"
 
 const logger = new Logger("DISCORD_SUBSCRIPTIONS_SERVICE")
 
-export class InvalidRaidFilterError extends Error {}
-
 export type RegisterDiscordWebhookInput = {
     guildId: string
     channelId: string
@@ -159,11 +157,8 @@ const normalizeTargetIds = (values?: string[]) =>
     values === undefined ? undefined : [...new Set(values.map(toBigIntString))]
 
 const subscriptionRaidBitForActivityID = (activityId: number): number => {
-    if (activityId >= 1 && activityId <= 32) return 2 ** activityId
     if (activityId === 101) return 2 ** 33
-    throw new InvalidRaidFilterError(
-        `Unsupported raid activity id for subscription filter: ${activityId}`
-    )
+    return 2 ** activityId
 }
 
 const singleActivityIdFromBitmap = (bitmap: number): number | null => {
@@ -191,9 +186,7 @@ const resolveActivityRaidBitmap = async (raidId?: number): Promise<number> => {
          LIMIT 1`,
         { params: [raidId] }
     )
-    if (!row) {
-        throw new InvalidRaidFilterError(`Unknown raid filter id: ${raidId}`)
-    }
+    if (!row) return 0
     return subscriptionRaidBitForActivityID(row.id)
 }
 
