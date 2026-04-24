@@ -725,6 +725,30 @@
           "createdAt"
         ]
       },
+      "ClanBasic": {
+        "type": "object",
+        "properties": {
+          "groupId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "callSign": {
+            "type": "string"
+          },
+          "motto": {
+            "type": "string"
+          },
+          "avatarPath": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["groupId", "name", "callSign", "motto", "avatarPath"],
+        "additionalProperties": false
+      },
       "ClanBannerData": {
         "type": "object",
         "properties": {
@@ -3152,6 +3176,30 @@
           }
         },
         "required": ["message", "route"]
+      },
+      "ClanBasicResponse": {
+        "type": "object",
+        "properties": {
+          "groupId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "callSign": {
+            "type": "string"
+          },
+          "motto": {
+            "type": "string"
+          },
+          "avatarPath": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["groupId", "name", "callSign", "motto", "avatarPath"],
+        "additionalProperties": false
       },
       "MetricsWeaponsRollingWeekResponse": {
         "type": "object",
@@ -6671,6 +6719,186 @@
                     },
                     "response": {
                       "$ref": "#/components/schemas/ClanResponse"
+                    }
+                  },
+                  "required": ["minted", "success", "response"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["ApiKeyError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["ClanNotFoundError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/ClanNotFoundError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["PathValidationError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/PathValidationError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InternalServerError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InternalServerError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "BungieServiceOffline",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["BungieServiceOffline"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/BungieServiceOffline"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clan/{groupId}/basic": {
+      "get": {
+        "description": "Low-cost clan identity (name, tag, avatar path) for bots and UIs. Does not load member rosters.",
+        "summary": "/clan/{groupId}/basic",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+n?$"
+            },
+            "required": true,
+            "name": "groupId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "response": {
+                      "$ref": "#/components/schemas/ClanBasicResponse"
                     }
                   },
                   "required": ["minted", "success", "response"]

@@ -2,6 +2,7 @@ import { RaidHubRouter } from "@/core/RaidHubRouter"
 import { adminRouter } from "./admin"
 import { adminAuthorizationRoute } from "./authorize/admin"
 import { userAuthorizationRoute } from "./authorize/user"
+import { clanBasicRoute } from "./clan/basic"
 import { clanStatsRoute } from "./clanStats"
 import { instanceRoute } from "./instance"
 import { leaderboardRouter } from "./leaderboard"
@@ -41,6 +42,10 @@ export const router = new RaidHubRouter({
         {
             path: "/clan/:groupId",
             route: clanStatsRoute
+        },
+        {
+            path: "/clan/:groupId/basic",
+            route: clanBasicRoute
         },
         {
             path: "/metrics",

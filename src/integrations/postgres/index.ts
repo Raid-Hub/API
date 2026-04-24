@@ -7,16 +7,23 @@ configurePostgresParsers()
 let pgReaderClient: ReturnType<typeof createReader> | null = null
 let pgAdminClient: ReturnType<typeof createTransactional> | null = null
 
+/** Match `getFixturePool()` / libpq defaults so tests and app hit the same host:port. */
+const postgresConnectionBase = () => ({
+    host: process.env.POSTGRES_HOST || "localhost",
+    port: Number(process.env.POSTGRES_PORT || 5432),
+    database: "raidhub",
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000
+})
+
 const getPgReader = () => {
     if (!pgReaderClient) {
         pgReaderClient = createReader({
+            ...postgresConnectionBase(),
             user: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
-            database: "raidhub",
             min: process.env.PROD ? 5 : 1,
-            max: process.env.PROD ? 150 : 10,
-            idleTimeoutMillis: 30000,
-            connectionTimeoutMillis: 10000
+            max: process.env.PROD ? 150 : 10
         })
     }
 
@@ -26,13 +33,11 @@ const getPgReader = () => {
 const getPgAdmin = () => {
     if (!pgAdminClient) {
         pgAdminClient = createTransactional({
+            ...postgresConnectionBase(),
             user: process.env.POSTGRES_WRITABLE_USER,
             password: process.env.POSTGRES_WRITABLE_PASSWORD,
-            database: "raidhub",
             min: process.env.PROD ? 2 : 1,
-            max: process.env.PROD ? 15 : 3,
-            idleTimeoutMillis: 30000,
-            connectionTimeoutMillis: 10000
+            max: process.env.PROD ? 15 : 3
         })
     }
 
