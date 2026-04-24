@@ -189,7 +189,8 @@ const resolveActivityRaidBitmap = async (raidIds?: number[]): Promise<number> =>
         { params: [ids] }
     )
     if (rows.length === 0) return 0
-    return rows.reduce((bitmap, row) => bitmap | subscriptionRaidBitForActivityID(row.id), 0)
+    // Use numeric addition, not `|`: bitwise OR coerces operands to int32 and corrupts bits past 2**31.
+    return rows.reduce((bitmap, row) => bitmap + subscriptionRaidBitForActivityID(row.id), 0)
 }
 
 /** Prior Discord webhook id for this channel, if any (used before replacing on re-register). */

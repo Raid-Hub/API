@@ -267,6 +267,46 @@ describe("discord webhook subscriptions service", () => {
         expect(result.players[0].raidIds).toEqual([9])
     })
 
+    test("getDiscordWebhookStatus decodes combined bitmap for raids 9 and 101", async () => {
+        const bitmapRaid9And101 = 2 ** 9 + 2 ** 33
+        queueQueryRow([
+            {
+                destinationId: "42",
+                destinationActive: true,
+                consecutiveDeliveryFailures: 0,
+                lastDeliverySuccessAt: null,
+                lastDeliveryFailureAt: null,
+                lastDeliveryError: null,
+                guildId: "guild_9",
+                channelId: "channel_9",
+                webhookId: "webhook_9"
+            }
+        ])
+        queueQueryRows([
+            [
+                {
+                    membershipId: "4611686018467831285",
+                    requireFresh: true,
+                    requireCompleted: false,
+                    activityRaidBitmap: bitmapRaid9And101
+                }
+            ],
+            []
+        ])
+
+        const result = await getDiscordWebhookStatus("channel_9")
+        if (!result.registered) expect.unreachable("Expected registered status")
+
+        expect(result.players[0].raidIds).toEqual([9, 101])
+    })
+
+    test("raid bitmap combine must not use JS bitwise OR (int32 truncates raid 101)", () => {
+        const bit9 = 2 ** 9
+        const bit101 = 2 ** 33
+        expect(bit9 | bit101).not.toBe(bit9 + bit101)
+        expect(bit9 + bit101).toBe(8589935104)
+    })
+
     test("getDiscordWebhookStatus returns registered false when channel is unknown", async () => {
         queueQueryRow([null])
 
