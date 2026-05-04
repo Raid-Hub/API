@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test"
+import type { IncomingHttpHeaders } from "http"
 
 import { generateJWT } from "./jwt"
 import { authFromHeaders } from "./user-context"
@@ -65,5 +66,26 @@ describe("authFromHeaders", () => {
             authorization: [`Bearer ${token}`, "ignored"]
         } as unknown as Parameters<typeof authFromHeaders>[0])
         expect(auth?.bungieMembershipId).toBe("1")
+    })
+
+    test("prefers x-raidhub-user-authorization when Discord-style Authorization is present", () => {
+        process.env.JWT_SECRET = "test-secret"
+        const userToken = generateJWT(
+            {
+                isAdmin: false,
+                bungieMembershipId: "42",
+                destinyMembershipIds: ["9", "8"]
+            },
+            600
+        )
+        const auth = authFromHeaders({
+            authorization: "Discord would-be-jwt",
+            "x-raidhub-user-authorization": `Bearer ${userToken}`
+        } as IncomingHttpHeaders)
+        expect(auth).toEqual({
+            isAdmin: false,
+            bungieMembershipId: "42",
+            destinyMembershipIds: ["9", "8"]
+        })
     })
 })

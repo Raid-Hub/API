@@ -1,4 +1,5 @@
 import type { JWTAuthContext } from "@/auth/jwt"
+import type { DiscordRaidHubUser } from "@/auth/express-discord-context"
 import type { DiscordInvocationContext } from "@/integrations/discord/context-jwt"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { RouteConfig } from "@asteasolutions/zod-to-openapi"
@@ -19,7 +20,7 @@ export interface IRaidHubRoute {
 
 export type ErrorData = readonly [
     ...{
-        statusCode: 400 | 401 | 403 | 404 | 501 | 503
+        statusCode: 400 | 401 | 403 | 404 | 500 | 501 | 503
         code: ErrorCode
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         schema: z.ZodObject<any>
@@ -40,6 +41,7 @@ export type RaidHubHandler<
         headers: IncomingHttpHeaders
         auth?: JWTAuthContext
         discord?: DiscordInvocationContext
+        discordRaidHubUser?: DiscordRaidHubUser
     },
     after: (callback: () => Promise<void>) => void
 ) => Promise<RaidHubHandlerReturn<T, ErrorResponse>>

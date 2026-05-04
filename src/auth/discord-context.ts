@@ -1,3 +1,4 @@
+import { lookupBungieMembershipIdForDiscordUser } from "@/integrations/discord/lookup-discord-account"
 import { verifyDiscordInvocationContext } from "@/integrations/discord/context-jwt"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { InvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
@@ -20,17 +21,17 @@ const extractDiscordContextToken = (authorizationHeader?: string) => {
     return token || null
 }
 
-export const attachDiscordContext: RequestHandler = (req, res, next) => {
+export const attachDiscordContext: RequestHandler = async (req, res, next) => {
     const token = extractDiscordContextToken(authorizationHeaderValue(req.headers))
     if (!token) {
         req.discord = undefined
+        req.discordRaidHubUser = undefined
         next()
         return
     }
 
     try {
         req.discord = verifyDiscordInvocationContext(token)
-        next()
     } catch {
         const err: InvalidDiscordAuthError = {
             minted: new Date(),
@@ -41,5 +42,15 @@ export const attachDiscordContext: RequestHandler = (req, res, next) => {
             }
         }
         res.status(401).json(err)
+        return
     }
+
+    try {
+        const bungieMembershipId = await lookupBungieMembershipIdForDiscordUser(req.discord.userId)
+        req.discordRaidHubUser = bungieMembershipId ? { bungieMembershipId } : undefined
+    } catch {
+        req.discordRaidHubUser = undefined
+    }
+
+    next()
 }

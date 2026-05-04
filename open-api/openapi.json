@@ -1206,6 +1206,293 @@
           }
         ]
       },
+      "DiscordWebhookBody": {
+        "type": "object",
+        "default": {},
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "targets": {
+            "type": "object",
+            "properties": {
+              "players": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "membershipId": {
+                      "type": "string",
+                      "pattern": "^\\d+$"
+                    },
+                    "requireFresh": {
+                      "type": "boolean"
+                    },
+                    "requireCompleted": {
+                      "type": "boolean"
+                    },
+                    "raids": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    }
+                  },
+                  "required": ["membershipId"]
+                },
+                "maxItems": 250
+              },
+              "clans": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "groupId": {
+                      "type": "string",
+                      "pattern": "^\\d+$"
+                    },
+                    "requireFresh": {
+                      "type": "boolean"
+                    },
+                    "requireCompleted": {
+                      "type": "boolean"
+                    },
+                    "raids": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                      }
+                    }
+                  },
+                  "required": ["groupId"]
+                },
+                "maxItems": 250
+              }
+            }
+          }
+        }
+      },
+      "DiscordWebhookPutResponse": {
+        "type": "object",
+        "properties": {
+          "guildId": {
+            "type": "string"
+          },
+          "channelId": {
+            "type": "string"
+          },
+          "webhookId": {
+            "type": "string"
+          },
+          "webhookUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "created": {
+            "type": "boolean"
+          },
+          "activated": {
+            "type": "boolean"
+          },
+          "updated": {
+            "type": "boolean"
+          },
+          "rules": {
+            "type": "object",
+            "properties": {
+              "players": {
+                "type": "object",
+                "properties": {
+                  "inserted": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "updated": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": ["inserted", "updated"]
+              },
+              "clans": {
+                "type": "object",
+                "properties": {
+                  "inserted": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "updated": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": ["inserted", "updated"]
+              }
+            },
+            "required": ["players", "clans"]
+          }
+        },
+        "required": [
+          "guildId",
+          "channelId",
+          "webhookId",
+          "created",
+          "activated",
+          "updated",
+          "rules"
+        ]
+      },
+      "DiscordWebhookDeleteResponse": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deleted"]
+      },
+      "DiscordWebhookStatusResponse": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "registered": {
+                "type": "boolean",
+                "enum": [false]
+              }
+            },
+            "required": ["registered"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "registered": {
+                "type": "boolean",
+                "enum": [true]
+              },
+              "guildId": {
+                "type": "string"
+              },
+              "channelId": {
+                "type": "string"
+              },
+              "webhookId": {
+                "type": "string"
+              },
+              "destinationActive": {
+                "type": "boolean"
+              },
+              "consecutiveDeliveryFailures": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "lastDeliverySuccessAt": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastDeliveryFailureAt": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastDeliveryError": {
+                "type": "string",
+                "nullable": true
+              },
+              "players": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "membershipId": {
+                      "type": "string",
+                      "pattern": "^\\d+$"
+                    },
+                    "requireFresh": {
+                      "type": "boolean"
+                    },
+                    "requireCompleted": {
+                      "type": "boolean"
+                    },
+                    "raidIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "required": [
+                    "membershipId",
+                    "requireFresh",
+                    "requireCompleted",
+                    "raidIds"
+                  ]
+                }
+              },
+              "clans": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "groupId": {
+                      "type": "string",
+                      "pattern": "^\\d+$"
+                    },
+                    "requireFresh": {
+                      "type": "boolean"
+                    },
+                    "requireCompleted": {
+                      "type": "boolean"
+                    },
+                    "raidIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "required": [
+                    "groupId",
+                    "requireFresh",
+                    "requireCompleted",
+                    "raidIds"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "registered",
+              "guildId",
+              "channelId",
+              "webhookId",
+              "destinationActive",
+              "consecutiveDeliveryFailures",
+              "lastDeliverySuccessAt",
+              "lastDeliveryFailureAt",
+              "lastDeliveryError",
+              "players",
+              "clans"
+            ]
+          }
+        ]
+      },
+      "InvalidDiscordAuthError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": ["Invalid Discord context token"]
+          }
+        },
+        "required": ["message"]
+      },
       "TeamLeaderboardEntry": {
         "type": "object",
         "properties": {
@@ -1795,293 +2082,6 @@
           "latestResolvedInstance",
           "estimatedBacklogEmptied"
         ]
-      },
-      "DiscordWebhookBody": {
-        "type": "object",
-        "default": {},
-        "properties": {
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 80
-          },
-          "targets": {
-            "type": "object",
-            "properties": {
-              "players": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "membershipId": {
-                      "type": "string",
-                      "pattern": "^\\d+$"
-                    },
-                    "requireFresh": {
-                      "type": "boolean"
-                    },
-                    "requireCompleted": {
-                      "type": "boolean"
-                    },
-                    "raids": {
-                      "type": "array",
-                      "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "exclusiveMinimum": true
-                      }
-                    }
-                  },
-                  "required": ["membershipId"]
-                },
-                "maxItems": 250
-              },
-              "clans": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "groupId": {
-                      "type": "string",
-                      "pattern": "^\\d+$"
-                    },
-                    "requireFresh": {
-                      "type": "boolean"
-                    },
-                    "requireCompleted": {
-                      "type": "boolean"
-                    },
-                    "raids": {
-                      "type": "array",
-                      "items": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "exclusiveMinimum": true
-                      }
-                    }
-                  },
-                  "required": ["groupId"]
-                },
-                "maxItems": 250
-              }
-            }
-          }
-        }
-      },
-      "DiscordWebhookPutResponse": {
-        "type": "object",
-        "properties": {
-          "guildId": {
-            "type": "string"
-          },
-          "channelId": {
-            "type": "string"
-          },
-          "webhookId": {
-            "type": "string"
-          },
-          "webhookUrl": {
-            "type": "string",
-            "format": "uri"
-          },
-          "created": {
-            "type": "boolean"
-          },
-          "activated": {
-            "type": "boolean"
-          },
-          "updated": {
-            "type": "boolean"
-          },
-          "rules": {
-            "type": "object",
-            "properties": {
-              "players": {
-                "type": "object",
-                "properties": {
-                  "inserted": {
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "updated": {
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "required": ["inserted", "updated"]
-              },
-              "clans": {
-                "type": "object",
-                "properties": {
-                  "inserted": {
-                    "type": "integer",
-                    "minimum": 0
-                  },
-                  "updated": {
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "required": ["inserted", "updated"]
-              }
-            },
-            "required": ["players", "clans"]
-          }
-        },
-        "required": [
-          "guildId",
-          "channelId",
-          "webhookId",
-          "created",
-          "activated",
-          "updated",
-          "rules"
-        ]
-      },
-      "DiscordWebhookDeleteResponse": {
-        "type": "object",
-        "properties": {
-          "deleted": {
-            "type": "boolean"
-          }
-        },
-        "required": ["deleted"]
-      },
-      "DiscordWebhookStatusResponse": {
-        "oneOf": [
-          {
-            "type": "object",
-            "properties": {
-              "registered": {
-                "type": "boolean",
-                "enum": [false]
-              }
-            },
-            "required": ["registered"]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "registered": {
-                "type": "boolean",
-                "enum": [true]
-              },
-              "guildId": {
-                "type": "string"
-              },
-              "channelId": {
-                "type": "string"
-              },
-              "webhookId": {
-                "type": "string"
-              },
-              "destinationActive": {
-                "type": "boolean"
-              },
-              "consecutiveDeliveryFailures": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "lastDeliverySuccessAt": {
-                "type": "string",
-                "nullable": true
-              },
-              "lastDeliveryFailureAt": {
-                "type": "string",
-                "nullable": true
-              },
-              "lastDeliveryError": {
-                "type": "string",
-                "nullable": true
-              },
-              "players": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "membershipId": {
-                      "type": "string",
-                      "pattern": "^\\d+$"
-                    },
-                    "requireFresh": {
-                      "type": "boolean"
-                    },
-                    "requireCompleted": {
-                      "type": "boolean"
-                    },
-                    "raidIds": {
-                      "type": "array",
-                      "items": {
-                        "type": "integer",
-                        "minimum": 0
-                      }
-                    }
-                  },
-                  "required": [
-                    "membershipId",
-                    "requireFresh",
-                    "requireCompleted",
-                    "raidIds"
-                  ]
-                }
-              },
-              "clans": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "groupId": {
-                      "type": "string",
-                      "pattern": "^\\d+$"
-                    },
-                    "requireFresh": {
-                      "type": "boolean"
-                    },
-                    "requireCompleted": {
-                      "type": "boolean"
-                    },
-                    "raidIds": {
-                      "type": "array",
-                      "items": {
-                        "type": "integer",
-                        "minimum": 0
-                      }
-                    }
-                  },
-                  "required": [
-                    "groupId",
-                    "requireFresh",
-                    "requireCompleted",
-                    "raidIds"
-                  ]
-                }
-              }
-            },
-            "required": [
-              "registered",
-              "guildId",
-              "channelId",
-              "webhookId",
-              "destinationActive",
-              "consecutiveDeliveryFailures",
-              "lastDeliverySuccessAt",
-              "lastDeliveryFailureAt",
-              "lastDeliveryError",
-              "players",
-              "clans"
-            ]
-          }
-        ]
-      },
-      "InvalidDiscordAuthError": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "enum": ["Invalid Discord context token"]
-          }
-        },
-        "required": ["message"]
       },
       "ManifestResponse": {
         "type": "object",
@@ -3470,7 +3470,23 @@
         },
         "required": ["value", "expires"]
       },
-      "SubscriptionsDiscordWebhooksResponse": {
+      "InternalQueueDiscordLinkedRoleSyncResponse": {
+        "type": "object",
+        "properties": {
+          "queued": {
+            "type": "boolean",
+            "enum": [true]
+          },
+          "destinyMembershipIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["queued", "destinyMembershipIds"]
+      },
+      "InternalSubscriptionsDiscordWebhooksResponse": {
         "oneOf": [
           {
             "type": "object",
@@ -8780,10 +8796,31 @@
         }
       }
     },
-    "/subscriptions/discord/webhooks": {
-      "get": {
-        "description": "Get RaidHub subscription webhook status for the current channel (no secrets).",
-        "summary": "/subscriptions/discord/webhooks",
+    "/internal/queue-discord-linked-role-sync": {
+      "post": {
+        "description": "Queue a Discord linked-role metadata sync. Body: Destiny membership ids only. Send `x-raidhub-client-secret: <CLIENT_SECRET>` (not in JSON). Refresh Discord OAuth in the BFF before calling.",
+        "summary": "/internal/queue-discord-linked-role-sync",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "destinyMembershipIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^\\d+n?$"
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": ["destinyMembershipIds"]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success",
@@ -8801,7 +8838,204 @@
                       "enum": [true]
                     },
                     "response": {
-                      "$ref": "#/components/schemas/SubscriptionsDiscordWebhooksResponse"
+                      "$ref": "#/components/schemas/InternalQueueDiscordLinkedRoleSyncResponse"
+                    }
+                  },
+                  "required": ["minted", "success", "response"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["BodyValidationError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/BodyValidationError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["ApiKeyError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "InvalidClientSecretError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InvalidClientSecretError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InvalidClientSecretError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["InternalServerError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/InternalServerError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minted": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "enum": [false]
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": ["InternalServerError"]
+                        },
+                        "error": {
+                          "$ref": "#/components/schemas/InternalServerError"
+                        }
+                      },
+                      "required": ["minted", "success", "code", "error"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ServiceUnavailableError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["ServiceUnavailableError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/ServiceUnavailableError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/subscriptions/discord/webhooks": {
+      "get": {
+        "description": "Get RaidHub subscription webhook status for the current channel (no secrets).",
+        "summary": "/internal/subscriptions/discord/webhooks",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "response": {
+                      "$ref": "#/components/schemas/InternalSubscriptionsDiscordWebhooksResponse"
                     }
                   },
                   "required": ["minted", "success", "response"]
@@ -8922,7 +9156,7 @@
       },
       "put": {
         "description": "Create or update the RaidHub subscription webhook for this channel (idempotent upsert).",
-        "summary": "/subscriptions/discord/webhooks",
+        "summary": "/internal/subscriptions/discord/webhooks",
         "requestBody": {
           "required": true,
           "content": {
@@ -8952,7 +9186,7 @@
                     "response": {
                       "allOf": [
                         {
-                          "$ref": "#/components/schemas/SubscriptionsDiscordWebhooksResponse"
+                          "$ref": "#/components/schemas/InternalSubscriptionsDiscordWebhooksResponse"
                         },
                         {
                           "type": "object",
@@ -9173,7 +9407,7 @@
       },
       "delete": {
         "description": "Delete a Discord subscription webhook registration for the current channel.",
-        "summary": "/subscriptions/discord/webhooks",
+        "summary": "/internal/subscriptions/discord/webhooks",
         "responses": {
           "200": {
             "description": "Success",
@@ -9193,7 +9427,7 @@
                     "response": {
                       "allOf": [
                         {
-                          "$ref": "#/components/schemas/SubscriptionsDiscordWebhooksResponse"
+                          "$ref": "#/components/schemas/InternalSubscriptionsDiscordWebhooksResponse"
                         },
                         {
                           "type": "object",

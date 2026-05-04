@@ -1,6 +1,7 @@
 import { Registry } from "prom-client"
 import {
     activityHistoryQueryTimer,
+    discordLrPublishTotal,
     httpRequestCountByRegion,
     httpRequestTimer,
     playerProfileQueryTimer,
@@ -16,3 +17,4 @@ prometheusRegistry.registerMetric(activityHistoryQueryTimer)
 prometheusRegistry.registerMetric(playerProfileQueryTimer)
 prometheusRegistry.registerMetric(playerSearchQueryTimer)
 prometheusRegistry.registerMetric(postgresConnectionsGauge)
+prometheusRegistry.registerMetric(discordLrPublishTotal)

@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { attachDiscordContext } from "./discord-context"
 
 describe("attachDiscordContext", () => {
-    test("ignores non-Discord authorization headers provided as arrays", () => {
+    test("ignores non-Discord authorization headers provided as arrays", async () => {
         let nextCalled = false
         const req = {
             headers: {
@@ -11,15 +11,16 @@ describe("attachDiscordContext", () => {
         } as unknown as Parameters<typeof attachDiscordContext>[0]
         const res = {} as Parameters<typeof attachDiscordContext>[1]
 
-        attachDiscordContext(req, res, () => {
+        // attachDiscordContext is async RequestHandler; eslint can mis-infer return type from Express typedefs.
+        await Promise.resolve(attachDiscordContext(req, res, () => {
             nextCalled = true
-        })
+        }))
 
         expect(nextCalled).toBe(true)
         expect((req as { discord?: unknown }).discord).toBeUndefined()
     })
 
-    test("returns InvalidDiscordAuthError for invalid Discord token in header array", () => {
+    test("returns InvalidDiscordAuthError for invalid Discord token in header array", async () => {
         let statusCode: number | undefined
         let payload: unknown
         const req = {
@@ -38,7 +39,7 @@ describe("attachDiscordContext", () => {
             }
         } as Parameters<typeof attachDiscordContext>[1]
 
-        attachDiscordContext(req, res, () => {})
+        await Promise.resolve(attachDiscordContext(req, res, () => {}))
 
         expect(statusCode).toBe(401)
         expect(payload).toMatchObject({
