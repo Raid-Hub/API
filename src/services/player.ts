@@ -56,7 +56,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'season', fastest.season_id::int,
                             'duration', fastest.duration::int,
                             'platformType', fastest.platform_type,
-                            'isDayOne', date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch'),
+                            'isDayOne', fastest.date_completed < COALESCE(activity_definition.day_one_end, TIMESTAMP 'epoch'),
                             'isContest', (
                                 CASE
                                     WHEN fa_cact.activity_id IS NOT NULL THEN (
@@ -66,7 +66,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                                     ELSE fastest.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
                                 END
                             ),
-                            'isWeekOne', date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch'),
+                            'isWeekOne', fastest.date_completed < COALESCE(activity_definition.week_one_end, TIMESTAMP 'epoch'),
                             'isBlacklisted', bi.instance_id IS NOT NULL
                         )
                         ELSE NULL
