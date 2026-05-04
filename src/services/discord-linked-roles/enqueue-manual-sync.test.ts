@@ -11,14 +11,14 @@ describe("enqueueManualLinkedRoleSync", () => {
 
     afterEach(() => {
         if (prevEnabled === undefined) {
-            delete process.env.DISCORD_LINKED_ROLES_ENABLED
+            Reflect.deleteProperty(process.env, "DISCORD_LINKED_ROLES_ENABLED")
         } else {
             process.env.DISCORD_LINKED_ROLES_ENABLED = prevEnabled
         }
     })
 
     test("disabled when env unset", async () => {
-        delete process.env.DISCORD_LINKED_ROLES_ENABLED
+        Reflect.deleteProperty(process.env, "DISCORD_LINKED_ROLES_ENABLED")
         const r = await enqueueManualLinkedRoleSync(["4611686018427387905"])
         expect(r).toEqual({ ok: false, reason: "disabled" })
     })
@@ -27,6 +27,15 @@ describe("enqueueManualLinkedRoleSync", () => {
         process.env.DISCORD_LINKED_ROLES_ENABLED = "false"
         const r = await enqueueManualLinkedRoleSync(["4611686018427387905"])
         expect(r).toEqual({ ok: false, reason: "disabled" })
+    })
+
+    test("enabled when env is 1", async () => {
+        process.env.DISCORD_LINKED_ROLES_ENABLED = "1"
+        const spy = spyOn(discordRoleMetadataSyncQueue, "sendJson").mockResolvedValue(true as never)
+        const ids = ["4611686018427387905"]
+        const r = await enqueueManualLinkedRoleSync(ids)
+        expect(r).toEqual({ ok: true, destinyMembershipIds: ids })
+        spy.mockRestore()
     })
 
     test("publish_failed when id list empty", async () => {
