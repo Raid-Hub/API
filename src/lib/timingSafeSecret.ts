@@ -1,7 +1,10 @@
 import { timingSafeEqual } from "node:crypto"
 
 /** Constant-time string compare for secrets (length mismatch returns false without throwing). */
-export function timingSafeStringEqual(expected: string | undefined, candidate: string | undefined): boolean {
+export function timingSafeStringEqual(
+    expected: string | undefined,
+    candidate: string | undefined
+): boolean {
     if (expected === undefined || candidate === undefined) {
         return false
     }

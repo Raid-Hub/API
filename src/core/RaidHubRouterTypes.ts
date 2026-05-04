@@ -1,5 +1,5 @@
-import type { JWTAuthContext } from "@/auth/jwt"
 import type { DiscordRaidHubUser } from "@/auth/express-discord-context"
+import type { JWTAuthContext } from "@/auth/jwt"
 import type { DiscordInvocationContext } from "@/integrations/discord/context-jwt"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { RouteConfig } from "@asteasolutions/zod-to-openapi"

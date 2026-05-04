@@ -12,9 +12,11 @@ describe("attachDiscordContext", () => {
         const res = {} as Parameters<typeof attachDiscordContext>[1]
 
         // attachDiscordContext is async RequestHandler; eslint can mis-infer return type from Express typedefs.
-        await Promise.resolve(attachDiscordContext(req, res, () => {
-            nextCalled = true
-        }))
+        await Promise.resolve(
+            attachDiscordContext(req, res, () => {
+                nextCalled = true
+            })
+        )
 
         expect(nextCalled).toBe(true)
         expect((req as { discord?: unknown }).discord).toBeUndefined()

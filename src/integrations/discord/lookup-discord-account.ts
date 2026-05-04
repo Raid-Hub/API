@@ -1,5 +1,5 @@
-import { createClient, type Client } from "@libsql/client"
 import { Logger } from "@/lib/utils/logging"
+import { createClient, type Client } from "@libsql/client"
 
 const logger = new Logger("DISCORD_ACCOUNT_LOOKUP")
 

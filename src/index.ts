@@ -1,6 +1,6 @@
+import "@/auth/express-discord-context"
 import "@/lib/extensions"
 import "@/lib/instrument"
-import "@/auth/express-discord-context"
 
 import compression from "compression"
 import express, { Router, static as expressStatic, json } from "express"

@@ -1,5 +1,5 @@
-import { lookupBungieMembershipIdForDiscordUser } from "@/integrations/discord/lookup-discord-account"
 import { verifyDiscordInvocationContext } from "@/integrations/discord/context-jwt"
+import { lookupBungieMembershipIdForDiscordUser } from "@/integrations/discord/lookup-discord-account"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { InvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
 import { RequestHandler } from "express"
