@@ -13,7 +13,7 @@ describe("queueDiscordLinkedRoleSyncRoute", () => {
 
     afterEach(() => {
         if (clientSecret === undefined) {
-            delete process.env.CLIENT_SECRET
+            Reflect.deleteProperty(process.env, "CLIENT_SECRET")
         } else {
             process.env.CLIENT_SECRET = clientSecret
         }
@@ -28,7 +28,7 @@ describe("queueDiscordLinkedRoleSyncRoute", () => {
     })
 
     test("500 when CLIENT_SECRET unset", async () => {
-        delete process.env.CLIENT_SECRET
+        Reflect.deleteProperty(process.env, "CLIENT_SECRET")
         const result = await queueDiscordLinkedRoleSyncRoute.$mock({
             body: { destinyMembershipIds: ["4611686018427387905"] },
             headers: { "x-raidhub-client-secret": "x" }
