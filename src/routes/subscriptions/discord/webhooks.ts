@@ -9,6 +9,7 @@ import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zInsufficientPermissionsError } from "@/schema/errors/InsufficientPermissionsError"
 import { zInvalidDiscordAuthError } from "@/schema/errors/InvalidDiscordAuthError"
 import {
+    DiscordWebhookMissingPermissionsError,
     deleteDiscordWebhook,
     getDiscordWebhookStatus,
     upsertDiscordWebhook
@@ -47,13 +48,22 @@ export const putDiscordWebhookRoute = new RaidHubRoute({
                 message: "Forbidden" as const
             })
         }
-        return RaidHubRoute.ok(
-            await upsertDiscordWebhook({
-                ...req.body,
-                guildId,
-                channelId
-            })
-        )
+        try {
+            return RaidHubRoute.ok(
+                await upsertDiscordWebhook({
+                    ...req.body,
+                    guildId,
+                    channelId
+                })
+            )
+        } catch (err) {
+            if (err instanceof DiscordWebhookMissingPermissionsError) {
+                return RaidHubRoute.fail(ErrorCode.InsufficientPermissionsError, {
+                    message: "Forbidden" as const
+                })
+            }
+            throw err
+        }
     }
 })
 

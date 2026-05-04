@@ -3,6 +3,13 @@ import { Logger } from "@/lib/utils/logging"
 
 const logger = new Logger("DISCORD_SUBSCRIPTIONS_SERVICE")
 
+export class DiscordWebhookMissingPermissionsError extends Error {
+    constructor(channelId: string) {
+        super(`Discord bot is missing permissions to create a webhook in channel ${channelId}`)
+        this.name = "DiscordWebhookMissingPermissionsError"
+    }
+}
+
 export type DiscordWebhookPlayerTargetInput = {
     membershipId: string
     requireFresh?: boolean
@@ -113,6 +120,9 @@ const createDiscordWebhook = async (
 
     if (!response.ok) {
         const detail = await response.text()
+        if (response.status === 403) {
+            throw new DiscordWebhookMissingPermissionsError(body.channelId)
+        }
         throw new Error(`Discord webhook create failed with status ${response.status}: ${detail}`)
     }
 
