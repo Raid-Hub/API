@@ -57,7 +57,15 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'duration', fastest.duration::int,
                             'platformType', fastest.platform_type,
                             'isDayOne', date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch'),
-                            'isContest', date_completed < COALESCE(contest_end, TIMESTAMP 'epoch'),
+                            'isContest', (
+                                CASE
+                                    WHEN fa_cact.activity_id IS NOT NULL THEN (
+                                        av.version_id = 32
+                                        AND fastest.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                                    )
+                                    ELSE fastest.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                                END
+                            ),
                             'isWeekOne', date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch'),
                             'isBlacklisted', bi.instance_id IS NOT NULL
                         )
@@ -69,6 +77,11 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                 LEFT JOIN instance fastest ON player_stats.fastest_instance_id = fastest.instance_id
                 LEFT JOIN blacklist_instance bi ON player_stats.fastest_instance_id = bi.instance_id
                 LEFT JOIN activity_version av ON fastest.hash = av.hash
+                LEFT JOIN (
+                    SELECT DISTINCT av2.activity_id
+                    FROM activity_version av2
+                    WHERE av2.version_id = 32
+                ) fa_cact ON fa_cact.activity_id = activity_definition.id
                 ORDER BY activity_definition.id`,
                 {
                     params: [membershipId],
@@ -142,19 +155,35 @@ export const getWorldFirstEntries = async (membershipId: bigint | string) => {
                 `
                 SELECT DISTINCT ON (activity_definition.id)
                     activity_definition.id::int AS "activityId",
-                    rank::int,
-                    instance_id AS "instanceId",
-                    time_after_launch::int AS "timeAfterLaunch",
-                    (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') ELSE false END) AS "isDayOne",
-                    (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') ELSE false END) AS "isContest",
-                    (CASE WHEN instance_id IS NOT NULL THEN date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') ELSE false END) AS "isWeekOne",
-                    COALESCE(is_challenge_mode, false) AS "isChallengeMode"
-                FROM world_first_contest_leaderboard
-                JOIN activity_definition ON world_first_contest_leaderboard.activity_id = activity_definition.id
-                WHERE membership_ids @> $1::jsonb
-                    AND rank <= 500
+                    wf.rank::int AS "rank",
+                    wf.instance_id AS "instanceId",
+                    wf.time_after_launch::int AS "timeAfterLaunch",
+                    (CASE WHEN wf.instance_id IS NOT NULL THEN wf.date_completed < COALESCE(activity_definition.day_one_end, TIMESTAMP 'epoch') ELSE false END) AS "isDayOne",
+                    (
+                        CASE
+                            WHEN wf.instance_id IS NULL THEN false
+                            WHEN wf_cact.activity_id IS NOT NULL THEN (
+                                av.version_id = 32
+                                AND i.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                            )
+                            ELSE i.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                        END
+                    ) AS "isContest",
+                    (CASE WHEN wf.instance_id IS NOT NULL THEN wf.date_completed < COALESCE(activity_definition.week_one_end, TIMESTAMP 'epoch') ELSE false END) AS "isWeekOne",
+                    COALESCE(wf.is_challenge_mode, false) AS "isChallengeMode"
+                FROM world_first_contest_leaderboard wf
+                JOIN activity_definition ON wf.activity_id = activity_definition.id
+                LEFT JOIN instance i ON i.instance_id = wf.instance_id
+                LEFT JOIN activity_version av ON av.hash = i.hash
+                LEFT JOIN (
+                    SELECT DISTINCT av2.activity_id
+                    FROM activity_version av2
+                    WHERE av2.version_id = 32
+                ) wf_cact ON wf_cact.activity_id = activity_definition.id
+                WHERE wf.membership_ids @> $1::jsonb
+                    AND wf.rank <= 500
                     AND activity_definition.is_raid = true
-                ORDER BY activity_definition.id ASC, rank ASC;`,
+                ORDER BY activity_definition.id ASC, wf.rank ASC;`,
                 { params: [`${[membershipId]}`] }
             )
     )

@@ -39,7 +39,8 @@ export const zInstance = registry.register(
                 description: "If the instance was completed before the day one end date"
             }),
             isContest: z.boolean().openapi({
-                description: "If the instance was completed before the contest end date"
+                description:
+                    "If this clear was contest mode: when the activity exposes version_id 32 (contest) on activity_version, true only for that version while still before contest_end; otherwise true when completed before contest_end (legacy raids)."
             }),
             isWeekOne: z.boolean().openapi({
                 description: "If the instance was completed before the week one end date"

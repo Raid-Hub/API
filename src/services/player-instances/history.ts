@@ -53,7 +53,15 @@ export const getActivities = async (
                     duration::int AS "duration",
                     platform_type AS "platformType",
                     date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
-                    date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
+                    (
+                        CASE
+                            WHEN ph_cact.activity_id IS NOT NULL THEN (
+                                av.version_id = 32
+                                AND instance.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                            )
+                            ELSE instance.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                        END
+                    ) AS "isContest",
                     date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
                     (bi.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted",
                     JSONB_BUILD_OBJECT(
@@ -67,6 +75,11 @@ export const getActivities = async (
                 LEFT JOIN blacklist_instance bi USING (instance_id)
                 INNER JOIN activity_version av USING (hash)
                 INNER JOIN activity_definition ON activity_definition.id = av.activity_id
+                LEFT JOIN (
+                    SELECT DISTINCT avc.activity_id
+                    FROM activity_version avc
+                    WHERE avc.version_id = 32
+                ) ph_cact ON ph_cact.activity_id = activity_definition.id
                 WHERE membership_id = $1::bigint
                 ${cursor ? `AND date_completed < $${++paramIndex}` : ""}
                 ${cutoff ? `AND date_completed > $${++paramIndex}` : ""}
