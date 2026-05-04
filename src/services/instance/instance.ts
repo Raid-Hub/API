@@ -13,30 +13,43 @@ import { PlayerInfo } from "@/schema/components/PlayerInfo"
 export async function getInstance(instanceId: bigint | string): Promise<Instance | null> {
     return await pgReader.queryRow<Instance>(
         `SELECT
-            instance_id AS "instanceId",
-            hash AS "hash",
-            activity_id::int AS "activityId",
-            version_id::int AS "versionId",
-            completed AS "completed",
-            player_count::int AS "playerCount",
-            score::int AS "score",
-            fresh AS "fresh",
-            flawless AS "flawless",
-            skull_hashes AS "skullHashes",
-            date_started AS "dateStarted",
-            date_completed AS "dateCompleted",
-            season_id::int AS "season",
-            duration::int AS "duration",
-            platform_type AS "platformType",
-            date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
-            date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
-            date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
+            instance.instance_id AS "instanceId",
+            instance.hash AS "hash",
+            av.activity_id::int AS "activityId",
+            av.version_id::int AS "versionId",
+            instance.completed AS "completed",
+            instance.player_count::int AS "playerCount",
+            instance.score::int AS "score",
+            instance.fresh AS "fresh",
+            instance.flawless AS "flawless",
+            instance.skull_hashes AS "skullHashes",
+            instance.date_started AS "dateStarted",
+            instance.date_completed AS "dateCompleted",
+            instance.season_id::int AS "season",
+            instance.duration::int AS "duration",
+            instance.platform_type AS "platformType",
+            instance.date_completed < COALESCE(activity_definition.day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
+            (
+                CASE
+                    WHEN ig_cact.activity_id IS NOT NULL THEN (
+                        av.version_id = 32
+                        AND instance.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                    )
+                    ELSE instance.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                END
+            ) AS "isContest",
+            instance.date_completed < COALESCE(activity_definition.week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
             (b.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted"
         FROM instance
         INNER JOIN activity_version av USING (hash)
         INNER JOIN activity_definition ON activity_definition.id = av.activity_id
+        LEFT JOIN (
+            SELECT DISTINCT avc.activity_id
+            FROM activity_version avc
+            WHERE avc.version_id = 32
+        ) ig_cact ON ig_cact.activity_id = activity_definition.id
         LEFT JOIN blacklist_instance b USING (instance_id)
-        WHERE instance_id = $1::bigint
+        WHERE instance.instance_id = $1::bigint
         LIMIT 1;`,
         {
             params: [instanceId],

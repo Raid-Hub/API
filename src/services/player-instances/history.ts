@@ -37,24 +37,32 @@ export const getActivities = async (
 
             return await pgReader.queryRows<InstanceForPlayer>(
                 `SELECT
-                    instance_id AS "instanceId",
-                    hash AS "hash",
-                    activity_id::int AS "activityId",
-                    version_id::int AS "versionId",
+                    instance.instance_id AS "instanceId",
+                    instance.hash AS "hash",
+                    av.activity_id::int AS "activityId",
+                    av.version_id::int AS "versionId",
                     instance.completed AS "completed",
-                    player_count::int AS "playerCount",
-                    score::int AS "score",
-                    fresh AS "fresh",
-                    flawless AS "flawless",
-                    skull_hashes AS "skullHashes",
-                    date_started AS "dateStarted",
-                    date_completed AS "dateCompleted",
-                    season_id::int AS "season",
-                    duration::int AS "duration",
-                    platform_type AS "platformType",
-                    date_completed < COALESCE(day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
-                    date_completed < COALESCE(contest_end, TIMESTAMP 'epoch') AS "isContest",
-                    date_completed < COALESCE(week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
+                    instance.player_count::int AS "playerCount",
+                    instance.score::int AS "score",
+                    instance.fresh AS "fresh",
+                    instance.flawless AS "flawless",
+                    instance.skull_hashes AS "skullHashes",
+                    instance.date_started AS "dateStarted",
+                    instance.date_completed AS "dateCompleted",
+                    instance.season_id::int AS "season",
+                    instance.duration::int AS "duration",
+                    instance.platform_type AS "platformType",
+                    instance.date_completed < COALESCE(activity_definition.day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
+                    (
+                        CASE
+                            WHEN ph_cact.activity_id IS NOT NULL THEN (
+                                av.version_id = 32
+                                AND instance.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                            )
+                            ELSE instance.date_completed < COALESCE(activity_definition.contest_end, TIMESTAMP 'epoch')
+                        END
+                    ) AS "isContest",
+                    instance.date_completed < COALESCE(activity_definition.week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
                     (bi.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted",
                     JSONB_BUILD_OBJECT(
                         'completed', instance_player.completed,
@@ -67,10 +75,15 @@ export const getActivities = async (
                 LEFT JOIN blacklist_instance bi USING (instance_id)
                 INNER JOIN activity_version av USING (hash)
                 INNER JOIN activity_definition ON activity_definition.id = av.activity_id
+                LEFT JOIN (
+                    SELECT DISTINCT avc.activity_id
+                    FROM activity_version avc
+                    WHERE avc.version_id = 32
+                ) ph_cact ON ph_cact.activity_id = activity_definition.id
                 WHERE membership_id = $1::bigint
-                ${cursor ? `AND date_completed < $${++paramIndex}` : ""}
-                ${cutoff ? `AND date_completed > $${++paramIndex}` : ""}
-                ORDER BY date_completed DESC
+                ${cursor ? `AND instance.date_completed < $${++paramIndex}` : ""}
+                ${cutoff ? `AND instance.date_completed > $${++paramIndex}` : ""}
+                ORDER BY instance.date_completed DESC
                 LIMIT $2;`,
                 // Note: the use of strictly less than is important because the cursor is the date of the last activity
                 // that was fetched. If we used less than or equal to, we would fetch the same activity twice.
