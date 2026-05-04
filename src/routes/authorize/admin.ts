@@ -1,5 +1,6 @@
 import { generateJWT } from "@/auth/jwt"
 import { RaidHubRoute } from "@/core/RaidHubRoute"
+import { timingSafeStringEqual } from "@/lib/timingSafeSecret"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zDigitString } from "@/schema/input"
 import { zISO8601DateString } from "@/schema/output"
@@ -31,7 +32,7 @@ export const adminAuthorizationRoute = new RaidHubRoute({
         ]
     },
     async handler({ body }) {
-        if (body.adminClientSecret === process.env.ADMIN_CLIENT_SECRET) {
+        if (timingSafeStringEqual(process.env.ADMIN_CLIENT_SECRET, body.adminClientSecret)) {
             return RaidHubRoute.ok({
                 value: generateJWT(
                     {

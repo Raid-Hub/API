@@ -1,3 +1,4 @@
+import "@/auth/express-discord-context"
 import "@/lib/extensions"
 import "@/lib/instrument"
 

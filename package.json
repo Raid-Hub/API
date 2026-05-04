@@ -52,6 +52,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.908.0",
     "@clickhouse/client": "^1.5.0",
+    "@libsql/client": "0.14.0",
     "@sentry/bun": "^10.23.0",
     "@types/pg": "^8.15.6",
     "amqplib": "^0.10.3",

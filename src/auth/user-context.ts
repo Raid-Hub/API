@@ -19,9 +19,34 @@ const authorizationHeaderValue = (headers: IncomingHttpHeaders): string | undefi
     return raw
 }
 
+const USER_JWT_HEADER = "x-raidhub-user-authorization"
+
+const pickHeader = (headers: IncomingHttpHeaders, name: string): string | undefined => {
+    const raw = headers[name]
+    if (raw === undefined) return undefined
+    if (Array.isArray(raw)) return raw[0]
+    return raw
+}
+
+/** Prefer extension header so clients can send ``Authorization: Discord …`` plus a user JWT. */
+const extractUserBearerCandidate = (headers: IncomingHttpHeaders): string | undefined => {
+    const fromExt = pickHeader(headers, USER_JWT_HEADER)
+    if (fromExt) {
+        const t = extractBearerToken(fromExt)
+        if (t) {
+            return t
+        }
+        const trimmed = fromExt.trim()
+        if (trimmed.startsWith("eyJ")) {
+            return trimmed
+        }
+    }
+    return extractBearerToken(authorizationHeaderValue(headers)) ?? undefined
+}
+
 /** Parse Bearer JWT into auth context (used by Express middleware and route $mock). */
 export const authFromHeaders = (headers: IncomingHttpHeaders): JWTAuthContext | undefined => {
-    const token = extractBearerToken(authorizationHeaderValue(headers))
+    const token = extractUserBearerCandidate(headers)
     if (!token) return undefined
 
     try {
