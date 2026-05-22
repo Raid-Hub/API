@@ -176,4 +176,19 @@ describe("zSplitCommaSeparatedString", () => {
             }
         })
     })
+
+    test("should pass an input array, but still checks the items", () => {
+        const schema = zSplitCommaSeparatedString(zBigIntString())
+        const invalidArrayInput = [123123n, "qweqwe"]
+        const validArrayInput = [123, 123123]
+
+        const invalidResult = schema.safeParse(invalidArrayInput)
+        expect(invalidResult.success).toBe(false)
+
+        const validResult = schema.safeParse(validArrayInput)
+        expect(validResult.success).toBe(true)
+        if (validResult.success) {
+            expect(validResult.data).toEqual([123n, 123123n])
+        }
+    })
 })

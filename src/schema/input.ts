@@ -1,4 +1,4 @@
-import { ZodBooleanDef, ZodDateDef, ZodNullable, ZodStringDef, ZodType, ZodTypeAny, z } from "zod"
+import { ZodBooleanDef, ZodDateDef, ZodNullable, ZodStringDef, ZodType, ZodTypeAny, z, ZodArray } from "zod"
 
 // ===== INPUT SCHEMAS (for parsing/coercing user input) =====
 
@@ -44,12 +44,21 @@ export const zDigitString = () =>
 // Input param that will be coerced to a BigInt
 export const zBigIntString = () => zDigitString().transform(val => BigInt(val))
 
-export const zSplitCommaSeparatedString = <T extends ZodTypeAny>(schema: T) =>
-    z.array(
-        z.preprocess(val => {
+export const zSplitCommaSeparatedString = <T extends ZodTypeAny, ResultingArray extends ZodTypeAny>(
+    itemSchema: T,
+    extendArraySchema?: (arraySchema: z.ZodArray<T>) => ResultingArray
+) => {
+    const finalArraySchema = extendArraySchema
+        ? extendArraySchema(z.array(itemSchema))
+        : z.array(itemSchema)
+
+    return z.preprocess(
+        val => {
             if (typeof val === "string") {
-                return val.split(",")
+                return val.split(",").map(s => s.trim())
             }
             return val
-        }, schema)
+        },
+        finalArraySchema
     )
+}
