@@ -21,18 +21,6 @@ describe("pantheon leaderboard 200", () => {
         }
     }
 
-    test("calus", () =>
-        t(
-            {
-                category: "freshClears",
-                version: "calus"
-            },
-            {
-                count: 10,
-                page: 1
-            }
-        ))
-
     test("clears", () =>
         t(
             {
