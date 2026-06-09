@@ -125,17 +125,11 @@ describe("getGauntletVersionIds", () => {
                     },
 
                     {
-
-                        id: 134,
-
-                        name: "Pantheon Gauntlet",
-
+                        id: 200,
+                        name: "Gauntlet Mode",
                         path: GAUNTLET_VERSION_PATH,
-
                         associatedActivityId: 102,
-
                         isChallengeMode: false
-
                     }
 
                 ],
@@ -144,7 +138,7 @@ describe("getGauntletVersionIds", () => {
 
             )
 
-        ).toEqual([134])
+        ).toEqual([200])
 
     })
 
