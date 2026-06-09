@@ -11,6 +11,11 @@ import {
     listHashes,
     listVersionDefinitions
 } from "@/services/manifest/definitions"
+import {
+    getGauntletVersionIds,
+    getPantheonActivityIds,
+    sortPantheonActivityIds
+} from "@/services/manifest/pantheon"
 import { TierBreaks } from "@/services/manifest/tiers"
 import { generateSplashUrls } from "@/services/manifest/urls"
 import { z } from "zod"
@@ -87,6 +92,10 @@ export const manifestRoute = new RaidHubRoute({
                             description: "The list of activityId for Pantheon"
                         })
                         .min(1),
+                    gauntletVersionIds: z.array(zNaturalNumber()).openapi({
+                        description:
+                            "The list of versionId for Pantheon gauntlet modes (full boss lineup)"
+                    }),
                     versionsForActivity: z.record(z.array(zNaturalNumber()).min(1)).openapi({
                         description: "The set of versionId for each activityId"
                     }),
@@ -120,7 +129,8 @@ export const manifestRoute = new RaidHubRoute({
             activitiesPromise.then(generateSplashUrls)
         ])
         const raids = activities.filter(a => a.isRaid)
-        const pantheonId = 101
+        const pantheonIds = sortPantheonActivityIds(activities, getPantheonActivityIds(activities))
+        const gauntletVersionIds = getGauntletVersionIds(versions, pantheonIds)
         const versionsSetForActivity: Record<number, Set<number>> = {}
         for (const { activityId, versionId } of hashes) {
             if (!versionsSetForActivity[activityId]) {
@@ -166,7 +176,8 @@ export const manifestRoute = new RaidHubRoute({
                 .filter(v => v.associatedActivityId && v.associatedActivityId < 100)
                 .map(a => a.associatedActivityId!),
             resprisedChallengeVersionIds: versions.filter(v => v.isChallengeMode).map(v => v.id),
-            pantheonIds: [pantheonId],
+            pantheonIds,
+            gauntletVersionIds,
             versionsForActivity: versionsForActivity,
             rankingTiers: TierBreaks,
             feats: feats,

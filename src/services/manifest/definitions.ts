@@ -4,6 +4,13 @@ import { ActivityDefinition } from "@/schema/components/ActivityDefinition"
 import { FeatDefinition } from "@/schema/components/FeatDefinition"
 import { VersionDefinition } from "@/schema/components/VersionDefinition"
 
+export const getActivityIdByPath = async (activityPath: string) => {
+    return await pgReader.queryRow<{ id: number }>(
+        `SELECT id::int FROM activity_definition WHERE path = $1`,
+        { params: [activityPath] }
+    )
+}
+
 export const getRaidId = async (raidPath: string) => {
     return await pgReader.queryRow<{ id: number }>(
         `SELECT id::int FROM activity_definition WHERE path = $1 AND is_raid`,

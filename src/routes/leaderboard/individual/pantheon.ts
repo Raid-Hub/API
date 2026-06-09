@@ -9,7 +9,7 @@ import {
     individualPantheonLeaderboardSortColumns,
     searchIndividualPantheonLeaderboard
 } from "@/services/leaderboard/individual/pantheon"
-import { getVersionId } from "@/services/manifest/definitions"
+import { getPantheonVersionId } from "@/services/manifest/pantheon"
 import { z } from "zod"
 
 const zCategory = z.enum(["clears", "freshClears", "score"])
@@ -59,7 +59,7 @@ export const leaderboardIndividualPantheonRoute = new RaidHubRoute({
 
         const { page, count, search } = req.query
 
-        const versionDefinition = await getVersionId(version, 101)
+        const versionDefinition = await getPantheonVersionId(version)
 
         if (!versionDefinition) {
             return RaidHubRoute.fail(ErrorCode.PantheonVersionNotFoundError, {
