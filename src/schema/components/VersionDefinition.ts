@@ -30,6 +30,27 @@ export const zVersionDefinition = registry.register(
                     path: "oryx",
                     associatedActivityId: 101,
                     isChallengeMode: false
+                },
+                {
+                    id: 132,
+                    name: "Calus Resplendent",
+                    path: "calus",
+                    associatedActivityId: 102,
+                    isChallengeMode: false
+                },
+                {
+                    id: 133,
+                    name: "Morgeth Surpassing",
+                    path: "morgeth",
+                    associatedActivityId: 102,
+                    isChallengeMode: false
+                },
+                {
+                    id: 134,
+                    name: "Pantheon Gauntlet",
+                    path: "gauntlet",
+                    associatedActivityId: 102,
+                    isChallengeMode: false
                 }
             ]
         })

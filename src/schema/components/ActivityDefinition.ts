@@ -22,18 +22,46 @@ export const zActivityDefinition = registry.register(
         .strict()
         .openapi({
             description: "The definition of an activity in the RaidHub database.",
-            example: {
-                id: 9,
-                name: "Vault of Glass",
-                path: "vaultofglass",
-                isSunset: false,
-                isRaid: true,
-                releaseDate: new Date("2021-05-22T00:00:00Z"),
-                dayOneEnd: new Date("2021-05-23T00:00:00Z"),
-                contestEnd: new Date("2021-05-23T00:00:00Z"),
-                weekOneEnd: new Date("2021-05-25T00:00:00Z"),
-                milestoneHash: 1888320892,
-                splashSlug: "vog"
-            }
+            examples: [
+                {
+                    id: 9,
+                    name: "Vault of Glass",
+                    path: "vaultofglass",
+                    isSunset: false,
+                    isRaid: true,
+                    releaseDate: new Date("2021-05-22T00:00:00Z"),
+                    dayOneEnd: new Date("2021-05-23T00:00:00Z"),
+                    contestEnd: new Date("2021-05-23T00:00:00Z"),
+                    weekOneEnd: new Date("2021-05-25T00:00:00Z"),
+                    milestoneHash: 1888320892,
+                    splashSlug: "vog"
+                },
+                {
+                    id: 101,
+                    name: "The Pantheon",
+                    path: "pantheon",
+                    isSunset: true,
+                    isRaid: false,
+                    releaseDate: new Date("2024-04-30T17:00:00Z"),
+                    dayOneEnd: null,
+                    contestEnd: null,
+                    weekOneEnd: null,
+                    milestoneHash: null,
+                    splashSlug: "pantheon"
+                },
+                {
+                    id: 102,
+                    name: "Pantheon",
+                    path: "pantheon",
+                    isSunset: false,
+                    isRaid: false,
+                    releaseDate: new Date("2026-06-09T17:00:00Z"),
+                    dayOneEnd: null,
+                    contestEnd: null,
+                    weekOneEnd: null,
+                    milestoneHash: null,
+                    splashSlug: "pantheon"
+                }
+            ]
         })
 )
