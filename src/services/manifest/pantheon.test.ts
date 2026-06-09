@@ -1,4 +1,9 @@
-import { getPantheonActivityIds, sortPantheonActivityIds } from "@/services/manifest/pantheon"
+import {
+    GAUNTLET_VERSION_PATH,
+    getGauntletVersionIds,
+    getPantheonActivityIds,
+    sortPantheonActivityIds
+} from "@/services/manifest/pantheon"
 import { describe, expect, test } from "bun:test"
 
 const pantheonActivity = {
@@ -70,5 +75,31 @@ describe("sortPantheonActivityIds", () => {
                 [101, 102]
             )
         ).toEqual([102, 101])
+    })
+})
+
+describe("getGauntletVersionIds", () => {
+    test("returns gauntlet versions associated with pantheon activities", () => {
+        expect(
+            getGauntletVersionIds(
+                [
+                    {
+                        id: 129,
+                        name: "Oryx Exalted",
+                        path: "oryx",
+                        associatedActivityId: 101,
+                        isChallengeMode: false
+                    },
+                    {
+                        id: 200,
+                        name: "Gauntlet Mode",
+                        path: GAUNTLET_VERSION_PATH,
+                        associatedActivityId: 102,
+                        isChallengeMode: false
+                    }
+                ],
+                [101, 102]
+            )
+        ).toEqual([200])
     })
 })

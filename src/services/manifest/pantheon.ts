@@ -1,8 +1,10 @@
 import { pgReader } from "@/integrations/postgres"
 import { ActivityDefinition } from "@/schema/components/ActivityDefinition"
+import { VersionDefinition } from "@/schema/components/VersionDefinition"
 
 export const PANTHEON_ACTIVITY_PATH = "pantheon"
 export const PANTHEON_SUNSET_ACTIVITY_PATH = "thepantheon"
+export const GAUNTLET_VERSION_PATH = "gauntlet"
 export const PANTHEON_ACTIVITY_PATHS = [
     PANTHEON_ACTIVITY_PATH,
     PANTHEON_SUNSET_ACTIVITY_PATH
@@ -34,6 +36,19 @@ export const sortPantheonActivityIds = (
         return b - a
     })
 }
+
+export const getGauntletVersionIds = (
+    versions: VersionDefinition[],
+    pantheonActivityIds: readonly number[]
+) =>
+    versions
+        .filter(
+            version =>
+                version.path === GAUNTLET_VERSION_PATH &&
+                version.associatedActivityId !== null &&
+                pantheonActivityIds.includes(version.associatedActivityId)
+        )
+        .map(version => version.id)
 
 export const getPantheonVersionId = async (versionPath: string) => {
     return await pgReader.queryRow<{ id: number }>(
