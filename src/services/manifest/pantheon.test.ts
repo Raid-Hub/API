@@ -16,7 +16,7 @@ const pantheonActivity = {
 } as const
 
 describe("getPantheonActivityIds", () => {
-    test("returns activities with the pantheon path", () => {
+    test("returns activities with pantheon or legacy thepantheon paths", () => {
         expect(
             getPantheonActivityIds([
                 {
@@ -35,7 +35,7 @@ describe("getPantheonActivityIds", () => {
                 {
                     id: 101,
                     name: "The Pantheon",
-                    path: "pantheon",
+                    path: "thepantheon",
                     isSunset: true,
                     ...pantheonActivity
                 },
@@ -59,7 +59,7 @@ describe("sortPantheonActivityIds", () => {
                     {
                         id: 101,
                         name: "The Pantheon",
-                        path: "pantheon",
+                        path: "thepantheon",
                         isSunset: true,
                         ...pantheonActivity
                     },
@@ -109,7 +109,7 @@ describe("getPantheonVersionIds", () => {
                     {
                         id: 101,
                         name: "The Pantheon",
-                        path: "pantheon",
+                        path: "thepantheon",
                         isSunset: true,
                         ...pantheonActivity
                     },

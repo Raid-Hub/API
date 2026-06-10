@@ -4,7 +4,10 @@ const SKULL_ADVENTURE_TIME_ON_YOUR_SIDE = 845104503
 const SKULL_ADVENTURE_FIXED = 2008962334
 const SKULL_EMPTY_FEAT = 790421403
 
-export function dedupeSkullHashes(skullHashes: readonly number[]): number[] {
+export function dedupeSkullHashes(skullHashes: readonly number[] | null | undefined): number[] {
+    if (!skullHashes?.length) {
+        return []
+    }
     const seen = new Set<number>()
     const out: number[] = []
     for (const skull of skullHashes) {
@@ -19,7 +22,7 @@ export function dedupeSkullHashes(skullHashes: readonly number[]): number[] {
 
 /** Classify difficulty tier from deduplicated PGCR skulls and feat skulls resolved at query time. */
 export function classifyDifficultyTier(
-    skullHashes: readonly number[],
+    skullHashes: readonly number[] | null | undefined,
     knownFeatSkulls: ReadonlySet<number>,
     activityHasTierCollection: boolean
 ): DifficultyTier | null {

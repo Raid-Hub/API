@@ -2,8 +2,8 @@ import { pgReader } from "@/integrations/postgres"
 import { DifficultyTier } from "@/schema/enums/DifficultyTier"
 import { activityHasTierCollection, classifyDifficultyTier } from "./classify"
 
-async function loadKnownFeatSkulls(skullHashes: readonly number[]): Promise<Set<number>> {
-    const unique = [...new Set(skullHashes.filter(skull => skull !== 0))]
+async function loadKnownFeatSkulls(skullHashes: readonly number[] | null | undefined): Promise<Set<number>> {
+    const unique = [...new Set((skullHashes ?? []).filter(skull => skull !== 0))]
     if (unique.length === 0) {
         return new Set()
     }
@@ -19,7 +19,7 @@ async function loadKnownFeatSkulls(skullHashes: readonly number[]): Promise<Set<
 }
 
 type InstanceWithSkulls = {
-    skullHashes: readonly number[]
+    skullHashes: readonly number[] | null | undefined
     activityId: number
 }
 
@@ -48,7 +48,7 @@ export async function attachDifficultyTiers<T extends InstanceWithSkulls>(
         return []
     }
 
-    const allSkulls = instances.flatMap(instance => instance.skullHashes)
+    const allSkulls = instances.flatMap(instance => instance.skullHashes ?? [])
     const knownFeatSkulls = await loadKnownFeatSkulls(allSkulls)
 
     return instances.map(instance => ({

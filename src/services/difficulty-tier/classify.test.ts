@@ -50,4 +50,9 @@ describe("classifyDifficultyTier", () => {
     it("returns null for non-tier activities", () => {
         expect(classifyDifficultyTier([], knownFeats, false)).toBeNull()
     })
+
+    it("handles null skull hashes", () => {
+        expect(classifyDifficultyTier(null, knownFeats, false)).toBeNull()
+        expect(classifyDifficultyTier(null, knownFeats, true)).toBe(DifficultyTier.Standard)
+    })
 })
