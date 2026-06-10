@@ -3,8 +3,10 @@ import { ActivityDefinition } from "@/schema/components/ActivityDefinition"
 import { VersionDefinition } from "@/schema/components/VersionDefinition"
 
 export const PANTHEON_ACTIVITY_PATH = "pantheon"
+export const PANTHEON_ACTIVITY_PATHS = ["pantheon", "thepantheon"] as const
 
-const isPantheonActivity = (activity: ActivityDefinition) => activity.path === PANTHEON_ACTIVITY_PATH
+const isPantheonActivity = (activity: ActivityDefinition) =>
+    PANTHEON_ACTIVITY_PATHS.includes(activity.path as (typeof PANTHEON_ACTIVITY_PATHS)[number])
 
 export const getPantheonActivityIds = (activities: ActivityDefinition[]) =>
     activities.filter(isPantheonActivity).map(activity => activity.id)
@@ -65,9 +67,9 @@ export const getPantheonVersionId = async (versionPath: string) => {
         `SELECT vd.id::int
          FROM version_definition vd
          INNER JOIN activity_definition ad ON ad.id = vd.associated_activity_id
-         WHERE vd.path = $1 AND ad.path = $2
+         WHERE vd.path = $1 AND ad.path = ANY($2::text[])
          ORDER BY ad.is_sunset ASC, ad.id DESC
          LIMIT 1`,
-        { params: [versionPath, PANTHEON_ACTIVITY_PATH] }
+        { params: [versionPath, PANTHEON_ACTIVITY_PATHS] }
     )
 }
