@@ -17,7 +17,7 @@ import {
     sortPantheonActivityIds
 } from "@/services/manifest/pantheon"
 import { TierBreaks } from "@/services/manifest/tiers"
-import { generateSplashUrls } from "@/services/manifest/urls"
+import { generateSplashUrls, generateVersionSplashUrls } from "@/services/manifest/urls"
 import { z } from "zod"
 
 export const manifestRoute = new RaidHubRoute({
@@ -116,6 +116,12 @@ export const manifestRoute = new RaidHubRoute({
                         .openapi({
                             description:
                                 "The mapping of each RaidHub activityId to its splash image URLs"
+                        }),
+                    versionSplashUrls: z
+                        .record(zNumericalRecordKey(), z.array(zImageContentData))
+                        .openapi({
+                            description:
+                                "The mapping of each RaidHub versionId to its splash image URLs"
                         })
                 })
                 .strict()
@@ -123,13 +129,16 @@ export const manifestRoute = new RaidHubRoute({
     },
     handler: async () => {
         const activitiesPromise = listActivityDefinitions()
-        const [activities, versions, hashes, feats, splashUrls] = await Promise.all([
-            activitiesPromise,
-            listVersionDefinitions(),
-            listHashes(),
-            listFeatDefinitions(),
-            activitiesPromise.then(generateSplashUrls)
-        ])
+        const versionsPromise = listVersionDefinitions()
+        const [activities, versions, hashes, feats, splashUrls, versionSplashUrls] =
+            await Promise.all([
+                activitiesPromise,
+                versionsPromise,
+                listHashes(),
+                listFeatDefinitions(),
+                activitiesPromise.then(generateSplashUrls),
+                versionsPromise.then(generateVersionSplashUrls)
+            ])
         const raids = activities.filter(a => a.isRaid)
         const pantheonIds = sortPantheonActivityIds(activities, getPantheonActivityIds(activities))
         const { pantheonVersionIds, pantheonSunsetVersionIds } = getPantheonVersionIds(
@@ -188,7 +197,8 @@ export const manifestRoute = new RaidHubRoute({
             versionsForActivity: versionsForActivity,
             rankingTiers: TierBreaks,
             feats: feats,
-            splashUrls: splashUrls
+            splashUrls: splashUrls,
+            versionSplashUrls: versionSplashUrls
         })
     }
 })

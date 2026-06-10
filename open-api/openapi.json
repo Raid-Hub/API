@@ -2323,6 +2323,16 @@
               }
             },
             "description": "The mapping of each RaidHub activityId to its splash image URLs"
+          },
+          "versionSplashUrls": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ImageContentData"
+              }
+            },
+            "description": "The mapping of each RaidHub versionId to its splash image URLs"
           }
         },
         "required": [
@@ -2342,7 +2352,8 @@
           "versionsForActivity",
           "rankingTiers",
           "feats",
-          "splashUrls"
+          "splashUrls",
+          "versionSplashUrls"
         ],
         "additionalProperties": false
       },
