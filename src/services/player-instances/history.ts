@@ -3,6 +3,7 @@ import { convertUInt32Value } from "@/integrations/postgres/transformer"
 import { activityHistoryQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { InstanceForPlayer } from "@/schema/components/InstanceForPlayer"
+import { attachDifficultyTiers } from "@/services/difficulty-tier/resolve"
 
 export const getActivities = async (
     membershipId: bigint | string,
@@ -35,7 +36,7 @@ export const getActivities = async (
                 params.push(cutoff)
             }
 
-            return await pgReader.queryRows<InstanceForPlayer>(
+            const rows = await pgReader.queryRows<Omit<InstanceForPlayer, "difficultyTier">>(
                 `SELECT
                     instance.instance_id AS "instanceId",
                     instance.hash AS "hash",
@@ -47,7 +48,6 @@ export const getActivities = async (
                     instance.fresh AS "fresh",
                     instance.flawless AS "flawless",
                     instance.skull_hashes AS "skullHashes",
-                    instance.difficulty_tier AS "difficultyTier",
                     instance.date_started AS "dateStarted",
                     instance.date_completed AS "dateCompleted",
                     instance.season_id::int AS "season",
@@ -96,6 +96,8 @@ export const getActivities = async (
                     }
                 }
             )
+
+            return attachDifficultyTiers(rows)
         }
     )
 }

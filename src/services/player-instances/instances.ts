@@ -5,6 +5,7 @@ import {
     convertUInt32Value
 } from "@/integrations/postgres/transformer"
 import { InstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
+import { attachDifficultyTiers } from "@/services/difficulty-tier/resolve"
 
 export async function getInstances({
     count,
@@ -121,7 +122,7 @@ export async function getInstances({
 
     params.push(count)
 
-    return await pgReader.queryRows<InstanceWithPlayers>(
+    const rows = await pgReader.queryRows<Omit<InstanceWithPlayers, "difficultyTier">>(
         `WITH _player_instances AS (${playerStmnts.join(" INTERSECT ")}) 
         SELECT
             instance.instance_id AS "instanceId",
@@ -134,7 +135,6 @@ export async function getInstances({
             instance.fresh AS "fresh",
             instance.flawless AS "flawless",
             instance.skull_hashes AS "skullHashes",
-            instance.difficulty_tier AS "difficultyTier",
             instance.date_started AS "dateStarted",
             instance.date_completed AS "dateCompleted",
             instance.season_id::int AS "season",
@@ -200,4 +200,6 @@ export async function getInstances({
             }
         }
     )
+
+    return attachDifficultyTiers(rows)
 }
