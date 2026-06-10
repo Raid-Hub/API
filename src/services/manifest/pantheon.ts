@@ -4,7 +4,8 @@ import { VersionDefinition } from "@/schema/components/VersionDefinition"
 
 export const PANTHEON_ACTIVITY_PATH = "pantheon"
 
-const isPantheonActivity = (activity: ActivityDefinition) => activity.path === PANTHEON_ACTIVITY_PATH
+const isPantheonActivity = (activity: ActivityDefinition) =>
+    activity.path === PANTHEON_ACTIVITY_PATH
 
 export const getPantheonActivityIds = (activities: ActivityDefinition[]) =>
     activities.filter(isPantheonActivity).map(activity => activity.id)

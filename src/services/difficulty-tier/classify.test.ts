@@ -1,5 +1,5 @@
-import { describe, expect, it } from "bun:test"
 import { DifficultyTier } from "@/schema/enums/DifficultyTier"
+import { describe, expect, it } from "bun:test"
 import { classifyDifficultyTier } from "./classify"
 
 const EMPTY_FEAT = 790421403
@@ -12,9 +12,7 @@ describe("classifyDifficultyTier", () => {
     const knownFeats = new Set([PHASE_LIMIT, CUTTHROAT, TOKEN_LIMIT])
 
     it("returns adventure when adventure skull is present", () => {
-        expect(classifyDifficultyTier([ADVENTURE], knownFeats, true)).toBe(
-            DifficultyTier.Adventure
-        )
+        expect(classifyDifficultyTier([ADVENTURE], knownFeats, true)).toBe(DifficultyTier.Adventure)
     })
 
     it("returns standard for featured custom with only empty feat", () => {
@@ -28,9 +26,9 @@ describe("classifyDifficultyTier", () => {
     })
 
     it("returns standard for customize-portal baseline feats", () => {
-        expect(
-            classifyDifficultyTier([EMPTY_FEAT, PHASE_LIMIT, CUTTHROAT], knownFeats, true)
-        ).toBe(DifficultyTier.Standard)
+        expect(classifyDifficultyTier([EMPTY_FEAT, PHASE_LIMIT, CUTTHROAT], knownFeats, true)).toBe(
+            DifficultyTier.Standard
+        )
     })
 
     it("returns custom for customize-portal with an extra feat", () => {

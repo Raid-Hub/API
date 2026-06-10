@@ -2,7 +2,9 @@ import { pgReader } from "@/integrations/postgres"
 import { DifficultyTier } from "@/schema/enums/DifficultyTier"
 import { activityHasTierCollection, classifyDifficultyTier } from "./classify"
 
-async function loadKnownFeatSkulls(skullHashes: readonly number[] | null | undefined): Promise<Set<number>> {
+async function loadKnownFeatSkulls(
+    skullHashes: readonly number[] | null | undefined
+): Promise<Set<number>> {
     const unique = [...new Set((skullHashes ?? []).filter(skull => skull !== 0))]
     if (unique.length === 0) {
         return new Set()
