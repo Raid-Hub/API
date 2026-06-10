@@ -39,7 +39,7 @@ export const zActivityDefinition = registry.register(
                 {
                     id: 101,
                     name: "The Pantheon",
-                    path: "thepantheon",
+                    path: "pantheon",
                     isSunset: true,
                     isRaid: false,
                     releaseDate: new Date("2024-04-30T17:00:00Z"),

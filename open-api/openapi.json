@@ -1388,7 +1388,7 @@
           {
             "id": 101,
             "name": "The Pantheon",
-            "path": "thepantheon",
+            "path": "pantheon",
             "isSunset": true,
             "isRaid": false,
             "releaseDate": "2024-04-30T17:00:00.000Z",
