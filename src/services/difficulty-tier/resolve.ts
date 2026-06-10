@@ -1,4 +1,5 @@
 import { pgReader } from "@/integrations/postgres"
+import { convertUInt32Value } from "@/integrations/postgres/transformer"
 import { DifficultyTier } from "@/schema/enums/DifficultyTier"
 import { activityHasTierCollection, classifyDifficultyTier } from "./classify"
 
@@ -11,10 +12,13 @@ async function loadKnownFeatSkulls(
     }
 
     const rows = await pgReader.queryRows<{ skullHash: number }>(
-        `SELECT skull_hash::int AS "skullHash"
+        `SELECT skull_hash AS "skullHash"
          FROM activity_feat_definition
          WHERE skull_hash = ANY($1::bigint[])`,
-        { params: [unique] }
+        {
+            params: [unique],
+            transformers: { skullHash: convertUInt32Value }
+        }
     )
 
     return new Set(rows.map(row => row.skullHash))
