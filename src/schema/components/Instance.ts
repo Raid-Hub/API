@@ -1,4 +1,5 @@
 import { zDestinyMembershipType } from "@/schema/enums/DestinyMembershipType"
+import { zDifficultyTier } from "@/schema/enums/DifficultyTier"
 import { zInt64, zISO8601DateString, zNaturalNumber, zUInt32, zWholeNumber } from "@/schema/output"
 import { registry } from "@/schema/registry"
 import { z } from "zod"
@@ -15,6 +16,7 @@ const zInstancePrimitive = z.object({
             description: "Mapped to a FeatDefinition by its skullHash"
         })
     ),
+    difficultyTier: zDifficultyTier.nullable(),
     score: zWholeNumber(),
     dateStarted: zISO8601DateString(),
     dateCompleted: zISO8601DateString(),

@@ -9,9 +9,12 @@ import { InstanceExtended } from "@/schema/components/InstanceExtended"
 import { InstanceMetadata } from "@/schema/components/InstanceMetadata"
 import { InstancePlayerExtended } from "@/schema/components/InstancePlayerExtended"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
+import { attachDifficultyTier, resolveDifficultyTier } from "@/services/difficulty-tier/resolve"
+
+type InstanceRow = Omit<Instance, "difficultyTier">
 
 export async function getInstance(instanceId: bigint | string): Promise<Instance | null> {
-    return await pgReader.queryRow<Instance>(
+    const instance = await pgReader.queryRow<InstanceRow>(
         `SELECT
             instance.instance_id AS "instanceId",
             instance.hash AS "hash",
@@ -59,6 +62,12 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
             }
         }
     )
+
+    if (!instance) {
+        return null
+    }
+
+    return attachDifficultyTier(instance)
 }
 
 export async function getInstanceExtended(
@@ -196,26 +205,30 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
     )
 }
 
-export async function getInstanceBasic(instanceId: bigint | string) {
-    const instance = await pgReader.queryRow<InstanceBasic>(
+type InstanceBasicRow = Omit<InstanceBasic, "difficultyTier"> & { activityId: number }
+
+export async function getInstanceBasic(instanceId: bigint | string): Promise<InstanceBasic | null> {
+    const instance = await pgReader.queryRow<InstanceBasicRow>(
         `SELECT
-            instance_id AS "instanceId",
-            hash AS "hash",
-            completed AS "completed",
-            player_count::int AS "playerCount",
-            score::int AS "score",
-            fresh AS "fresh",
-            flawless AS "flawless",
-            skull_hashes AS "skullHashes",
-            date_started AT TIME ZONE 'UTC' AS "dateStarted",
-            date_completed AT TIME ZONE 'UTC' AS "dateCompleted",
-            season_id::int AS "season",
-            duration::int AS "duration",
-            platform_type AS "platformType",
+            instance.instance_id AS "instanceId",
+            instance.hash AS "hash",
+            av.activity_id::int AS "activityId",
+            instance.completed AS "completed",
+            instance.player_count::int AS "playerCount",
+            instance.score::int AS "score",
+            instance.fresh AS "fresh",
+            instance.flawless AS "flawless",
+            instance.skull_hashes AS "skullHashes",
+            instance.date_started AT TIME ZONE 'UTC' AS "dateStarted",
+            instance.date_completed AT TIME ZONE 'UTC' AS "dateCompleted",
+            instance.season_id::int AS "season",
+            instance.duration::int AS "duration",
+            instance.platform_type AS "platformType",
             pgcr.date_crawled AS "dateResolved"
         FROM instance
         JOIN pgcr USING (instance_id)
-        WHERE instance_id = $1::bigint
+        JOIN activity_version av USING (hash)
+        WHERE instance.instance_id = $1::bigint
         LIMIT 1;`,
         {
             params: [instanceId],
@@ -226,7 +239,27 @@ export async function getInstanceBasic(instanceId: bigint | string) {
         }
     )
 
-    return instance
+    if (!instance) {
+        return null
+    }
+
+    return {
+        instanceId: instance.instanceId,
+        hash: instance.hash,
+        completed: instance.completed,
+        playerCount: instance.playerCount,
+        score: instance.score,
+        fresh: instance.fresh,
+        flawless: instance.flawless,
+        skullHashes: instance.skullHashes,
+        dateStarted: instance.dateStarted,
+        dateCompleted: instance.dateCompleted,
+        season: instance.season,
+        duration: instance.duration,
+        platformType: instance.platformType,
+        dateResolved: instance.dateResolved,
+        difficultyTier: await resolveDifficultyTier(instance)
+    }
 }
 
 export async function getInstancePlayerInfo(instanceId: bigint | string) {

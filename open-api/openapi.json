@@ -218,6 +218,11 @@
         },
         "required": ["issues"]
       },
+      "DifficultyTier": {
+        "type": "string",
+        "enum": ["adventure", "standard", "custom"],
+        "description": "MotT difficulty tier derived at read time from instance skull_hashes and activity_feat_definition. Adventure uses fixed skulls; Custom has selected feats; Standard is Custom with no feats."
+      },
       "DestinyMembershipType": {
         "type": "integer",
         "enum": [0, 1, 2, 3, 4, 5, 6, -1],
@@ -261,6 +266,10 @@
               "description": "Mapped to a FeatDefinition by its skullHash",
               "format": "uint32"
             }
+          },
+          "difficultyTier": {
+            "nullable": true,
+            "$ref": "#/components/schemas/DifficultyTier"
           },
           "score": {
             "type": "integer",
@@ -330,6 +339,7 @@
           "fresh",
           "playerCount",
           "skullHashes",
+          "difficultyTier",
           "score",
           "dateStarted",
           "dateCompleted",
@@ -382,6 +392,10 @@
               "format": "uint32"
             }
           },
+          "difficultyTier": {
+            "nullable": true,
+            "$ref": "#/components/schemas/DifficultyTier"
+          },
           "score": {
             "type": "integer",
             "minimum": 0
@@ -428,6 +442,7 @@
           "fresh",
           "playerCount",
           "skullHashes",
+          "difficultyTier",
           "score",
           "dateStarted",
           "dateCompleted",
@@ -1373,7 +1388,7 @@
           {
             "id": 101,
             "name": "The Pantheon",
-            "path": "thepantheon",
+            "path": "pantheon",
             "isSunset": true,
             "isRaid": false,
             "releaseDate": "2024-04-30T17:00:00.000Z",
@@ -2241,14 +2256,23 @@
             "minItems": 1,
             "description": "The list of activityId for Pantheon"
           },
-          "gauntletVersionIds": {
+          "pantheonVersionIds": {
             "type": "array",
             "items": {
               "type": "integer",
               "minimum": 0,
               "exclusiveMinimum": true
             },
-            "description": "The list of versionId for Pantheon gauntlet modes (full boss lineup)"
+            "description": "Active Pantheon versionId values in display order"
+          },
+          "pantheonSunsetVersionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "description": "Sunset Pantheon versionId values in display order"
           },
           "versionsForActivity": {
             "type": "object",
@@ -2313,7 +2337,8 @@
           "resprisedRaidIds",
           "resprisedChallengeVersionIds",
           "pantheonIds",
-          "gauntletVersionIds",
+          "pantheonVersionIds",
+          "pantheonSunsetVersionIds",
           "versionsForActivity",
           "rankingTiers",
           "feats",
