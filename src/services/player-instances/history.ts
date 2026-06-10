@@ -47,6 +47,7 @@ export const getActivities = async (
                     instance.fresh AS "fresh",
                     instance.flawless AS "flawless",
                     instance.skull_hashes AS "skullHashes",
+                    instance.difficulty_tier AS "difficultyTier",
                     instance.date_started AS "dateStarted",
                     instance.date_completed AS "dateCompleted",
                     instance.season_id::int AS "season",
