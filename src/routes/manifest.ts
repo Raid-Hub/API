@@ -12,8 +12,8 @@ import {
     listVersionDefinitions
 } from "@/services/manifest/definitions"
 import {
-    getGauntletVersionIds,
     getPantheonActivityIds,
+    getPantheonVersionIds,
     sortPantheonActivityIds
 } from "@/services/manifest/pantheon"
 import { TierBreaks } from "@/services/manifest/tiers"
@@ -92,9 +92,11 @@ export const manifestRoute = new RaidHubRoute({
                             description: "The list of activityId for Pantheon"
                         })
                         .min(1),
-                    gauntletVersionIds: z.array(zNaturalNumber()).openapi({
-                        description:
-                            "The list of versionId for Pantheon gauntlet modes (full boss lineup)"
+                    pantheonVersionIds: z.array(zNaturalNumber()).openapi({
+                        description: "Active Pantheon versionId values in display order"
+                    }),
+                    pantheonSunsetVersionIds: z.array(zNaturalNumber()).openapi({
+                        description: "Sunset Pantheon versionId values in display order"
                     }),
                     versionsForActivity: z.record(z.array(zNaturalNumber()).min(1)).openapi({
                         description: "The set of versionId for each activityId"
@@ -130,7 +132,11 @@ export const manifestRoute = new RaidHubRoute({
         ])
         const raids = activities.filter(a => a.isRaid)
         const pantheonIds = sortPantheonActivityIds(activities, getPantheonActivityIds(activities))
-        const gauntletVersionIds = getGauntletVersionIds(versions, pantheonIds)
+        const { pantheonVersionIds, pantheonSunsetVersionIds } = getPantheonVersionIds(
+            versions,
+            pantheonIds,
+            activities
+        )
         const versionsSetForActivity: Record<number, Set<number>> = {}
         for (const { activityId, versionId } of hashes) {
             if (!versionsSetForActivity[activityId]) {
@@ -177,7 +183,8 @@ export const manifestRoute = new RaidHubRoute({
                 .map(a => a.associatedActivityId!),
             resprisedChallengeVersionIds: versions.filter(v => v.isChallengeMode).map(v => v.id),
             pantheonIds,
-            gauntletVersionIds,
+            pantheonVersionIds,
+            pantheonSunsetVersionIds,
             versionsForActivity: versionsForActivity,
             rankingTiers: TierBreaks,
             feats: feats,

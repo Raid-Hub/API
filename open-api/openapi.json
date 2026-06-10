@@ -2241,14 +2241,23 @@
             "minItems": 1,
             "description": "The list of activityId for Pantheon"
           },
-          "gauntletVersionIds": {
+          "pantheonVersionIds": {
             "type": "array",
             "items": {
               "type": "integer",
               "minimum": 0,
               "exclusiveMinimum": true
             },
-            "description": "The list of versionId for Pantheon gauntlet modes (full boss lineup)"
+            "description": "Active Pantheon versionId values in display order"
+          },
+          "pantheonSunsetVersionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "description": "Sunset Pantheon versionId values in display order"
           },
           "versionsForActivity": {
             "type": "object",
@@ -2313,7 +2322,8 @@
           "resprisedRaidIds",
           "resprisedChallengeVersionIds",
           "pantheonIds",
-          "gauntletVersionIds",
+          "pantheonVersionIds",
+          "pantheonSunsetVersionIds",
           "versionsForActivity",
           "rankingTiers",
           "feats",

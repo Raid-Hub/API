@@ -1,7 +1,6 @@
 import {
-    GAUNTLET_VERSION_PATH,
-    getGauntletVersionIds,
     getPantheonActivityIds,
+    getPantheonVersionIds,
     sortPantheonActivityIds
 } from "@/services/manifest/pantheon"
 import { describe, expect, test } from "bun:test"
@@ -17,7 +16,7 @@ const pantheonActivity = {
 } as const
 
 describe("getPantheonActivityIds", () => {
-    test("returns activities with pantheon paths", () => {
+    test("returns activities with the pantheon path", () => {
         expect(
             getPantheonActivityIds([
                 {
@@ -36,13 +35,13 @@ describe("getPantheonActivityIds", () => {
                 {
                     id: 101,
                     name: "The Pantheon",
-                    path: "thepantheon",
+                    path: "pantheon",
                     isSunset: true,
                     ...pantheonActivity
                 },
                 {
                     id: 102,
-                    name: "Pantheon",
+                    name: "The Pantheon",
                     path: "pantheon",
                     isSunset: false,
                     ...pantheonActivity
@@ -60,13 +59,13 @@ describe("sortPantheonActivityIds", () => {
                     {
                         id: 101,
                         name: "The Pantheon",
-                        path: "thepantheon",
+                        path: "pantheon",
                         isSunset: true,
                         ...pantheonActivity
                     },
                     {
                         id: 102,
-                        name: "Pantheon",
+                        name: "The Pantheon",
                         path: "pantheon",
                         isSunset: false,
                         ...pantheonActivity
@@ -78,28 +77,54 @@ describe("sortPantheonActivityIds", () => {
     })
 })
 
-describe("getGauntletVersionIds", () => {
-    test("returns gauntlet versions associated with pantheon activities", () => {
+describe("getPantheonVersionIds", () => {
+    test("splits active and sunset pantheon versions", () => {
         expect(
-            getGauntletVersionIds(
+            getPantheonVersionIds(
                 [
                     {
-                        id: 129,
-                        name: "Oryx Exalted",
-                        path: "oryx",
+                        id: 128,
+                        name: "Atraks Sovereign",
+                        path: "atraks",
                         associatedActivityId: 101,
                         isChallengeMode: false
                     },
                     {
-                        id: 200,
-                        name: "Gauntlet Mode",
-                        path: GAUNTLET_VERSION_PATH,
+                        id: 132,
+                        name: "Calus Resplendent",
+                        path: "calus-resplendent",
+                        associatedActivityId: 102,
+                        isChallengeMode: false
+                    },
+                    {
+                        id: 135,
+                        name: "Argos",
+                        path: "argos",
                         associatedActivityId: 102,
                         isChallengeMode: false
                     }
                 ],
-                [101, 102]
+                [102, 101],
+                [
+                    {
+                        id: 101,
+                        name: "The Pantheon",
+                        path: "pantheon",
+                        isSunset: true,
+                        ...pantheonActivity
+                    },
+                    {
+                        id: 102,
+                        name: "The Pantheon",
+                        path: "pantheon",
+                        isSunset: false,
+                        ...pantheonActivity
+                    }
+                ]
             )
-        ).toEqual([200])
+        ).toEqual({
+            pantheonVersionIds: [132, 135],
+            pantheonSunsetVersionIds: [128]
+        })
     })
 })
