@@ -16,7 +16,7 @@ const zInstancePrimitive = z.object({
             description: "Mapped to a FeatDefinition by its skullHash"
         })
     ),
-    difficultyTier: zDifficultyTier,
+    difficultyTier: zDifficultyTier.nullable(),
     score: zWholeNumber(),
     dateStarted: zISO8601DateString(),
     dateCompleted: zISO8601DateString(),
