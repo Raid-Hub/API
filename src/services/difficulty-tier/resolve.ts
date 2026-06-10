@@ -16,7 +16,7 @@ async function loadKnownFeatSkulls(
          FROM activity_feat_definition
          WHERE skull_hash = ANY($1::bigint[])`,
         {
-            params: [unique],
+            params: [unique.map(skull => BigInt(skull))],
             transformers: { skullHash: convertUInt32Value }
         }
     )
