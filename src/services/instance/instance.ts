@@ -193,22 +193,50 @@ export async function getInstanceMetadataByHash(
 }
 
 export const getLeaderboardEntryForInstance = async (instanceId: bigint | string) => {
-    return await pgReader.queryRow<{
+    const versionEntry = await pgReader.queryRow<{
         rank: number
     }>(
         `SELECT rank::int
-        FROM (
-            SELECT rank::int, instance_id
-            FROM team_activity_version_leaderboard
-            UNION ALL
-            SELECT rank::int, instance_id
-            FROM team_pantheon_custom_race_leaderboard
-        ) leaderboard_entries
+        FROM team_activity_version_leaderboard
         WHERE instance_id = $1::bigint
         ORDER BY rank ASC
         LIMIT 1;`,
         { params: [instanceId] }
     )
+
+    let customRaceEntry: { rank: number } | null = null
+    try {
+        customRaceEntry = await pgReader.queryRow<{
+            rank: number
+        }>(
+            `SELECT rank::int
+            FROM team_pantheon_custom_race_leaderboard
+            WHERE instance_id = $1::bigint
+            ORDER BY rank ASC
+            LIMIT 1;`,
+            { params: [instanceId] }
+        )
+    } catch (error) {
+        if (
+            !(
+                typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                error.code === "42P01"
+            )
+        ) {
+            throw error
+        }
+    }
+
+    if (!versionEntry) {
+        return customRaceEntry
+    }
+    if (!customRaceEntry) {
+        return versionEntry
+    }
+
+    return versionEntry.rank <= customRaceEntry.rank ? versionEntry : customRaceEntry
 }
 
 type InstanceBasicRow = Omit<InstanceBasic, "difficultyTier"> & { activityId: number }

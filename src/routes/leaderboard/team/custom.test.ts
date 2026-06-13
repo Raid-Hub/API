@@ -1,11 +1,18 @@
 import {
     assertTeamLeaderboardPage,
-    assertTeamSearchIncludesMembership
+    assertTeamSearchIncludesMembership,
+    isPantheonCustomRaceLeaderboardAvailable
 } from "@/lib/leaderboard-test-assertions"
 import { expectErr, expectOk } from "@/lib/test-utils"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
-import { describe, expect, test } from "bun:test"
+import { beforeAll, describe, expect, test } from "bun:test"
 import { leaderboardTeamCustomRoute } from "./custom"
+
+let hasCustomRaceLeaderboard = false
+
+beforeAll(async () => {
+    hasCustomRaceLeaderboard = await isPantheonCustomRaceLeaderboardAvailable()
+})
 
 describe("custom pantheon race leaderboard 200", () => {
     const t = async (query?: { count?: number; search?: string; page?: number }) => {
@@ -15,6 +22,8 @@ describe("custom pantheon race leaderboard 200", () => {
     }
 
     test("pantheon-community-race", async () => {
+        if (!hasCustomRaceLeaderboard) return
+
         const result = await t({
             count: 10,
             page: 1
@@ -26,6 +35,8 @@ describe("custom pantheon race leaderboard 200", () => {
     })
 
     test("search", async () => {
+        if (!hasCustomRaceLeaderboard) return
+
         const result = await t({
             count: 10,
             search: "4611686018488107374"
@@ -41,6 +52,8 @@ describe("custom pantheon race leaderboard 200", () => {
 
 describe("custom pantheon race leaderboard 404", () => {
     test("player not found", async () => {
+        if (!hasCustomRaceLeaderboard) return
+
         const result = await leaderboardTeamCustomRoute.$mock({
             query: {
                 count: 10,
