@@ -2991,6 +2991,70 @@
           }
         ]
       },
+      "LeaderboardTeamCustomPantheonCommunityRaceResponse": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["team"]
+              },
+              "format": {
+                "type": "string",
+                "enum": ["duration", "numerical"]
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TeamLeaderboardEntry"
+                }
+              }
+            },
+            "required": ["type", "format", "page", "count", "entries"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["individual"]
+              },
+              "format": {
+                "type": "string",
+                "enum": ["duration", "numerical"]
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/IndividualLeaderboardEntry"
+                }
+              }
+            },
+            "required": ["type", "format", "page", "count", "entries"]
+          }
+        ]
+      },
       "LeaderboardClanResponse": {
         "type": "array",
         "items": {
@@ -6495,6 +6559,184 @@
                       "required": ["minted", "success", "code", "error"]
                     }
                   ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["InternalServerError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/InternalServerError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/leaderboard/team/custom/pantheon-community-race": {
+      "get": {
+        "description": "Ranking of teams that completed the 5-feat Insurrection Prime Revolutionary pantheon version during the community-hosted raid race window (first 24 hours from 2026-06-13 17:00 UTC).",
+        "summary": "/leaderboard/team/custom/pantheon-community-race",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 100,
+              "default": 50
+            },
+            "required": false,
+            "name": "count",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+n?$"
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "default": 1,
+              "description": "Page number of leaderboard data. Ignored if `search` is provided. Defaults to 1"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "response": {
+                      "$ref": "#/components/schemas/LeaderboardTeamCustomPantheonCommunityRaceResponse"
+                    }
+                  },
+                  "required": ["minted", "success", "response"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["QueryValidationError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/QueryValidationError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["ApiKeyError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/ApiKeyError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "PlayerNotOnLeaderboardError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "minted": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["PlayerNotOnLeaderboardError"]
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/PlayerNotOnLeaderboardError"
+                    }
+                  },
+                  "required": ["minted", "success", "code", "error"]
                 }
               }
             }
