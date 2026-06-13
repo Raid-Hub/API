@@ -13,15 +13,15 @@ export const blacklistInstance = async (data: {
         // Insert into blacklist_instance
         const reportSource = data.reportId ? "WebReport" : "Manual"
         await conn.queryRow(
-            `INSERT INTO blacklist_instance (instance_id, report_source, report_id, reason)
-            VALUES ($1::bigint, $2::"BlacklistReportSource", $3, $4)
+            `INSERT INTO flagging.blacklist_instance (instance_id, report_source, report_id, reason)
+            VALUES ($1::bigint, $2, $3, $4)
             ON CONFLICT (instance_id) DO NOTHING`,
             { params: [data.instanceId, reportSource, data.reportId, data.reason] }
         )
 
         // Insert into blacklist_instance_flag
         const playerStmnt = await conn.prepare(
-            `INSERT INTO blacklist_instance_player (instance_id, membership_id, reason)
+            `INSERT INTO flagging.blacklist_instance_player (instance_id, membership_id, reason)
             VALUES ($1::bigint, $2::bigint, $3)
             ON CONFLICT (instance_id, membership_id) DO NOTHING`
         )
@@ -43,9 +43,12 @@ export const blacklistInstance = async (data: {
 export const removeInstanceBlacklist = async (instanceId: bigint | string) => {
     return await pgAdmin.transaction(async conn => {
         // Delete from blacklist_instance
-        await conn.queryRow(`DELETE FROM blacklist_instance WHERE instance_id = $1::bigint`, {
-            params: [instanceId]
-        })
+        await conn.queryRow(
+            `DELETE FROM flagging.blacklist_instance WHERE instance_id = $1::bigint`,
+            {
+                params: [instanceId]
+            }
+        )
 
         // Set instance.is_whitelisted to true
         await conn.queryRow(
