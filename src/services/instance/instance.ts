@@ -197,7 +197,13 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
         rank: number
     }>(
         `SELECT rank::int
-        FROM team_activity_version_leaderboard
+        FROM (
+            SELECT rank::int, instance_id
+            FROM team_activity_version_leaderboard
+            UNION ALL
+            SELECT rank::int, instance_id
+            FROM team_pantheon_custom_race_leaderboard
+        ) leaderboard_entries
         WHERE instance_id = $1::bigint
         ORDER BY rank ASC
         LIMIT 1;`,

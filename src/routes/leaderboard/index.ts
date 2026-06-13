@@ -4,6 +4,7 @@ import { leaderboardIndividualGlobalRoute } from "./individual/global"
 import { leaderboardIndividualPantheonRoute } from "./individual/pantheon"
 import { leaderboardIndividualRaidRoute } from "./individual/raid"
 import { leaderboardTeamContestRoute } from "./team/contest"
+import { leaderboardTeamCustomRoute } from "./team/custom"
 import { leaderboardTeamFirstActivityVersionRoute } from "./team/first"
 
 export const leaderboardRouter = new RaidHubRouter({
@@ -32,6 +33,10 @@ export const leaderboardRouter = new RaidHubRouter({
                     {
                         path: "/contest/:raid",
                         route: leaderboardTeamContestRoute
+                    },
+                    {
+                        path: "/custom/pantheon-community-race",
+                        route: leaderboardTeamCustomRoute
                     }
                 ]
             })
