@@ -197,7 +197,8 @@ describe("getLeaderboardEntryForInstance", () => {
 
         const parsed = z
             .object({
-                rank: z.number().int()
+                rank: z.number().int(),
+                isGauntletRace: z.boolean()
             })
             .nullable()
             .safeParse(data)

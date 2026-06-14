@@ -9,6 +9,7 @@ export type InstanceExtended = z.input<typeof zInstanceExtended>
 export const zInstanceExtended = zInstance
     .extend({
         leaderboardRank: zNaturalNumber().nullable(),
+        isGauntletRace: z.boolean(),
         metadata: zInstanceMetadata,
         players: z.array(zInstancePlayerExtended)
     })

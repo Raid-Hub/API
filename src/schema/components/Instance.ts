@@ -38,7 +38,8 @@ export const zInstance = registry.register(
             activityId: zNaturalNumber(),
             versionId: zNaturalNumber(),
             isDayOne: z.boolean().openapi({
-                description: "If the instance was completed before the day one end date"
+                description:
+                    "If the instance was completed within 24 hours of release. For pantheon modes, uses the version release date (release_date_override when set); otherwise uses the activity day_one_end."
             }),
             isContest: z.boolean().openapi({
                 description:
@@ -46,6 +47,9 @@ export const zInstance = registry.register(
             }),
             isWeekOne: z.boolean().openapi({
                 description: "If the instance was completed before the week one end date"
+            }),
+            isPantheon: z.boolean().openapi({
+                description: "If the instance is a pantheon activity mode"
             }),
             isBlacklisted: z.boolean().openapi({
                 description: "If the instance is blacklisted from leaderboards"

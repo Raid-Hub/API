@@ -49,7 +49,29 @@ export const zWorldFirstEntry = registry.register(
         isDayOne: z.boolean(),
         isContest: z.boolean(),
         isWeekOne: z.boolean(),
-        isChallengeMode: z.boolean()
+        isChallengeMode: z.boolean(),
+        isGauntletRace: z.boolean().optional()
+    })
+)
+
+export type GauntletRaceEntry = z.input<typeof zGauntletRaceEntry>
+export const zGauntletRaceEntry = registry.register(
+    "GauntletRaceEntry",
+    z.object({
+        instanceId: zInt64(),
+        rank: zNaturalNumber(),
+        versionId: zNaturalNumber()
+    })
+)
+
+export type PantheonVersionFirstEntry = z.input<typeof zPantheonVersionFirstEntry>
+export const zPantheonVersionFirstEntry = registry.register(
+    "PantheonVersionFirstEntry",
+    z.object({
+        versionId: zNaturalNumber(),
+        instanceId: zInt64(),
+        rank: zNaturalNumber(),
+        isDayOne: z.boolean()
     })
 )
 
@@ -61,5 +83,10 @@ export const zPlayerProfile = z.object({
         global: zPlayerProfileGlobalStats,
         activity: z.record(zNumericalRecordKey(), zPlayerProfileActivityStats)
     }),
-    worldFirstEntries: z.record(zNumericalRecordKey(), zWorldFirstEntry.nullable())
+    worldFirstEntries: z.record(zNumericalRecordKey(), zWorldFirstEntry.nullable()),
+    gauntletRaceEntry: zGauntletRaceEntry.nullable(),
+    pantheonVersionFirstEntries: z.record(
+        zNumericalRecordKey(),
+        zPantheonVersionFirstEntry.nullable()
+    )
 })

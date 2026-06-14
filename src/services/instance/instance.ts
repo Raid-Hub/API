@@ -10,6 +10,7 @@ import { InstanceMetadata } from "@/schema/components/InstanceMetadata"
 import { InstancePlayerExtended } from "@/schema/components/InstancePlayerExtended"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
 import { attachDifficultyTier, resolveDifficultyTier } from "@/services/difficulty-tier/resolve"
+import { SQL_IS_DAY_ONE, SQL_IS_PANTHEON } from "@/services/instance/is-day-one"
 
 type InstanceRow = Omit<Instance, "difficultyTier">
 
@@ -31,7 +32,7 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
             instance.season_id::int AS "season",
             instance.duration::int AS "duration",
             instance.platform_type AS "platformType",
-            instance.date_completed < COALESCE(activity_definition.day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
+            ${SQL_IS_DAY_ONE} AS "isDayOne",
             (
                 CASE
                     WHEN ig_cact.activity_id IS NOT NULL THEN (
@@ -42,7 +43,8 @@ export async function getInstance(instanceId: bigint | string): Promise<Instance
                 END
             ) AS "isContest",
             instance.date_completed < COALESCE(activity_definition.week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
-            (b.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted"
+            (b.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted",
+            ${SQL_IS_PANTHEON} AS "isPantheon"
         FROM instance
         INNER JOIN activity_version av USING (hash)
         INNER JOIN activity_definition ON activity_definition.id = av.activity_id
@@ -162,9 +164,12 @@ export async function getInstanceExtended(
         }
         const instanceMetadataPromise = getInstanceMetadataByHash(instance.hash)
 
+        const leaderboardEntry = await leaderboardEntryPromise
+
         return {
             ...instance,
-            leaderboardRank: await leaderboardEntryPromise.then(entry => entry?.rank || null),
+            leaderboardRank: leaderboardEntry?.rank ?? null,
+            isGauntletRace: leaderboardEntry?.isGauntletRace ?? false,
             metadata: await instanceMetadataPromise,
             players: await instancePlayersPromise
         }
@@ -229,14 +234,15 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
         }
     }
 
-    if (!versionEntry) {
-        return customRaceEntry
-    }
-    if (!customRaceEntry) {
-        return versionEntry
+    if (customRaceEntry) {
+        return { rank: customRaceEntry.rank, isGauntletRace: true }
     }
 
-    return versionEntry.rank <= customRaceEntry.rank ? versionEntry : customRaceEntry
+    if (versionEntry) {
+        return { rank: versionEntry.rank, isGauntletRace: false }
+    }
+
+    return null
 }
 
 type InstanceBasicRow = Omit<InstanceBasic, "difficultyTier"> & { activityId: number }
