@@ -4,10 +4,10 @@ import { playerProfileQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
 import {
-    PlayerProfileActivityStats,
-    PlayerProfileGlobalStats,
     GauntletRaceEntry,
     PantheonVersionFirstEntry,
+    PlayerProfileActivityStats,
+    PlayerProfileGlobalStats,
     WorldFirstEntry
 } from "@/schema/components/PlayerProfile"
 import { sqlIsDayOne } from "@/services/instance/is-day-one"

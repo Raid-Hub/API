@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test"
 import { sqlIsDayOne } from "@/services/instance/is-day-one"
+import { describe, expect, test } from "bun:test"
 
 describe("sqlIsDayOne", () => {
     test("uses version release date for pantheon activities", () => {
