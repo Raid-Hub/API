@@ -16,7 +16,7 @@ jobs:
               run: bun install --frozen-lockfile
 
             - name: Build with sourcemaps
-              run: bun build --sourcemap=external ./src/index.ts --outfile ./dist/index.js
+              run: bun build --target=bun --sourcemap=external ./src/index.ts --outdir ./dist
 
             - name: Upload sourcemaps to Sentry
               env:
@@ -24,8 +24,8 @@ jobs:
                   SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
                   SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
               run: |
-                  npx @sentry/cli sourcemaps inject ./dist
-                  npx @sentry/cli sourcemaps upload --release=${{ github.sha }} ./dist
+                  bunx @sentry/cli sourcemaps inject ./dist
+                  bunx @sentry/cli sourcemaps upload --release=${{ github.sha }} ./dist
 
             - name: Install cloudflared
               run: ./.github/scripts/install-cloudflared.sh
