@@ -60,7 +60,7 @@ export const zActivityDefinition = registry.register(
                     contestEnd: null,
                     weekOneEnd: null,
                     milestoneHash: null,
-                    splashSlug: "pantheon"
+                    splashSlug: "pantheon2"
                 }
             ]
         })
