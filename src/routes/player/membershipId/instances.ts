@@ -23,7 +23,9 @@ export const playerInstancesRoute = new RaidHubRoute({
         membershipId: zBigIntString()
     }),
     query: z.object({
-        membershipIds: zSplitCommaSeparatedString(zBigIntString(), a => a.max(6).default([])).openapi({
+        membershipIds: zSplitCommaSeparatedString(zBigIntString(), a =>
+            a.max(6).default([])
+        ).openapi({
             description:
                 "A comma-separated list of up to 6 membershipIds the must be present in the instance. You do not need to include the target membershipId from the path parameter in this list."
         }),
