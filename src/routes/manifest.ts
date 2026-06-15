@@ -5,7 +5,10 @@ import { zFeatDefinition } from "@/schema/components/FeatDefinition"
 import { zImageContentData } from "@/schema/components/ImageContentData"
 import { zVersionDefinition } from "@/schema/components/VersionDefinition"
 import { zNaturalNumber, zNumericalRecordKey } from "@/schema/output"
-import { getCheckpointNamesForRaids } from "@/services/manifest/checkpoint-names"
+import {
+    getCheckpointNamesForRaids,
+    getVersionCheckpointNames
+} from "@/services/manifest/checkpoint-names"
 import {
     listActivityDefinitions,
     listFeatDefinitions,
@@ -127,6 +130,10 @@ export const manifestRoute = new RaidHubRoute({
                     checkpointNames: z.record(zNumericalRecordKey(), z.string()).openapi({
                         description:
                             "The checkpoint encounter name for each raid activityId, used in lowman tag labels"
+                    }),
+                    versionCheckpointNames: z.record(zNumericalRecordKey(), z.string()).openapi({
+                        description:
+                            "The checkpoint encounter name for each Pantheon versionId, used in lowman tag labels"
                     })
                 })
                 .strict()
@@ -172,6 +179,8 @@ export const manifestRoute = new RaidHubRoute({
                 }
             })
             .map(a => a.id)
+        const versionDefinitionsById = Object.fromEntries(versions.map(data => [data.id, data]))
+        const pantheonVersionIdsAll = [...pantheonVersionIds, ...pantheonSunsetVersionIds]
 
         return RaidHubRoute.ok({
             hashes: Object.fromEntries(
@@ -184,7 +193,7 @@ export const manifestRoute = new RaidHubRoute({
                 ])
             ),
             activityDefinitions: Object.fromEntries(activities.map(data => [data.id, data])),
-            versionDefinitions: Object.fromEntries(versions.map(data => [data.id, data])),
+            versionDefinitions: versionDefinitionsById,
             listedRaidIds,
             sunsetRaidIds: raids.filter(a => a.isSunset).map(a => a.id),
             prestigeRaidIds: [
@@ -206,7 +215,11 @@ export const manifestRoute = new RaidHubRoute({
             feats: feats,
             splashUrls: splashUrls,
             versionSplashUrls: versionSplashUrls,
-            checkpointNames: getCheckpointNamesForRaids(listedRaidIds)
+            checkpointNames: getCheckpointNamesForRaids(listedRaidIds),
+            versionCheckpointNames: getVersionCheckpointNames(
+                pantheonVersionIdsAll,
+                versionDefinitionsById
+            )
         })
     }
 })
