@@ -124,12 +124,10 @@ export const manifestRoute = new RaidHubRoute({
                             description:
                                 "The mapping of each RaidHub versionId to its splash image URLs"
                         }),
-                    checkpointNames: z
-                        .record(zNumericalRecordKey(), z.string())
-                        .openapi({
-                            description:
-                                "The checkpoint encounter name for each raid activityId, used in lowman tag labels"
-                        })
+                    checkpointNames: z.record(zNumericalRecordKey(), z.string()).openapi({
+                        description:
+                            "The checkpoint encounter name for each raid activityId, used in lowman tag labels"
+                    })
                 })
                 .strict()
         }
