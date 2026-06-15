@@ -34,11 +34,12 @@ export const getPantheonCustomRaceTeamLeaderboard = async ({
                         'isPrivate', is_private,
                         'cheatLevel', cheat_level
                     )
-                    ORDER BY instance_player.completed DESC, instance_player.time_played_seconds DESC
+                    ORDER BY instance_player.kills DESC
                 ) as "players"
             FROM instance_player
             INNER JOIN player USING (membership_id)
             WHERE instance_player.instance_id = team_pantheon_custom_race_leaderboard.instance_id
+                AND instance_player.completed
         ) as "lateral" ON true
         WHERE position > $1 AND position <= ($1 + $2)
         ORDER BY position ASC`,
