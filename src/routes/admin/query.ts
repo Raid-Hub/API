@@ -10,6 +10,10 @@ export const adminQueryRoute = new RaidHubRoute({
     isAdministratorRoute: true,
     description: "Run a query against the database",
     method: "post",
+    audit: {
+        action: "admin.query.execute",
+        responseFields: ["type", "cost"]
+    },
     body: z.object({
         query: z.string(),
         type: z.enum(["SELECT", "EXPLAIN"]),

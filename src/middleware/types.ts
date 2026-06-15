@@ -6,4 +6,6 @@ export interface RaidHubLocals {
     // populated by duration-metrics
     _startTime: number
     _duration: number
+    // populated by audit-log middleware
+    _auditResponseBody?: unknown
 }

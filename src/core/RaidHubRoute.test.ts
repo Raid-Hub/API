@@ -1,5 +1,9 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test"
+import { beforeEach, describe, expect, mock, spyOn, test } from "bun:test"
 
+import { adminProtected } from "@/auth/admin"
+import { generateJWT } from "@/auth/jwt"
+import { attachUserAuth } from "@/auth/user-context"
+import * as auditLog from "@/lib/audit/audit-log"
 import { errorHandler } from "@/middleware/error-handler"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString, zDigitString } from "@/schema/input"
@@ -266,6 +270,106 @@ describe("raidhub route unhandled error", () => {
         expect(res.body.response).toMatchObject({
             game: "destiny 2"
         })
+    })
+})
+
+describe("raidhub route audit logging", () => {
+    test("mountable emits audit log when route has audit config", async () => {
+        const auditSpy = spyOn(auditLog, "writeAuditLog").mockImplementation(() => {})
+
+        try {
+            const auditRoute = new RaidHubRoute({
+                method: "post",
+                description: "audit test route",
+                isAdministratorRoute: true,
+                audit: {
+                    action: "test.audit.action",
+                    responseFields: ["ok"]
+                },
+                handler: async () =>
+                    RaidHubRoute.ok({
+                        ok: true
+                    }),
+                response: {
+                    success: {
+                        statusCode: 200,
+                        schema: z.object({
+                            ok: z.boolean()
+                        })
+                    }
+                }
+            })
+
+            const auditApp = express()
+            auditApp.use(express.json())
+            auditApp.use(attachUserAuth)
+            auditApp.use(adminProtected)
+            auditApp.use("/audit-test", auditRoute.mountable)
+
+            const token = generateJWT(
+                {
+                    isAdmin: true,
+                    bungieMembershipId: "4611686018555780000",
+                    destinyMembershipIds: []
+                },
+                600
+            )
+
+            const res = await request(auditApp)
+                .post("/audit-test")
+                .set("Authorization", "Bearer " + token)
+
+            expect(res.status).toBe(200)
+            expect(auditSpy).toHaveBeenCalledTimes(1)
+            expect(auditSpy.mock.calls[0][0].action).toBe("test.audit.action")
+        } finally {
+            auditSpy.mockRestore()
+        }
+    })
+
+    test("deprecatedCopy preserves audit config", async () => {
+        const auditSpy = spyOn(auditLog, "writeAuditLog").mockImplementation(() => {})
+
+        try {
+            const route = new RaidHubRoute({
+                method: "put",
+                description: "audit copy test",
+                isAdministratorRoute: true,
+                audit: { action: "test.audit.copy", responseFields: ["copied"] },
+                handler: async () => RaidHubRoute.ok({ copied: true }),
+                response: {
+                    success: {
+                        statusCode: 200,
+                        schema: z.object({ copied: z.boolean() })
+                    }
+                }
+            })
+
+            const auditApp = express()
+            auditApp.use(express.json())
+            auditApp.use(attachUserAuth)
+            auditApp.use(adminProtected)
+            auditApp.use("/audit-copy", route.deprecatedCopy().mountable)
+
+            const token = generateJWT(
+                {
+                    isAdmin: true,
+                    bungieMembershipId: "4611686018555780000",
+                    destinyMembershipIds: []
+                },
+                600
+            )
+
+            await request(auditApp)
+                .put("/audit-copy")
+                .set("Authorization", "Bearer " + token)
+
+            expect(auditSpy).toHaveBeenCalledTimes(1)
+            expect(auditSpy.mock.calls[0][0].action).toBe("test.audit.copy")
+            expect(auditSpy.mock.calls[0][0].response?.copied).toBe(true)
+        } finally {
+            auditSpy.mockRestore()
+        }
     })
 })
 
