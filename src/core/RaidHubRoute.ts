@@ -4,6 +4,7 @@ import { Logger } from "@/lib/utils/logging"
 import { durationMetrics } from "@/middleware/duration-metrics"
 import { regionMetrics } from "@/middleware/region-metrics"
 import { requestLogging } from "@/middleware/request-logging"
+import { AuditRouteConfig, auditRoute } from "@/middleware/audit-log"
 import { zApiKeyError } from "@/schema/errors/ApiKeyError"
 import { BodyValidationError, zBodyValidationError } from "@/schema/errors/BodyValidationError"
 import { ErrorCode } from "@/schema/errors/ErrorCode"
@@ -59,6 +60,7 @@ export class RaidHubRoute<
     private readonly isAdministratorRoute: boolean = false
     private readonly isProtectedPlayerRoute: boolean = false
     private readonly isDeprecated: boolean = false
+    private readonly auditConfig: AuditRouteConfig | null = null
     private readonly middlewares: RequestHandler<
         z.output<Params>,
         any,
@@ -84,6 +86,8 @@ export class RaidHubRoute<
         isAdministratorRoute?: boolean
         isProtectedPlayerRoute?: boolean
         isDeprecated?: boolean
+        /** Emits structured ADMIN_ACTION audit logs for accountability */
+        audit?: AuditRouteConfig
         middleware?: RequestHandler<z.output<Params>, any, z.output<Body>, z.output<Query>>[]
         handler: RaidHubHandler<
             Params,
@@ -112,6 +116,7 @@ export class RaidHubRoute<
         this.isAdministratorRoute = args.isAdministratorRoute ?? false
         this.isProtectedPlayerRoute = args.isProtectedPlayerRoute ?? false
         this.isDeprecated = args.isDeprecated ?? false
+        this.auditConfig = args.audit ?? null
         this.middlewares = args.middleware ?? []
         this.handler = args.handler
         this.responseSchema = args.response.success.schema
@@ -216,6 +221,7 @@ export class RaidHubRoute<
             this.validateParams,
             this.validateQuery,
             this.validateBody,
+            ...(this.auditConfig ? [auditRoute(this.auditConfig)] : []),
             ...this.middlewares,
             async (req, res, next) => {
                 try {
@@ -293,6 +299,7 @@ export class RaidHubRoute<
             body: this.bodySchema,
             isAdministratorRoute: this.isAdministratorRoute,
             isProtectedPlayerRoute: this.isProtectedPlayerRoute,
+            audit: this.auditConfig ?? undefined,
             middleware: this.middlewares,
             handler: this.handler,
             response: {

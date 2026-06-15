@@ -10,6 +10,10 @@ export const blacklistInstanceRoute = new RaidHubRoute({
     isAdministratorRoute: true,
     method: "put",
     description: "Blacklist an instance from leaderboards, as well as the players involved.",
+    audit: {
+        action: "reporting.blacklist.update",
+        responseFields: ["blacklisted"]
+    },
     params: z.object({
         instanceId: zBigIntString()
     }),

@@ -11,6 +11,9 @@ export const patchPlayer = new RaidHubRoute({
     isAdministratorRoute: true,
     method: "patch",
     description: "Update fields on a player. Currently, only the cheat level can be updated.",
+    audit: {
+        action: "reporting.player.update"
+    },
     params: z.object({
         membershipId: zBigIntString()
     }),
