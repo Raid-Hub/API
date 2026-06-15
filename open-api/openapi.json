@@ -2340,6 +2340,13 @@
               "type": "string"
             },
             "description": "The checkpoint encounter name for each raid activityId, used in lowman tag labels"
+          },
+          "versionCheckpointNames": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The checkpoint encounter name for each Pantheon versionId, used in lowman tag labels"
           }
         },
         "required": [
@@ -2361,7 +2368,8 @@
           "feats",
           "splashUrls",
           "versionSplashUrls",
-          "checkpointNames"
+          "checkpointNames",
+          "versionCheckpointNames"
         ],
         "additionalProperties": false
       },
