@@ -21,7 +21,7 @@ export const getPantheonCustomRaceTeamLeaderboard = async ({
             "lateral".players
         FROM team_pantheon_custom_race_leaderboard
         LEFT JOIN LATERAL (
-            SELECT
+            SELECT 
                 JSONB_AGG(
                     JSONB_BUILD_OBJECT(
                         'membershipId', membership_id::text,
@@ -34,7 +34,6 @@ export const getPantheonCustomRaceTeamLeaderboard = async ({
                         'isPrivate', is_private,
                         'cheatLevel', cheat_level
                     )
-                    ORDER BY instance_player.kills DESC
                 ) as "players"
             FROM instance_player
             INNER JOIN player USING (membership_id)
