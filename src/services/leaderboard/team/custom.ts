@@ -21,24 +21,27 @@ export const getPantheonCustomRaceTeamLeaderboard = async ({
             "lateral".players
         FROM team_pantheon_custom_race_leaderboard
         LEFT JOIN LATERAL (
-            SELECT
-                JSONB_AGG(
-                    JSONB_BUILD_OBJECT(
-                        'membershipId', membership_id::text,
-                        'membershipType', membership_type,
-                        'iconPath', icon_path,
-                        'displayName', display_name,
-                        'bungieGlobalDisplayName', bungie_global_display_name,
-                        'bungieGlobalDisplayNameCode', bungie_global_display_name_code,
-                        'lastSeen', last_seen,
-                        'isPrivate', is_private,
-                        'cheatLevel', cheat_level
-                    )
-                    ORDER BY instance_player.completed DESC, instance_player.time_played_seconds DESC
+            SELECT 
+                COALESCE(
+                    JSONB_AGG(
+                        JSONB_BUILD_OBJECT(
+                            'membershipId', membership_id::text,
+                            'membershipType', membership_type,
+                            'iconPath', icon_path,
+                            'displayName', display_name,
+                            'bungieGlobalDisplayName', bungie_global_display_name,
+                            'bungieGlobalDisplayNameCode', bungie_global_display_name_code,
+                            'lastSeen', last_seen,
+                            'isPrivate', is_private,
+                            'cheatLevel', cheat_level
+                        )
+                    ),
+                    '[]'::jsonb
                 ) as "players"
             FROM instance_player
             INNER JOIN player USING (membership_id)
             WHERE instance_player.instance_id = team_pantheon_custom_race_leaderboard.instance_id
+                AND instance_player.completed
         ) as "lateral" ON true
         WHERE position > $1 AND position <= ($1 + $2)
         ORDER BY position ASC`,
