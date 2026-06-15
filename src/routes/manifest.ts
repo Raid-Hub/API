@@ -5,6 +5,7 @@ import { zFeatDefinition } from "@/schema/components/FeatDefinition"
 import { zImageContentData } from "@/schema/components/ImageContentData"
 import { zVersionDefinition } from "@/schema/components/VersionDefinition"
 import { zNaturalNumber, zNumericalRecordKey } from "@/schema/output"
+import { getCheckpointNamesForRaids } from "@/services/manifest/checkpoint-names"
 import {
     listActivityDefinitions,
     listFeatDefinitions,
@@ -122,7 +123,11 @@ export const manifestRoute = new RaidHubRoute({
                         .openapi({
                             description:
                                 "The mapping of each RaidHub versionId to its splash image URLs"
-                        })
+                        }),
+                    checkpointNames: z.record(zNumericalRecordKey(), z.string()).openapi({
+                        description:
+                            "The checkpoint encounter name for each raid activityId, used in lowman tag labels"
+                    })
                 })
                 .strict()
         }
@@ -158,6 +163,16 @@ export const manifestRoute = new RaidHubRoute({
             versionsForActivity[parseInt(activityId)] = [...set]
         })
 
+        const listedRaidIds = raids
+            .sort((a, b) => {
+                if (+a.isSunset ^ +b.isSunset) {
+                    return a.isSunset ? 1 : -1
+                } else {
+                    return b.id - a.id
+                }
+            })
+            .map(a => a.id)
+
         return RaidHubRoute.ok({
             hashes: Object.fromEntries(
                 hashes.map(h => [
@@ -170,15 +185,7 @@ export const manifestRoute = new RaidHubRoute({
             ),
             activityDefinitions: Object.fromEntries(activities.map(data => [data.id, data])),
             versionDefinitions: Object.fromEntries(versions.map(data => [data.id, data])),
-            listedRaidIds: raids
-                .sort((a, b) => {
-                    if (+a.isSunset ^ +b.isSunset) {
-                        return a.isSunset ? 1 : -1
-                    } else {
-                        return b.id - a.id
-                    }
-                })
-                .map(a => a.id),
+            listedRaidIds,
             sunsetRaidIds: raids.filter(a => a.isSunset).map(a => a.id),
             prestigeRaidIds: [
                 ...new Set(hashes.filter(h => h.versionId === 3).map(h => h.activityId))
@@ -198,7 +205,8 @@ export const manifestRoute = new RaidHubRoute({
             rankingTiers: TierBreaks,
             feats: feats,
             splashUrls: splashUrls,
-            versionSplashUrls: versionSplashUrls
+            versionSplashUrls: versionSplashUrls,
+            checkpointNames: getCheckpointNamesForRaids(listedRaidIds)
         })
     }
 })
