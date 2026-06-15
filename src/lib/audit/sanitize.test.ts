@@ -40,20 +40,13 @@ describe("sanitizeForAudit", () => {
 
     test("sanitizes arrays recursively", () => {
         expect(
-            sanitizeForAudit([
-                { token: "secret" },
-                "visible",
-                [1, { api_key: "hidden" }]
-            ])
+            sanitizeForAudit([{ token: "secret" }, "visible", [1, { api_key: "hidden" }]])
         ).toEqual([{ token: "[REDACTED]" }, "visible", [1, { api_key: "[REDACTED]" }]])
     })
 
     test("redacts custom keys", () => {
         expect(
-            sanitizeForAudit(
-                { query: "SELECT 1", note: "safe" },
-                { redactKeys: ["query"] }
-            )
+            sanitizeForAudit({ query: "SELECT 1", note: "safe" }, { redactKeys: ["query"] })
         ).toEqual({ query: "[REDACTED]", note: "safe" })
     })
 
