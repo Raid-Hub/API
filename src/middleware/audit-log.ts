@@ -78,7 +78,11 @@ export const auditRoute = <
             const responseBody = res.locals._auditResponseBody
 
             let errorCode: string | undefined
-            if (typeof responseBody === "object" && responseBody !== null && "success" in responseBody) {
+            if (
+                typeof responseBody === "object" &&
+                responseBody !== null &&
+                "success" in responseBody
+            ) {
                 const failedResponse = responseBody as { success?: boolean; code?: unknown }
                 if (failedResponse.success === false && typeof failedResponse.code === "string") {
                     errorCode = failedResponse.code

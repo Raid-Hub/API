@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any */
 import { authFromHeaders } from "@/auth/user-context"
 import { Logger } from "@/lib/utils/logging"
+import { AuditRouteConfig, auditRoute } from "@/middleware/audit-log"
 import { durationMetrics } from "@/middleware/duration-metrics"
 import { regionMetrics } from "@/middleware/region-metrics"
 import { requestLogging } from "@/middleware/request-logging"
-import { AuditRouteConfig, auditRoute } from "@/middleware/audit-log"
 import { zApiKeyError } from "@/schema/errors/ApiKeyError"
 import { BodyValidationError, zBodyValidationError } from "@/schema/errors/BodyValidationError"
 import { ErrorCode } from "@/schema/errors/ErrorCode"

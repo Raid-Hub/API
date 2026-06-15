@@ -1,9 +1,9 @@
-import { describe, expect, spyOn, test } from "bun:test"
-import { sanitizeForAudit } from "@/lib/audit/sanitize"
-import * as auditLog from "@/lib/audit/audit-log"
+import { adminProtected } from "@/auth/admin"
 import { generateJWT } from "@/auth/jwt"
 import { attachUserAuth } from "@/auth/user-context"
-import { adminProtected } from "@/auth/admin"
+import * as auditLog from "@/lib/audit/audit-log"
+import { sanitizeForAudit } from "@/lib/audit/sanitize"
+import { describe, expect, spyOn, test } from "bun:test"
 import express from "express"
 import request from "supertest"
 import { auditRoute } from "./audit-log"
@@ -97,13 +97,9 @@ describe("auditRoute middleware", () => {
         try {
             const app = express()
             app.use(express.json())
-            app.post(
-                "/admin/query",
-                auditRoute({ action: "admin.query.execute" }),
-                (_req, res) => {
-                    res.status(200).json({ success: true })
-                }
-            )
+            app.post("/admin/query", auditRoute({ action: "admin.query.execute" }), (_req, res) => {
+                res.status(200).json({ success: true })
+            })
 
             await request(app).post("/admin/query").send({ query: "SELECT 1" })
 
