@@ -26,6 +26,28 @@ export const getPlayer = async (membershipId: bigint | string) => {
         { params: [membershipId] }
     )
 }
+
+export const getPlayers = async (membershipIds: readonly (bigint | string)[]) => {
+    if (!membershipIds.length) {
+        return []
+    }
+
+    return await pgReader.queryRows<PlayerInfo>(
+        `SELECT
+            membership_id AS "membershipId",
+            membership_type AS "membershipType",
+            icon_path AS "iconPath",
+            display_name AS "displayName",
+            bungie_global_display_name AS "bungieGlobalDisplayName",
+            bungie_global_display_name_code AS "bungieGlobalDisplayNameCode",
+            last_seen AS "lastSeen",
+            is_private AS "isPrivate",
+            cheat_level AS "cheatLevel"
+        FROM player
+        WHERE membership_id = ANY($1::bigint[])`,
+        { params: [membershipIds] }
+    )
+}
 export const getPlayerActivityStats = async (membershipId: bigint | string) => {
     return await withHistogramTimer(
         playerProfileQueryTimer,
