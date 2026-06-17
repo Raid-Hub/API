@@ -44,8 +44,10 @@ describe("player basic batch 200", () => {
             }
         })
 
-        const data = expectOk(result)
-        expect(data.players).toHaveLength(1)
-        expect(data.players[0]?.membershipId).toBe(fixtureMembershipId)
+        expectOk(result)
+        if (result.type === "ok") {
+            expect(result.parsed.players).toHaveLength(1)
+            expect(result.parsed.players[0]?.membershipId).toBe(fixtureMembershipId)
+        }
     })
 })
