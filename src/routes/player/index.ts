@@ -1,4 +1,5 @@
 import { RaidHubRouter } from "@/core/RaidHubRouter"
+import { playerBasicBatchRoute } from "./basic-batch"
 import { playerBasicRoute } from "./membershipId/basic"
 import { playerHistoryRoute } from "./membershipId/history"
 import { playerInstancesRoute } from "./membershipId/instances"
@@ -9,6 +10,7 @@ import { playerSearchRoute } from "./search"
 export const playerRouter = new RaidHubRouter({
     routes: [
         { path: "/search", route: playerSearchRoute },
+        { path: "/basic/batch", route: playerBasicBatchRoute },
         {
             path: "/:membershipId",
             route: new RaidHubRouter({
