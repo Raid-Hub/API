@@ -6,6 +6,7 @@ import {
 } from "@/integrations/postgres/transformer"
 import { InstanceWithPlayers } from "@/schema/components/InstanceWithPlayers"
 import { attachDifficultyTiers } from "@/services/difficulty-tier/resolve"
+import { SQL_IS_DAY_ONE, SQL_IS_PANTHEON } from "@/services/instance/is-day-one"
 
 export async function getInstances({
     count,
@@ -140,7 +141,7 @@ export async function getInstances({
             instance.season_id::int AS "season",
             instance.duration::int AS "duration",
             instance.platform_type AS "platformType",
-            instance.date_completed < COALESCE(activity_definition.day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
+            ${SQL_IS_DAY_ONE} AS "isDayOne",
             (
                 CASE
                     WHEN pi2_cact.activity_id IS NOT NULL THEN (
@@ -152,6 +153,7 @@ export async function getInstances({
             ) AS "isContest",
             instance.date_completed < COALESCE(activity_definition.week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
             (b.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted",
+            ${SQL_IS_PANTHEON} AS "isPantheon",
             "_lateral".players AS "players"
         FROM _player_instances
         INNER JOIN instance USING (instance_id)

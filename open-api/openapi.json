@@ -316,7 +316,7 @@
           },
           "isDayOne": {
             "type": "boolean",
-            "description": "If the instance was completed before the day one end date"
+            "description": "If the instance was completed within 24 hours of release. For pantheon modes, uses the version release date (release_date_override when set); otherwise uses the activity day_one_end."
           },
           "isContest": {
             "type": "boolean",
@@ -325,6 +325,10 @@
           "isWeekOne": {
             "type": "boolean",
             "description": "If the instance was completed before the week one end date"
+          },
+          "isPantheon": {
+            "type": "boolean",
+            "description": "If the instance is a pantheon activity mode"
           },
           "isBlacklisted": {
             "type": "boolean",
@@ -351,6 +355,7 @@
           "isDayOne",
           "isContest",
           "isWeekOne",
+          "isPantheon",
           "isBlacklisted"
         ],
         "additionalProperties": false
@@ -1727,6 +1732,9 @@
           },
           "isChallengeMode": {
             "type": "boolean"
+          },
+          "isGauntletRace": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -1739,6 +1747,49 @@
           "isWeekOne",
           "isChallengeMode"
         ]
+      },
+      "GauntletRaceEntry": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "versionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          }
+        },
+        "required": ["instanceId", "rank", "versionId"]
+      },
+      "PantheonVersionFirstEntry": {
+        "type": "object",
+        "properties": {
+          "versionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "instanceId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "isDayOne": {
+            "type": "boolean"
+          }
+        },
+        "required": ["versionId", "instanceId", "rank", "isDayOne"]
       },
       "Teammate": {
         "type": "object",
@@ -2574,9 +2625,26 @@
               "nullable": true,
               "$ref": "#/components/schemas/WorldFirstEntry"
             }
+          },
+          "gauntletRaceEntry": {
+            "nullable": true,
+            "$ref": "#/components/schemas/GauntletRaceEntry"
+          },
+          "pantheonVersionFirstEntries": {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true,
+              "$ref": "#/components/schemas/PantheonVersionFirstEntry"
+            }
           }
         },
-        "required": ["playerInfo", "stats", "worldFirstEntries"]
+        "required": [
+          "playerInfo",
+          "stats",
+          "worldFirstEntries",
+          "gauntletRaceEntry",
+          "pantheonVersionFirstEntries"
+        ]
       },
       "PlayerTeammatesResponse": {
         "type": "array",
@@ -2634,6 +2702,9 @@
                 "minimum": 0,
                 "exclusiveMinimum": true
               },
+              "isGauntletRace": {
+                "type": "boolean"
+              },
               "metadata": {
                 "$ref": "#/components/schemas/InstanceMetadata"
               },
@@ -2644,7 +2715,12 @@
                 }
               }
             },
-            "required": ["leaderboardRank", "metadata", "players"],
+            "required": [
+              "leaderboardRank",
+              "isGauntletRace",
+              "metadata",
+              "players"
+            ],
             "additionalProperties": false
           }
         ]

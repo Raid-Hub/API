@@ -4,6 +4,7 @@ import { activityHistoryQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { InstanceForPlayer } from "@/schema/components/InstanceForPlayer"
 import { attachDifficultyTiers } from "@/services/difficulty-tier/resolve"
+import { SQL_IS_DAY_ONE, SQL_IS_PANTHEON } from "@/services/instance/is-day-one"
 
 export const getActivities = async (
     membershipId: bigint | string,
@@ -53,7 +54,7 @@ export const getActivities = async (
                     instance.season_id::int AS "season",
                     instance.duration::int AS "duration",
                     instance.platform_type AS "platformType",
-                    instance.date_completed < COALESCE(activity_definition.day_one_end, TIMESTAMP 'epoch') AS "isDayOne",
+                    ${SQL_IS_DAY_ONE} AS "isDayOne",
                     (
                         CASE
                             WHEN ph_cact.activity_id IS NOT NULL THEN (
@@ -65,6 +66,7 @@ export const getActivities = async (
                     ) AS "isContest",
                     instance.date_completed < COALESCE(activity_definition.week_one_end, TIMESTAMP 'epoch') AS "isWeekOne",
                     (bi.instance_id IS NOT NULL AND NOT COALESCE(instance.is_whitelisted, false)) AS "isBlacklisted",
+                    ${SQL_IS_PANTHEON} AS "isPantheon",
                     JSONB_BUILD_OBJECT(
                         'completed', instance_player.completed,
                         'sherpas', instance_player.sherpas::int,

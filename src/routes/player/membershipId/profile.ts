@@ -7,6 +7,8 @@ import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/input"
 import { zInt64 } from "@/schema/output"
 import {
+    getGauntletRaceEntry,
+    getPantheonVersionFirstEntries,
     getPlayer,
     getPlayerActivityStats,
     getPlayerGlobalStats,
@@ -52,7 +54,9 @@ This is used to hydrate the RaidHub profile page`,
         const statsPromises = Promise.all([
             getPlayerActivityStats(membershipId),
             getPlayerGlobalStats(membershipId),
-            getWorldFirstEntries(membershipId)
+            getWorldFirstEntries(membershipId),
+            getGauntletRaceEntry(membershipId),
+            getPantheonVersionFirstEntries(membershipId)
         ])
 
         const player = await getPlayer(membershipId)
@@ -70,7 +74,13 @@ This is used to hydrate the RaidHub profile page`,
             return RaidHubRoute.fail(ErrorCode.PlayerPrivateProfileError, { membershipId })
         }
 
-        const [activityStats, globalStats, worldFirstEntries] = await statsPromises
+        const [
+            activityStats,
+            globalStats,
+            worldFirstEntries,
+            gauntletRaceEntry,
+            pantheonVersionFirstEntries
+        ] = await statsPromises
 
         if (!globalStats) {
             throw new Error(`Unexpected error: global stats for player ${membershipId} not found`)
@@ -90,6 +100,10 @@ This is used to hydrate the RaidHub profile page`,
                             WorldFirstEntry | null
                         ]
                 )
+            ),
+            gauntletRaceEntry,
+            pantheonVersionFirstEntries: Object.fromEntries(
+                pantheonVersionFirstEntries.map(entry => [entry.versionId, entry])
             )
         })
     }

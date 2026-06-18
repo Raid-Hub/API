@@ -4,10 +4,13 @@ import { playerProfileQueryTimer } from "@/integrations/prometheus/metrics"
 import { withHistogramTimer } from "@/integrations/prometheus/util"
 import { PlayerInfo } from "@/schema/components/PlayerInfo"
 import {
+    GauntletRaceEntry,
+    PantheonVersionFirstEntry,
     PlayerProfileActivityStats,
     PlayerProfileGlobalStats,
     WorldFirstEntry
 } from "@/schema/components/PlayerProfile"
+import { sqlIsDayOne } from "@/services/instance/is-day-one"
 
 export const getPlayer = async (membershipId: bigint | string) => {
     return await pgReader.queryRow<PlayerInfo>(
@@ -78,7 +81,7 @@ export const getPlayerActivityStats = async (membershipId: bigint | string) => {
                             'season', fastest.season_id::int,
                             'duration', fastest.duration::int,
                             'platformType', fastest.platform_type,
-                            'isDayOne', fastest.date_completed < COALESCE(activity_definition.day_one_end, TIMESTAMP 'epoch'),
+                            'isDayOne', ${sqlIsDayOne("fastest")},
                             'isContest', (
                                 CASE
                                     WHEN fa_cact.activity_id IS NOT NULL THEN (
@@ -206,6 +209,65 @@ export const getWorldFirstEntries = async (membershipId: bigint | string) => {
                     AND wf.rank <= 500
                     AND activity_definition.is_raid = true
                 ORDER BY activity_definition.id ASC, wf.rank ASC;`,
+                { params: [`${[membershipId]}`] }
+            )
+    )
+}
+
+export const getGauntletRaceEntry = async (membershipId: bigint | string) => {
+    return await withHistogramTimer(
+        playerProfileQueryTimer,
+        {
+            method: "getGauntletRaceEntry"
+        },
+        async () => {
+            try {
+                return await pgReader.queryRow<GauntletRaceEntry>(
+                    `SELECT
+                        pcr.instance_id AS "instanceId",
+                        pcr.rank::int AS "rank",
+                        134::int AS "versionId"
+                    FROM team_pantheon_custom_race_leaderboard pcr
+                    WHERE pcr.membership_ids @> $1::jsonb
+                    ORDER BY pcr.rank ASC
+                    LIMIT 1;`,
+                    { params: [`${[membershipId]}`] }
+                )
+            } catch (error) {
+                if (
+                    typeof error === "object" &&
+                    error !== null &&
+                    "code" in error &&
+                    error.code === "42P01"
+                ) {
+                    return null
+                }
+                throw error
+            }
+        }
+    )
+}
+
+export const getPantheonVersionFirstEntries = async (membershipId: bigint | string) => {
+    return await withHistogramTimer(
+        playerProfileQueryTimer,
+        {
+            method: "getPantheonVersionFirstEntries"
+        },
+        () =>
+            pgReader.queryRows<PantheonVersionFirstEntry>(
+                `SELECT DISTINCT ON (tavl.version_id)
+                    tavl.version_id::int AS "versionId",
+                    tavl.instance_id AS "instanceId",
+                    tavl.rank::int AS "rank",
+                    ${sqlIsDayOne("i")} AS "isDayOne"
+                FROM team_activity_version_leaderboard tavl
+                INNER JOIN instance i USING (instance_id)
+                INNER JOIN activity_version av ON av.hash = i.hash
+                INNER JOIN activity_definition ON activity_definition.id = av.activity_id
+                WHERE tavl.membership_ids @> $1::jsonb
+                    AND activity_definition.path = 'pantheon'
+                ORDER BY tavl.version_id ASC, tavl.rank ASC;`,
                 { params: [`${[membershipId]}`] }
             )
     )
