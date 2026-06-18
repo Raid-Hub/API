@@ -5,14 +5,13 @@ import { userAuthorizationRoute } from "./authorize/user"
 import { clanBasicRoute } from "./clan/basic"
 import { clanStatsRoute } from "./clanStats"
 import { instanceRoute } from "./instance"
+import { internalRouter } from "./internal"
 import { leaderboardRouter } from "./leaderboard"
 import { manifestRoute } from "./manifest"
 import { metricsRouter } from "./metrics"
 import { pgcrRoute } from "./pgcr"
 import { playerRouter } from "./player"
 import { statusRoute } from "./status"
-import { subscriptionsRouter } from "./subscriptions"
-
 export const router = new RaidHubRouter({
     routes: [
         {
@@ -64,8 +63,8 @@ export const router = new RaidHubRouter({
             route: userAuthorizationRoute
         },
         {
-            path: "/subscriptions",
-            route: subscriptionsRouter
+            path: "/internal",
+            route: internalRouter
         }
     ]
 })

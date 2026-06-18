@@ -41,3 +41,10 @@ export const postgresConnectionsGauge = new Gauge({
     labelNames: ["pool_name", "connection_state"],
     help: "Number of PostgreSQL connections in the pool and their states"
 })
+
+/** Same metric name as Hermes `discord_lr_publish_total` (scrape both targets in Prometheus). */
+export const discordLrPublishTotal = new Counter({
+    name: "discord_lr_publish_total",
+    help: "Publishes to discord_role_metadata_sync queue by result",
+    labelNames: ["result"]
+})
