@@ -6,7 +6,7 @@ import {
     zBigIntString,
     zBoolString,
     zCoercedNaturalNumber,
-    zCoercedWholeNumber,
+    zPgInt32,
     zDateString,
     zSplitCommaSeparatedString
 } from "@/schema/input"
@@ -37,8 +37,8 @@ export const playerInstancesRoute = new RaidHubRoute({
         playerCount: zCoercedNaturalNumber().optional(),
         minPlayerCount: zCoercedNaturalNumber().optional(),
         maxPlayerCount: zCoercedNaturalNumber().optional(),
-        minDurationSeconds: zCoercedWholeNumber().optional(),
-        maxDurationSeconds: zCoercedWholeNumber().optional(),
+        minDurationSeconds: zPgInt32().optional(),
+        maxDurationSeconds: zPgInt32().optional(),
         season: zCoercedNaturalNumber().optional(),
         minSeason: zCoercedNaturalNumber().optional(),
         maxSeason: zCoercedNaturalNumber().optional(),
