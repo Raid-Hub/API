@@ -1,7 +1,13 @@
 import "@/schema/registry" // Initialize OpenAPI extensions
 import { describe, expect, test } from "bun:test"
 import { z } from "zod"
-import { zBigIntString, zBoolString, zSplitCommaSeparatedString } from "./input"
+import {
+    PG_BIGINT_MAX,
+    zBigIntString,
+    zBoolString,
+    zPgInt32,
+    zSplitCommaSeparatedString
+} from "./input"
 
 describe("zBoolString", () => {
     test("should parse truthy values correctly", () => {
@@ -38,6 +44,20 @@ describe("zBoolString", () => {
             const result = schema.safeParse(value)
             expect(result.success).toBe(false)
         })
+    })
+})
+
+describe("zPgInt32", () => {
+    test("accepts values within PostgreSQL INTEGER range", () => {
+        const schema = zPgInt32()
+        expect(schema.safeParse(0).success).toBe(true)
+        expect(schema.safeParse(2_147_483_647).success).toBe(true)
+    })
+
+    test("rejects values above PostgreSQL INTEGER max", () => {
+        const schema = zPgInt32()
+        expect(schema.safeParse(10_000_000_000).success).toBe(false)
+        expect(schema.safeParse(2_147_483_648).success).toBe(false)
     })
 })
 
@@ -97,8 +117,8 @@ describe("zSplitCommaSeparatedString", () => {
         const singleValueInput = [
             { input: "123", expected: [123n] },
             {
-                input: "1234567890123456789012345678901234567890123456789012345678901234567890",
-                expected: [1234567890123456789012345678901234567890123456789012345678901234567890n]
+                input: String(PG_BIGINT_MAX),
+                expected: [PG_BIGINT_MAX]
             }
         ]
 
@@ -111,24 +131,21 @@ describe("zSplitCommaSeparatedString", () => {
         })
     })
 
+    test("should reject bigint values above PostgreSQL BIGINT max", () => {
+        const schema = zBigIntString()
+        const tooLarge = String(PG_BIGINT_MAX + 1n)
+
+        expect(schema.safeParse(tooLarge).success).toBe(false)
+        expect(schema.safeParse("46116860184306851060").success).toBe(false)
+    })
+
     test("should pass on a valid multi-value input", () => {
         const schema = zSplitCommaSeparatedString(zBigIntString())
         const singleValueInput = [
             { input: "123,123,123", expected: [123n, 123n, 123n] },
             {
-                input: "123,1234567890123456789012345678901234567890123456789012345678901234567890",
-                expected: [
-                    123n,
-                    1234567890123456789012345678901234567890123456789012345678901234567890n
-                ]
-            },
-            {
-                input: "11234567890123456789012345678901234567890123456789012345678901234567890,21234567890123456789012345678901234567890123456789012345678901234567890,31234567890123456789012345678901234567890123456789012345678901234567890",
-                expected: [
-                    1_1234567890123456789012345678901234567890123456789012345678901234567890n,
-                    2_1234567890123456789012345678901234567890123456789012345678901234567890n,
-                    3_1234567890123456789012345678901234567890123456789012345678901234567890n
-                ]
+                input: `123,${PG_BIGINT_MAX}`,
+                expected: [123n, PG_BIGINT_MAX]
             }
         ]
 
@@ -148,23 +165,8 @@ describe("zSplitCommaSeparatedString", () => {
             { input: "123 ", expected: [123n] },
             { input: " 123 ", expected: [123n] },
             {
-                input: " 1234567890123456789012345678901234567890123456789012345678901234567890",
-                expected: [1234567890123456789012345678901234567890123456789012345678901234567890n]
-            },
-            {
-                input: "1234567890123456789012345678901234567890123456789012345678901234567890 ",
-                expected: [1234567890123456789012345678901234567890123456789012345678901234567890n]
-            },
-            {
-                input: " 1234567890123456789012345678901234567890123456789012345678901234567890 ",
-                expected: [1234567890123456789012345678901234567890123456789012345678901234567890n]
-            },
-            {
-                input: "  123  ,  1234567890123456789012345678901234567890123456789012345678901234567890  ",
-                expected: [
-                    123n,
-                    1234567890123456789012345678901234567890123456789012345678901234567890n
-                ]
+                input: String(PG_BIGINT_MAX),
+                expected: [PG_BIGINT_MAX]
             }
         ]
 
@@ -190,5 +192,19 @@ describe("zSplitCommaSeparatedString", () => {
         if (validResult.success) {
             expect(validResult.data).toEqual([123n, 123123n])
         }
+    })
+})
+
+describe("zPgInt32", () => {
+    test("accepts values within PostgreSQL INTEGER range", () => {
+        const schema = zPgInt32()
+        expect(schema.safeParse(0).success).toBe(true)
+        expect(schema.safeParse(2_147_483_647).success).toBe(true)
+    })
+
+    test("rejects values above PostgreSQL INTEGER max", () => {
+        const schema = zPgInt32()
+        expect(schema.safeParse(10_000_000_000).success).toBe(false)
+        expect(schema.safeParse(2_147_483_648).success).toBe(false)
     })
 })

@@ -14,7 +14,7 @@ export const blacklistInstance = async (data: {
         const reportSource = data.reportId ? "WebReport" : "Manual"
         await conn.queryRow(
             `INSERT INTO flagging.blacklist_instance (instance_id, report_source, report_id, reason)
-            VALUES ($1::bigint, $2, $3, $4)
+            VALUES ($1::bigint, $2::flagging."BlacklistReportSource", $3, $4)
             ON CONFLICT (instance_id) DO NOTHING`,
             { params: [data.instanceId, reportSource, data.reportId, data.reason] }
         )

@@ -2,9 +2,21 @@ import { ZodBooleanDef, ZodDateDef, ZodNullable, ZodStringDef, ZodType, ZodTypeA
 
 // ===== INPUT SCHEMAS (for parsing/coercing user input) =====
 
+/** PostgreSQL signed BIGINT upper bound (membership_id, instance_id, etc.). */
+export const PG_BIGINT_MAX = 9223372036854775807n
+
+/** PostgreSQL INTEGER upper bound (duration, season_id, etc.). */
+export const PG_INT32_MAX = 2_147_483_647
+
 export const zCoercedNaturalNumber = () => z.coerce.number().int().positive()
 
 export const zCoercedWholeNumber = () => z.coerce.number().int().nonnegative()
+
+/** Whole number that fits in a PostgreSQL INTEGER column. */
+export const zPgInt32 = () =>
+    zCoercedWholeNumber().max(PG_INT32_MAX, {
+        message: `Must be at most ${PG_INT32_MAX}`
+    })
 
 export const zPage = () => z.coerce.number().int().positive().default(1)
 
@@ -41,8 +53,13 @@ export const zDateString = <N extends boolean = false>({
 export const zDigitString = () =>
     z.coerce.string().regex(/^\d+n?$/) as ZodType<string, ZodStringDef, number | string | bigint>
 
-// Input param that will be coerced to a BigInt
-export const zBigIntString = () => zDigitString().transform(val => BigInt(val))
+// Input param that will be coerced to a BigInt within PostgreSQL BIGINT range
+export const zBigIntString = () =>
+    zDigitString()
+        .transform(val => BigInt(val))
+        .refine(val => val <= PG_BIGINT_MAX, {
+            message: `Must be at most ${PG_BIGINT_MAX}`
+        })
 
 export const zSplitCommaSeparatedString = <T extends ZodTypeAny, ResultingArray extends ZodTypeAny>(
     itemSchema: T,

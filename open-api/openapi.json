@@ -5181,7 +5181,8 @@
             "schema": {
               "type": "integer",
               "nullable": true,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             },
             "required": false,
             "name": "minDurationSeconds",
@@ -5191,7 +5192,8 @@
             "schema": {
               "type": "integer",
               "nullable": true,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             },
             "required": false,
             "name": "maxDurationSeconds",
