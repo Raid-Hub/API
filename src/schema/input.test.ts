@@ -1,7 +1,13 @@
 import "@/schema/registry" // Initialize OpenAPI extensions
 import { describe, expect, test } from "bun:test"
 import { z } from "zod"
-import { zBigIntString, zBoolString, zPgInt32, zSplitCommaSeparatedString, PG_BIGINT_MAX } from "./input"
+import {
+    PG_BIGINT_MAX,
+    zBigIntString,
+    zBoolString,
+    zPgInt32,
+    zSplitCommaSeparatedString
+} from "./input"
 
 describe("zBoolString", () => {
     test("should parse truthy values correctly", () => {
@@ -161,7 +167,7 @@ describe("zSplitCommaSeparatedString", () => {
             {
                 input: String(PG_BIGINT_MAX),
                 expected: [PG_BIGINT_MAX]
-            },
+            }
         ]
 
         validValuesWithExtraSpaces.forEach(value => {
