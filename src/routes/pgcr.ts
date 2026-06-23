@@ -7,11 +7,8 @@ import {
 import { ErrorCode } from "@/schema/errors/ErrorCode"
 import { zBigIntString } from "@/schema/input"
 import { zInt64 } from "@/schema/output"
-import { getRawCompressedPGCR } from "@/services/pgcr"
-import { gunzipSync } from "bun"
+import { decodePgcrPayload, getRawCompressedPGCR } from "@/services/pgcr"
 import { z } from "zod"
-
-const decoder = new TextDecoder()
 
 export const pgcrRoute = new RaidHubRoute({
     method: "get",
@@ -46,8 +43,7 @@ Useful if you need to access PGCRs when Bungie's API is down.`,
             return RaidHubRoute.fail(ErrorCode.PGCRNotFoundError, { instanceId })
         }
 
-        const decompressed = gunzipSync(result.data)
-        const pgcr = JSON.parse(decoder.decode(decompressed)) as RaidHubPostGameCarnageReport
+        const pgcr = JSON.parse(decodePgcrPayload(result.data)) as RaidHubPostGameCarnageReport
         pgcr.activityDetails.instanceId = BigInt(pgcr.activityDetails.instanceId)
         pgcr.entries.forEach(entry => {
             entry.characterId = BigInt(entry.characterId)
