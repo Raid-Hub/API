@@ -210,9 +210,8 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
             rank: number
         }>(
             `SELECT rank::int
-            FROM team_pantheon_custom_race_leaderboard
+            FROM pantheon_custom_race_snapshot
             WHERE instance_id = $1::bigint
-            ORDER BY rank ASC
             LIMIT 1;`,
             { params: [instanceId] }
         )
@@ -227,6 +226,17 @@ export const getLeaderboardEntryForInstance = async (instanceId: bigint | string
         ) {
             throw error
         }
+
+        customRaceEntry = await pgReader.queryRow<{
+            rank: number
+        }>(
+            `SELECT rank::int
+            FROM team_pantheon_custom_race_leaderboard
+            WHERE instance_id = $1::bigint
+            ORDER BY rank ASC
+            LIMIT 1;`,
+            { params: [instanceId] }
+        )
     }
 
     if (!versionEntry) {
